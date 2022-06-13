@@ -28,9 +28,9 @@
         {
           "extend": "colvis",
           "text": "{{ _('Hide/Unhide Columns') }}"
-        }{{ ', "copy", "print"' | safe
-          if resource_view.get('export_buttons') else ''}}
-        ]'
+        }
+        {{ ', "copy", "print"' | safe if resource_view.get('export_buttons') else ''}}
+      ]'
       data-keys='true'>
     <thead>
       <tr>
@@ -51,6 +51,29 @@
     <input type="hidden" name="filters" value="{{ request.args.get('filters', '')|e }}" />
   </form>
 
+  <script>
+
+    let height;
+
+    const sendPostMessage = () => {
+      console.log( 'sendPostMessage height=' + $( 'html' ).height() );
+      window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*');
+
+      /*
+      if (height !== document.getElementById('resource-viewer').offsetHeight) {
+        height = document.getElementById('resource-viewer').offsetHeight;
+        window.parent.postMessage({
+          frameHeight: height
+        }, '*');
+        console.log(height);
+      }
+      */
+    }
+
+    window.onload = () => sendPostMessage();
+    window.onresize = () => sendPostMessage();
+
+  </script>
 
 {% endblock %}
 

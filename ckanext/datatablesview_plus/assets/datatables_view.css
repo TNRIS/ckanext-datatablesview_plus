@@ -1,5 +1,7 @@
 body {
   background: none;
+  padding: 0.3rem 0.3rem 0 0;
+  scrollbar-color: #0D2856 #ff0000;  
 }
 
 
@@ -13,31 +15,53 @@ body {
 
 }
 
+#dtprv_wrapper .dataTables_info
+{
+
+  padding: 0.5rem;
+
+}
+
 
 .paging_extStyle
 {
 
-  border: 1px solid #534B52;
+  border: 1px solid #0D2856;
   border-radius: 0.8rem;
+  float: left;
+  padding: .25rem 0;
+
+}
+
+.paginate_input_box,
+.start_row_input_box,
+.end_row_input_box
+{
+
+  border: 0.1rem solid #A5A09C;
+  border-radius: 0.8rem;
+  width: auto;
+  text-align: center;
+  display: block;
   float: left;
 
 }
 
-.paginate_input_box
+.range_separator
 {
 
-  border: 0.05rem solid #A5A09C;
-  border-radius: 0.8rem;
-  width: auto;
-  text-align: center;
-  margin: 0.5rem;
+  display: block;
+  float: left;
 
 }
 
-.form-inline .paginate_input_box
+.form-inline .paginate_input_box,
+.form-inline .start_row_input_box,
+.form-inline .end_row_input_box
 {
 
-  padding-bottom: 0;
+  font-size: 1.2rem;
+  padding: 0;
 
 }
 
@@ -48,6 +72,11 @@ body {
   width: 4rem;
   text-align: center;
   font-size: 2rem;
+  margin: 0 0 0;
+  line-height: 2.2rem;
+  cursor: pointer;
+  display: block;
+  float: left;
 
 }
 
@@ -56,6 +85,22 @@ body {
 
   color: #E0E0E0;
   cursor: not-allowed;
+
+}
+
+div.dataTables_wrapper div.dataTables_filter label
+{
+
+}
+
+div.dataTables_wrapper div.dataTables_filter input
+{
+
+  border: 1px solid #0D2856;
+  border-radius: 0.8rem;
+  font-size: 1.4rem;
+  padding: 0.7rem;
+
 
 }
 
@@ -96,7 +141,7 @@ body {
 
 /* OVERRIDES for table layout */
 
-table.dataTable
+#dtprv_wrapper table.dataTable
 {
 
   border-right: 1px solid #ffffff;
@@ -104,17 +149,26 @@ table.dataTable
 }
 
 /* Don't show sort arrows unless the column is the current sort column or the th is in a hver state */
-table.dataTable thead > tr > th.sorting:before, table.dataTable thead > tr > th.sorting:after, table.dataTable thead > tr > th.sorting_asc:before, table.dataTable thead > tr > th.sorting_asc:after, table.dataTable thead > tr > th.sorting_desc:before, table.dataTable thead > tr > th.sorting_desc:after, table.dataTable thead > tr > th.sorting_asc_disabled:before, table.dataTable thead > tr > th.sorting_asc_disabled:after, table.dataTable thead > tr > th.sorting_desc_disabled:before, table.dataTable thead > tr > th.sorting_desc_disabled:after,
-table.dataTable thead > tr > td.sorting:before,
-table.dataTable thead > tr > td.sorting:after,
-table.dataTable thead > tr > td.sorting_asc:before,
-table.dataTable thead > tr > td.sorting_asc:after,
-table.dataTable thead > tr > td.sorting_desc:before,
-table.dataTable thead > tr > td.sorting_desc:after,
-table.dataTable thead > tr > td.sorting_asc_disabled:before,
-table.dataTable thead > tr > td.sorting_asc_disabled:after,
-table.dataTable thead > tr > td.sorting_desc_disabled:before,
-table.dataTable thead > tr > td.sorting_desc_disabled:after {
+#dtprv_wrapper table.dataTable thead > tr > th.sorting:before, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting:after, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_asc:before, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_asc:after, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_desc:before, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_desc:after, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_asc_disabled:before, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_asc_disabled:after, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_desc_disabled:before, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_desc_disabled:after,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting:before,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting:after,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_asc:before,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_asc:after,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc:before,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc:after,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_asc_disabled:before,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_asc_disabled:after,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc_disabled:before,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc_disabled:after {
   opacity: 0;
   line-height: 1rem;
   font-size: .9em;
@@ -122,50 +176,128 @@ table.dataTable thead > tr > td.sorting_desc_disabled:after {
 
 /* The default unicode arrows don't match in height so we are using these instead */
 
-table.dataTable thead > tr > th.sorting:before, table.dataTable thead > tr > th.sorting_asc:before, table.dataTable thead > tr > th.sorting_desc:before, table.dataTable thead > tr > th.sorting_asc_disabled:before, table.dataTable thead > tr > th.sorting_desc_disabled:before,
-table.dataTable thead > tr > td.sorting:before,
-table.dataTable thead > tr > td.sorting_asc:before,
-table.dataTable thead > tr > td.sorting_desc:before,
-table.dataTable thead > tr > td.sorting_asc_disabled:before,
-table.dataTable thead > tr > td.sorting_desc_disabled:before {
+#dtprv_wrapper table.dataTable thead > tr > th.sorting:before, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_asc:before, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_desc:before, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_asc_disabled:before, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_desc_disabled:before,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting:before,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_asc:before,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc:before,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_asc_disabled:before,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc_disabled:before 
+{
   content: "▲";
 }
-table.dataTable thead > tr > th.sorting:after, table.dataTable thead > tr > th.sorting_asc:after, table.dataTable thead > tr > th.sorting_desc:after, table.dataTable thead > tr > th.sorting_asc_disabled:after, table.dataTable thead > tr > th.sorting_desc_disabled:after,
-table.dataTable thead > tr > td.sorting:after,
-table.dataTable thead > tr > td.sorting_asc:after,
-table.dataTable thead > tr > td.sorting_desc:after,
-table.dataTable thead > tr > td.sorting_asc_disabled:after,
-table.dataTable thead > tr > td.sorting_desc_disabled:after {
+
+#dtprv_wrapper table.dataTable thead > tr > th.sorting:after, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_asc:after, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_desc:after, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_asc_disabled:after, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_desc_disabled:after,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting:after,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_asc:after,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc:after,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_asc_disabled:after,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc_disabled:after {
   content: "▼";
 }
 
 /* When a solumn is the sort column, show the dark version of the appropriate arrow */
-table.dataTable thead > tr > th.sorting_asc:before, 
-table.dataTable thead > tr > th.sorting_desc:after,
-table.dataTable thead > tr > td.sorting_asc:before,
-table.dataTable thead > tr > td.sorting_desc:after {
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_asc:before, 
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_desc:after,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_asc:before,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc:after {
   opacity: 0.6;
 }
 
 /* When hovering over a th with no sort set, show up arrow as dark and down arrow as light */
-table.dataTable thead > tr > th:hover:before, 
-table.dataTable thead > tr > td:hover:before {
+#dtprv_wrapper table.dataTable thead > tr > th:hover:before, 
+#dtprv_wrapper table.dataTable thead > tr > td:hover:before {
   opacity: 0.6;
 }
-table.dataTable thead > tr > th:hover:after,
-table.dataTable thead > tr > td:hover:after {
+#dtprv_wrapper table.dataTable thead > tr > th:hover:after,
+#dtprv_wrapper table.dataTable thead > tr > td:hover:after {
   opacity: 0.125;
 }
 
 /* When hovering over a th that is the current sort order set to ascending, show dark down arrow and light up arrow */
-table.dataTable thead > tr > th.sorting_desc:hover:after,
-table.dataTable thead > tr > td.sorting_desc:hover:after {
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_desc:hover:after,
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc:hover:after {
   opacity: 0.6;
 }
 
-table.dataTable thead > tr > th.sorting_desc:hover:before, 
-table.dataTable thead > tr > td.sorting_desc:hover:before {
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_desc:hover:before, 
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc:hover:before {
   opacity: 0.126;
 }
 
 
+
+
+
+div.dataTables_scrollBody
+{
+
+  border-left: 1px solid #0D2856 !important;
+  /* border-right: 1px solid #0D2856 !important; */
+
+}
+
+#dtprv_wrapper .table-bordered {
+
+  border-color: #0D2856;
+}
+
+#dtprv_wrapper div.dataTables_scrollFootInner table.table-bordered tr th:first-child, 
+#dtprv_wrapper div.dataTables_scrollHeadInner table.table-bordered tr th:first-child 
+{
+  border-left: 1px solid #0D2856 !important;
+}
+
+#dtprv_wrapper table tr th:first-child,
+#dtprv_wrapper table tr td:first-child
+{
+
+  text-align: center;
+
+}
+
+#dtprv_wrapper table tr th:last-child
+{
+
+  border-radius: 0 0 0 0;
+
+}
+
+
+#dtprv_wrapper .table-bordered > thead > tr > th, 
+#dtprv_wrapper .table-bordered > tbody > tr > th, 
+#dtprv_wrapper .table-bordered > tfoot > tr > th, 
+#dtprv_wrapper .table-bordered > thead > tr > td,
+#dtprv_wrapper .table-bordered > tbody > tr > td, 
+#dtprv_wrapper .table-bordered > tfoot > tr > td 
+{
+
+  border-color: #0D2856;
+
+}
+
+#dtprv_wrapper .table-bordered > thead > tr > th, 
+#dtprv_wrapper .table-bordered > tbody > tr > th, 
+#dtprv_wrapper .table-bordered > tfoot > tr > th
+{
+
+  text-align: center;
+  color: #0C142D;
+
+}
+
+#dtprv_wrapper .table-bordered > thead > tr > td,
+#dtprv_wrapper .table-bordered > tbody > tr > td, 
+#dtprv_wrapper .table-bordered > tfoot > tr > td 
+{
+
+  color: #59555B;
+
+}

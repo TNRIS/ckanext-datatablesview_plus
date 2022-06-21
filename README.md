@@ -1,6 +1,4 @@
-[![Tests](https://github.com/twdbben/ckanext-datatablesview_plus/workflows/Tests/badge.svg?branch=main)](https://github.com/twdbben/ckanext-datatablesview_plus/actions)
-
-# ckanext-datatablesview_plus
+# ckanext-datatablesview_twdh
 
 **TODO:** Put a description of your extension here:  What does it do? What features does it have? Consider including some screenshots or embedding a video!
 
@@ -35,7 +33,7 @@ Suggested values:
    For example installing any non-Python dependencies or adding any required
    config settings.
 
-To install ckanext-datatablesview_plus:
+To install ckanext-datatablesview_twdh:
 
 1. Activate your CKAN virtual environment, for example:
 
@@ -43,12 +41,12 @@ To install ckanext-datatablesview_plus:
 
 2. Clone the source and install it on the virtualenv
 
-    git clone https://github.com/twdbben/ckanext-datatablesview_plus.git
-    cd ckanext-datatablesview_plus
+    git clone https://github.com/twdbben/ckanext-datatablesview_twdh.git
+    cd ckanext-datatablesview_twdh
     pip install -e .
 	pip install -r requirements.txt
 
-3. Add `datatablesview_plus` to the `ckan.plugins` setting in your CKAN
+3. Add `datatablesview_twdh` to the `ckan.plugins` setting in your CKAN
    config file (by default the config file is located at
    `/etc/ckan/default/ckan.ini`).
 
@@ -65,16 +63,16 @@ None at present
 
 	# The minimum number of hours to wait before re-checking a resource
 	# (optional, default: 24).
-	ckanext.datatablesview_plus.some_setting = some_default_value
+	ckanext.datatablesview_twdh.some_setting = some_default_value
 
 
 ## Developer installation
 
-To install ckanext-datatablesview_plus for development, activate your CKAN virtualenv and
+To install ckanext-datatablesview_twdh for development, activate your CKAN virtualenv and
 do:
 
-    git clone https://github.com/twdbben/ckanext-datatablesview_plus.git
-    cd ckanext-datatablesview_plus
+    git clone https://github.com/twdbben/ckanext-datatablesview_twdh.git
+    cd ckanext-datatablesview_twdh
     python setup.py develop
     pip install -r dev-requirements.txt
 
@@ -86,9 +84,9 @@ To run the tests, do:
     pytest --ckan-ini=test.ini
 
 
-## Releasing a new version of ckanext-datatablesview_plus
+## Releasing a new version of ckanext-datatablesview_twdh
 
-If ckanext-datatablesview_plus should be available on PyPI you can follow these steps to publish a new version:
+If ckanext-datatablesview_twdh should be available on PyPI you can follow these steps to publish a new version:
 
 1. Update the version number in the `setup.py` file. See [PEP 440](http://legacy.python.org/dev/peps/pep-0440/#public-version-identifiers) for how to choose version numbers.
 

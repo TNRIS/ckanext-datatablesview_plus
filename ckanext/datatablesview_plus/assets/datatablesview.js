@@ -29,10 +29,14 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           searchPlaceholder: "Search..."
         },
         "sPaginationType": "extStyle",
+        "pageLength": 20,
         "infoCallback": function( settings, start, end, max, total, pre ) {
           return total + " records";
         },
         "headerCallback": function( thead, data, start, end, display ) {
+
+          $(thead).find('th').eq(0).html( 'ID' );
+
           // replace column header labels with those from the data dictionary if available
           var datadict = JSON.parse( $('#dtprv_wrapper table').attr( 'data-datadictionary' ) );
           $( datadict ).each( function( i ) {
@@ -40,19 +44,17 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               $(thead).find('th').eq(i+1).html( datadict[i].info.label );
             }
           });
-
         }
-
       });
 
 
 
 
-      var dtprv_status = $( '<div id="dtprv_status"><p class="warning"><span title="" class="error-icon"></span>Data shown below reflects a snapshot of the full dataset. This preview includes the first XXXX records out of ZZZZZ records and was last updated on DD/MM/YYYY. Use the download button to access the full dataset.</p></div>' );
+      var dtprv_status = $( '<div id="dtprv_status"><p class="warning"><span title="" class="error-icon"></span>Data shown below reflects a snapshot of the full dataset. This preview includes the first XXXX records out of ZZZZZ records and was last updated on DD/MM/YYYY. Use the DOWNLOAD ALL button at the top of this page to access the full dataset.</p></div>' );
       dtprv_status.insertBefore( '#dtprv_processing' );
 
       datatable.on('draw.dt', function() {
-        console.log( 'datatable redraw' );
+        // console.log( 'datatable redraw' );
         window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*');
       });
 
@@ -63,8 +65,9 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       // Adds download dropdown to buttons menu
       datatable.button().add(2, {
-        text: 'Download',
+        text: 'Download Preview',
         extend: 'collection',
+        className: 'btn-primary dropdown-toggle btn-download-toggle',
         buttons: [
           {
             text: 'CSV',
@@ -100,6 +103,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           }]
         }
       );
+
+
     }
   }
 });
@@ -141,33 +146,46 @@ $.fn.dataTableExt.oPagination.extStyle = {
 
     var oPaging = oSettings.oInstance.fnExtStylePagingInfo();
 
-    nFirst = $('<span/>', { 'class': 'paginate_button first' , text : "" }).append('<i class="fa fa-angle-double-left" aria-hidden="true"></i>');
+    // nFirst = $('<span/>', { 'class': 'paginate_button first' , text : "" }).append('<i class="fa fa-angle-double-left" aria-hidden="true"></i>');
     nPrevious = $('<span/>', { 'class': 'paginate_button previous' , text : "" }).append('<i class="fa fa-angle-left" aria-hidden="true"></i>');
     nNext = $('<span/>', { 'class': 'paginate_button next' , text : "" }).append('<i class="fa fa-angle-right" aria-hidden="true"></i>');
-    nLast = $('<span/>', { 'class': 'paginate_button last' , text : "" }).append('<i class="fa fa-angle-double-right" aria-hidden="true"></i>');
-    nPageTxt = $("<span />", { text: '' });
-    nPageNumBox = $('<input />', { type: 'text', val: 1, 'size': 4, 'class': 'paginate_input_box' });
-    nPageOf = $('<span />', { text: '/' });
-    nTotalPages = $('<span />', { class :  "paginate_total" , text : oPaging.iTotalPages });
+    // nLast = $('<span/>', { 'class': 'paginate_button last' , text : "" }).append('<i class="fa fa-angle-double-right" aria-hidden="true"></i>');
+    // nPageTxt = $("<span />", { text: '' });
+
+    // nPageNumBox = $('<input />', { type: 'text', val: 1, 'size': 4, 'class': 'paginate_input_box' });
+
+    
+    nStartRowBox = $('<input />', { type: 'text', val: 1, 'size': 4, 'class': 'start_row_input_box' });
+    nRowHyphen = $('<span />', { text: '-', 'class': 'range_separator' });
+    nEndRowBox = $('<input />', { type: 'text', val: oPaging.iLength, 'size': 4, 'class': 'end_row_input_box' });
+
+
+    // nPageOf = $('<span />', { text: '/' });
+    // nTotalPages = $('<span />', { class :  "paginate_total" , text : oPaging.iTotalPages });
 
 
     $(nPaging)
       // .append(nFirst)
       .append(nPrevious)
-      .append(nPageTxt)
-      .append(nPageNumBox)
-      .append(nPageOf)
-      .append(nTotalPages)
+      // .append(nPageTxt)
+      // .append(nPageNumBox)
+      .append(nStartRowBox)
+      .append(nRowHyphen)
+      .append(nEndRowBox)
+      // .append(nPageOf)
+      // .append(nTotalPages)
       .append(nNext)
       // .append(nLast)
       ;
 
+    /*
     nFirst.click(function () {
       if( $(this).hasClass("disabled") )
         return;
       oSettings.oApi._fnPageChange(oSettings, "first");
       fnCallbackDraw(oSettings);
     }).bind('selectstart', function () { return false; });
+    */
 
     nPrevious.click(function () {
       if( $(this).hasClass("disabled") )
@@ -183,13 +201,16 @@ $.fn.dataTableExt.oPagination.extStyle = {
       fnCallbackDraw(oSettings);
     }).bind('selectstart', function () { return false; });
 
+    /*
     nLast.click(function () {
       if( $(this).hasClass("disabled") )
         return;
       oSettings.oApi._fnPageChange(oSettings, "last");
       fnCallbackDraw(oSettings);
     }).bind('selectstart', function () { return false; });
+    */
 
+    /*
     nPageNumBox.change(function () {
       var pageValue = parseInt($(this).val(), 10) - 1 ; // -1 because pages are 0 indexed, but the UI is 1
       var oPaging = oSettings.oInstance.fnPagingInfo();
@@ -202,6 +223,7 @@ $.fn.dataTableExt.oPagination.extStyle = {
       oSettings.oApi._fnPageChange(oSettings, pageValue);
       fnCallbackDraw(oSettings);
     });
+    */
 
   },
 
@@ -218,6 +240,14 @@ $.fn.dataTableExt.oPagination.extStyle = {
 
     $(an).find('span.paginate_total').html(oPaging.iTotalPages);
     $(an).find('.paginate_input_box').val(oPaging.iPage+1);
+
+    $(an).find('.start_row_input_box').val( ( oPaging.iPage * oPaging.iLength ) +1);
+
+    $(an).find('.end_row_input_box').val( 
+      ( oPaging.iPage * oPaging.iLength ) + oPaging.iLength > oPaging.iFilteredTotal ?
+        oPaging.iFilteredTotal : ( oPaging.iPage * oPaging.iLength ) + oPaging.iLength
+    
+    );
 
     $(an).each(function(index,item) {
 
@@ -241,8 +271,6 @@ $.fn.dataTableExt.oPagination.extStyle = {
     });
   }
 };
-
-
 
 jQuery.fn.dataTableExt.oApi.fnPagingInfo = function ( oSettings )
 {

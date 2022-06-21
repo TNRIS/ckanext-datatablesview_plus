@@ -360,7 +360,7 @@ span.dt-down-arrow {
 }
 
 div.dataTables_wrapper div.dt-buttons.btn-group button.btn:last-of-type:first-of-type {
-  border-radius: 4px !important;
+  /* border-radius: 4px !important; */
 }
 
 span.dt-down-arrow {

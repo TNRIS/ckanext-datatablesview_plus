@@ -17,7 +17,7 @@ var run_query = function(params, format) {
   form.submit();
 }
 
-this.ckan.module('datatablesview_plus', function (jQuery) {
+this.ckan.module('datatablesview_twdh', function (jQuery) {
   return {
     initialize: function() {
 

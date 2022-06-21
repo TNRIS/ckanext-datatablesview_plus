@@ -4,14 +4,14 @@
     <table id="dtprv"
       {# class="table table-striped table-bordered" #}
       class="table table-bordered"
-      data-module="datatablesview_plus"
+      data-module="datatablesview_twdh"
       data-datadictionary='{{ h.datastore_dictionary(resource.id)|tojson }}'
       data-paging="true"
       data-server-side="true"
       data-processing="true"
       data-ajax='{
           "url": "{{ h.url_for(
-            'datatablesview_plus.ajax',
+            'datatablesview_twdh.ajax',
             resource_view_id=resource_view.id) }}",
           "type": "POST",
           "data": { "filters": "{{ request.args.get('filters', '')|e }}" }
@@ -50,7 +50,7 @@
     </tbody>
   </table>
   <form id="filtered-datatables-download" method="POST" action="{{ h.url_for(
-                                                                  'datatablesview_plus.filtered_download',
+                                                                  'datatablesview_twdh.filtered_download',
                                                                   resource_view_id=resource_view.id) }}">
     <input type="hidden" name="filters" value="{{ request.args.get('filters', '')|e }}" />
   </form>
@@ -70,8 +70,8 @@
 
 {% block styles %}
   {{ super() }}
-  {% asset 'ckanext-datatablesview_plus/main-css' %}
-  {% asset 'ckanext-datatablesview_plus/main-js' %}
+  {% asset 'ckanext-datatablesview_twdh/main-css' %}
+  {% asset 'ckanext-datatablesview_twdh/main-js' %}
 {% endblock %}
 
 {% block custom_styles %}{% endblock %}

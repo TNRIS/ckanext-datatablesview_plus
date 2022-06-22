@@ -255,6 +255,13 @@ div.dataTables_scrollBody
   border-left: 1px solid #0D2856 !important;
 }
 
+#dtprv_wrapper table tr th
+{
+
+  vertical-align: middle;
+
+}
+
 #dtprv_wrapper table tr th:first-child,
 #dtprv_wrapper table tr td:first-child
 {

@@ -1,9 +1,16 @@
 body {
   background: none;
-  padding: 0.3rem 0.3rem 0 0;
-  scrollbar-color: #0D2856 #ff0000;  
+  /* padding: 0.3rem 0.3rem 0 0; */
+  padding: 0;
+  
 }
 
+table.dataTable
+{
+
+  margin-top: 0px !important;
+
+}
 
 #dtprv_wrapper .dt-buttons,
 #dtprv_wrapper .dataTables_length,
@@ -29,13 +36,11 @@ body {
   border: 1px solid #0D2856;
   border-radius: 0.8rem;
   float: left;
-  padding: .25rem 0;
+  padding: .25rem 0.5rem;
 
 }
 
-.paginate_input_box,
-.start_row_input_box,
-.end_row_input_box
+.paginate_input_box
 {
 
   border: 0.1rem solid #A5A09C;
@@ -44,6 +49,18 @@ body {
   text-align: center;
   display: block;
   float: left;
+
+}
+
+.start_row_input_box,
+.end_row_input_box
+{
+
+  width: 3rem;
+  text-align: center;
+  display: block;
+  float: left;
+
 
 }
 
@@ -69,7 +86,7 @@ body {
 {
 
   display: inline-block;
-  width: 4rem;
+  width: 2rem;
   text-align: center;
   font-size: 2rem;
   margin: 0 0 0;
@@ -101,6 +118,13 @@ div.dataTables_wrapper div.dataTables_filter input
   font-size: 1.4rem;
   padding: 0.7rem;
 
+
+}
+
+.dataTables_filter
+{
+
+  margin-right: 0.1rem;
 
 }
 
@@ -141,10 +165,20 @@ div.dataTables_wrapper div.dataTables_filter input
 
 /* OVERRIDES for table layout */
 
+/*
 #dtprv_wrapper table.dataTable
 {
 
-  border-right: 1px solid #ffffff;
+  border-right: 1px solid #ff0000;
+
+}
+*/
+
+.dataTables_scroll
+{
+
+  border-right: 1px solid #0D2856;
+  
 
 }
 
@@ -168,7 +202,21 @@ div.dataTables_wrapper div.dataTables_filter input
 #dtprv_wrapper table.dataTable thead > tr > td.sorting_asc_disabled:before,
 #dtprv_wrapper table.dataTable thead > tr > td.sorting_asc_disabled:after,
 #dtprv_wrapper table.dataTable thead > tr > td.sorting_desc_disabled:before,
-#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc_disabled:after {
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc_disabled:after, 
+
+div.dtfh-floatingparent table.dataTable thead > tr > th.sorting:before, 
+div.dtfh-floatingparent table.dataTable thead > tr > th.sorting:after, 
+div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_asc:before, 
+div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_asc:after, 
+div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_desc:before, 
+div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_desc:after, 
+div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_asc_disabled:before, 
+div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_asc_disabled:after, 
+div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_desc_disabled:before, 
+div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_desc_disabled:after
+
+
+{
   opacity: 0;
   line-height: 1rem;
   font-size: .9em;
@@ -185,7 +233,15 @@ div.dataTables_wrapper div.dataTables_filter input
 #dtprv_wrapper table.dataTable thead > tr > td.sorting_asc:before,
 #dtprv_wrapper table.dataTable thead > tr > td.sorting_desc:before,
 #dtprv_wrapper table.dataTable thead > tr > td.sorting_asc_disabled:before,
-#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc_disabled:before 
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc_disabled:before,
+
+div.dtfh-floatingparent table.table-bordered thead > tr > th.sorting:before, 
+div.dtfh-floatingparent table.table-bordered thead > tr > th.sorting_asc:before, 
+div.dtfh-floatingparent table.table-bordered thead > tr > th.sorting_desc:before, 
+div.dtfh-floatingparent table.table-bordered thead > tr > th.sorting_asc_disabled:before, 
+div.dtfh-floatingparent table.table-bordered thead > tr > th.sorting_desc_disabled:before
+
+
 {
   content: "▲";
 }
@@ -199,7 +255,15 @@ div.dataTables_wrapper div.dataTables_filter input
 #dtprv_wrapper table.dataTable thead > tr > td.sorting_asc:after,
 #dtprv_wrapper table.dataTable thead > tr > td.sorting_desc:after,
 #dtprv_wrapper table.dataTable thead > tr > td.sorting_asc_disabled:after,
-#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc_disabled:after {
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc_disabled:after, 
+
+div.dtfh-floatingparent table.table-bordered thead > tr > th.sorting:after, 
+div.dtfh-floatingparent table.table-bordered thead > tr > th.sorting_asc:after, 
+div.dtfh-floatingparent table.table-bordered thead > tr > th.sorting_desc:after, 
+div.dtfh-floatingparent table.table-bordered thead > tr > th.sorting_asc_disabled:after, 
+div.dtfh-floatingparent table.table-bordered thead > tr > th.sorting_desc_disabled:after
+
+{
   content: "▼";
 }
 
@@ -207,32 +271,46 @@ div.dataTables_wrapper div.dataTables_filter input
 #dtprv_wrapper table.dataTable thead > tr > th.sorting_asc:before, 
 #dtprv_wrapper table.dataTable thead > tr > th.sorting_desc:after,
 #dtprv_wrapper table.dataTable thead > tr > td.sorting_asc:before,
-#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc:after {
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc:after, 
+
+div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_asc:before, 
+div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_desc:after
+
+{
   opacity: 0.6;
 }
 
 /* When hovering over a th with no sort set, show up arrow as dark and down arrow as light */
 #dtprv_wrapper table.dataTable thead > tr > th:hover:before, 
-#dtprv_wrapper table.dataTable thead > tr > td:hover:before {
+#dtprv_wrapper table.dataTable thead > tr > td:hover:before,
+
+div.dtfh-floatingparent table.dataTable thead > tr > th:hover:before
+{
   opacity: 0.6;
 }
+
 #dtprv_wrapper table.dataTable thead > tr > th:hover:after,
-#dtprv_wrapper table.dataTable thead > tr > td:hover:after {
+#dtprv_wrapper table.dataTable thead > tr > td:hover:after,
+div.dtfh-floatingparent table.dataTable thead > tr > th:hover:after
+{
   opacity: 0.125;
 }
 
 /* When hovering over a th that is the current sort order set to ascending, show dark down arrow and light up arrow */
 #dtprv_wrapper table.dataTable thead > tr > th.sorting_desc:hover:after,
-#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc:hover:after {
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc:hover:after,
+
+div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_desc:hover:after
+{
   opacity: 0.6;
 }
 
 #dtprv_wrapper table.dataTable thead > tr > th.sorting_desc:hover:before, 
-#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc:hover:before {
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_desc:hover:before, 
+div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_desc:hover:before
+{
   opacity: 0.126;
 }
-
-
 
 
 
@@ -244,13 +322,17 @@ div.dataTables_scrollBody
 
 }
 
-#dtprv_wrapper .table-bordered {
+
+#dtprv_wrapper .table-bordered, 
+div.dtfh-floatingparent  .table-bordered
+{
 
   border-color: #0D2856;
 }
 
 #dtprv_wrapper div.dataTables_scrollFootInner table.table-bordered tr th:first-child, 
-#dtprv_wrapper div.dataTables_scrollHeadInner table.table-bordered tr th:first-child 
+#dtprv_wrapper div.dataTables_scrollHeadInner table.table-bordered tr th:first-child,
+div.dtfh-floatingparent table.table-bordered tr th:first-child  
 {
   border-left: 1px solid #0D2856 !important;
 }
@@ -283,7 +365,8 @@ div.dataTables_scrollBody
 #dtprv_wrapper .table-bordered > tfoot > tr > th, 
 #dtprv_wrapper .table-bordered > thead > tr > td,
 #dtprv_wrapper .table-bordered > tbody > tr > td, 
-#dtprv_wrapper .table-bordered > tfoot > tr > td 
+#dtprv_wrapper .table-bordered > tfoot > tr > td, 
+div.dtfh-floatingparent table.table-bordered tr th
 {
 
   border-color: #0D2856;
@@ -292,7 +375,8 @@ div.dataTables_scrollBody
 
 #dtprv_wrapper .table-bordered > thead > tr > th, 
 #dtprv_wrapper .table-bordered > tbody > tr > th, 
-#dtprv_wrapper .table-bordered > tfoot > tr > th
+#dtprv_wrapper .table-bordered > tfoot > tr > th,
+div.dtfh-floatingparent table.table-bordered > thead > tr > th
 {
 
   text-align: center;

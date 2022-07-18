@@ -47,20 +47,17 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
         }
       });
 
-
-
-
-      var dtprv_status = $( '<div id="dtprv_status"><p class="warning"><span title="" class="error-icon"></span>Data shown below reflects a snapshot of the full dataset. This preview includes the first XXXX records out of ZZZZZ records and was last updated on DD/MM/YYYY. Use the DOWNLOAD ALL button at the top of this page to access the full dataset.</p></div>' );
+      var dtprv_status = $( '<div id="dtprv_status"><p class="warning"><span title="" class="error-icon"></span>Data shown below reflects a snapshot of the full dataset. This preview includes the first 1000 records out of ZZZZZ records and was last updated on DD/MM/YYYY. Use the DOWNLOAD ALL button at the top of this page to access the full dataset.</p></div>' );
       dtprv_status.insertBefore( '#dtprv_processing' );
 
       datatable.on('draw.dt', function() {
         // console.log( 'datatable redraw' );
-        window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*');
+        // window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*');
       });
 
       datatable.on('init.dt', function() {
-        console.log( 'datatable initialized' );
-        window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*');
+        // console.log( 'datatable initialized' );
+        // window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*');
       });
 
       // Adds download dropdown to buttons menu
@@ -146,46 +143,53 @@ $.fn.dataTableExt.oPagination.extStyle = {
 
     var oPaging = oSettings.oInstance.fnExtStylePagingInfo();
 
-    // nFirst = $('<span/>', { 'class': 'paginate_button first' , text : "" }).append('<i class="fa fa-angle-double-left" aria-hidden="true"></i>');
+    nFirst = $('<span/>', { 'class': 'paginate_button first' , text : "" }).append('<i class="fa fa-angle-double-left" aria-hidden="true"></i>');
     nPrevious = $('<span/>', { 'class': 'paginate_button previous' , text : "" }).append('<i class="fa fa-angle-left" aria-hidden="true"></i>');
     nNext = $('<span/>', { 'class': 'paginate_button next' , text : "" }).append('<i class="fa fa-angle-right" aria-hidden="true"></i>');
-    // nLast = $('<span/>', { 'class': 'paginate_button last' , text : "" }).append('<i class="fa fa-angle-double-right" aria-hidden="true"></i>');
+    nLast = $('<span/>', { 'class': 'paginate_button last' , text : "" }).append('<i class="fa fa-angle-double-right" aria-hidden="true"></i>');
     // nPageTxt = $("<span />", { text: '' });
 
     // nPageNumBox = $('<input />', { type: 'text', val: 1, 'size': 4, 'class': 'paginate_input_box' });
 
     
-    nStartRowBox = $('<input />', { type: 'text', val: 1, 'size': 4, 'class': 'start_row_input_box' });
+    nStartRowBox = $('<span />', { type: 'text', text: 1, 'size': 4, 'class': 'start_row_input_box' });
     nRowHyphen = $('<span />', { text: '-', 'class': 'range_separator' });
-    nEndRowBox = $('<input />', { type: 'text', val: oPaging.iLength, 'size': 4, 'class': 'end_row_input_box' });
+    nEndRowBox = $('<span />', { type: 'text', text: oPaging.iLength, 'size': 4, 'class': 'end_row_input_box' });
 
 
+    console.log( oPaging );
     // nPageOf = $('<span />', { text: '/' });
     // nTotalPages = $('<span />', { class :  "paginate_total" , text : oPaging.iTotalPages });
 
-
-    $(nPaging)
-      // .append(nFirst)
-      .append(nPrevious)
-      // .append(nPageTxt)
-      // .append(nPageNumBox)
-      .append(nStartRowBox)
-      .append(nRowHyphen)
-      .append(nEndRowBox)
-      // .append(nPageOf)
-      // .append(nTotalPages)
-      .append(nNext)
-      // .append(nLast)
-      ;
-
+    // check to make sure the pager is necessary
+    // if( oPaging.iTotal > oPaging.iLength ) {
+      $(nPaging)
+        .append(nFirst)
+        .append(nPrevious)
+        // .append(nPageTxt)
+        // .append(nPageNumBox)
+        .append(nStartRowBox)
+        .append(nRowHyphen)
+        .append(nEndRowBox)
+        // .append(nPageOf)
+        // .append(nTotalPages)
+        .append(nNext)
+        .append(nLast)
+        ;
     /*
+    } else {
+      // if not hide the container
+      $( '#dtprv_paginate' ).css( 'display', 'none' );
+
+    }
+    */
+
     nFirst.click(function () {
       if( $(this).hasClass("disabled") )
         return;
       oSettings.oApi._fnPageChange(oSettings, "first");
       fnCallbackDraw(oSettings);
     }).bind('selectstart', function () { return false; });
-    */
 
     nPrevious.click(function () {
       if( $(this).hasClass("disabled") )
@@ -201,14 +205,12 @@ $.fn.dataTableExt.oPagination.extStyle = {
       fnCallbackDraw(oSettings);
     }).bind('selectstart', function () { return false; });
 
-    /*
     nLast.click(function () {
       if( $(this).hasClass("disabled") )
         return;
       oSettings.oApi._fnPageChange(oSettings, "last");
       fnCallbackDraw(oSettings);
     }).bind('selectstart', function () { return false; });
-    */
 
     /*
     nPageNumBox.change(function () {
@@ -241,9 +243,9 @@ $.fn.dataTableExt.oPagination.extStyle = {
     $(an).find('span.paginate_total').html(oPaging.iTotalPages);
     $(an).find('.paginate_input_box').val(oPaging.iPage+1);
 
-    $(an).find('.start_row_input_box').val( ( oPaging.iPage * oPaging.iLength ) +1);
+    $(an).find('.start_row_input_box').html( ( oPaging.iPage * oPaging.iLength ) +1);
 
-    $(an).find('.end_row_input_box').val( 
+    $(an).find('.end_row_input_box').html( 
       ( oPaging.iPage * oPaging.iLength ) + oPaging.iLength > oPaging.iFilteredTotal ?
         oPaging.iFilteredTotal : ( oPaging.iPage * oPaging.iLength ) + oPaging.iLength
     

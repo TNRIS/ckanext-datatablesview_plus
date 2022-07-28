@@ -1,8 +1,13 @@
 {% extends "base.html" %}
 
 {% block page %}
+
+  <input type="hidden" id="dtprv_is_preview" value="{{ resource.preview }}"/>
+  <input type="hidden" id="dtprv_preview_rows" value="{{ resource.preview_rows }}"/>
+  <input type="hidden" id="dtprv_total_record_count" value="{{ resource.total_record_count }}"/>
+  <input type="hidden" id="dtprv_metadata_modified" value="{{ h.dtprv_date(resource.metadata_modified) }}"/>  
+
     <table id="dtprv"
-      {# class="table table-striped table-bordered" #}
       class="table table-bordered"
       data-module="datatablesview_twdh"
       data-datadictionary='{{ h.datastore_dictionary(resource.id)|tojson }}'
@@ -35,7 +40,8 @@
         {{ ', "copy", "print"' | safe if resource_view.get('export_buttons') else ''}}
       ]'
       #}
-      data-keys='true'>
+      data-keys='true'
+      style="width: 100%;">
     <thead>
       <tr>
         {% for field in [{'id': '_id'}] + h.datastore_dictionary(resource.id) %}
@@ -57,13 +63,14 @@
 
   <script>
     /* Set height of iframe to avoid vertical scrolling */
+    /*
     let height;
     const sendPostMessage = () => {
-      // console.log( 'sendPostMessage height=' + $( 'html' ).height() );
       window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*');
     }
     window.onload = () => sendPostMessage();
     window.onresize = () => sendPostMessage();
+    */
   </script>
 
 {% endblock %}

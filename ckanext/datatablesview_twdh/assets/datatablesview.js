@@ -1,3 +1,5 @@
+var table_rows_per_page = 10;
+
 var run_query = function(params, format) {
 
   var form = $('#filtered-datatables-download');
@@ -29,9 +31,9 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
           searchPlaceholder: "Search..."
         },
         "sPaginationType": "extStyle",
-        "pageLength": 20,
+        "pageLength": table_rows_per_page,
         "infoCallback": function( settings, start, end, max, total, pre ) {
-          return total + " records";
+          return total + " record" + ( total != 1 ? 's' : '' );
         },
         "headerCallback": function( thead, data, start, end, display ) {
 
@@ -44,21 +46,28 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
               $(thead).find('th').eq(i+1).html( datadict[i].info.label );
             }
           });
-        }
+        },
+        // "bAutoWidth": false,
+        // truncate cell text to 17 characters and add tooltip for remainder
+        columnDefs: [ {
+          targets: '_all',
+          render: $.fn.dataTable.render.ellipsis( 50, true )
+        } ]
+
       });
 
-      var dtprv_status = $( '<div id="dtprv_status"><p class="warning"><span title="" class="error-icon"></span>Data shown below reflects a snapshot of the full dataset. This preview includes the first 1000 records out of ZZZZZ records and was last updated on DD/MM/YYYY. Use the DOWNLOAD ALL button at the top of this page to access the full dataset.</p></div>' );
+      var dtprv_is_preview = $( '#dtprv_is_preview' ).val();
+      var dtprv_preview_rows = $( '#dtprv_preview_rows' ).val();
+      var dtprv_total_record_count = $( '#dtprv_total_record_count' ).val();
+      var dtprv_date_modified = $( '#dtprv_metadata_modified' ).val();
+
+      if( dtprv_is_preview == 'True' ) {
+        var dtprv_status = $( '<div id="dtprv_status"><p class="warning"><span title="" class="error-icon"></span>Data shown below reflects a snapshot of the full dataset. This preview includes the first ' + dtprv_preview_rows + ' records out of ' + dtprv_total_record_count + ' records and was last updated on ' + dtprv_date_modified + '. Use the DOWNLOAD ALL button at the top of this page to access the full dataset.</p></div>' );
       dtprv_status.insertBefore( '#dtprv_processing' );
-
-      datatable.on('draw.dt', function() {
-        // console.log( 'datatable redraw' );
-        // window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*');
-      });
-
-      datatable.on('init.dt', function() {
-        // console.log( 'datatable initialized' );
-        // window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*');
-      });
+      } else {
+        var dtprv_status = $( '<div id="dtprv_status"><p class="">This data was last updated on ' + dtprv_date_modified + '. Use the DOWNLOAD ALL button at the top of this page to access the full dataset.</p></div>' );
+      dtprv_status.insertBefore( '#dtprv_processing' );
+      }
 
       // Adds download dropdown to buttons menu
       datatable.button().add(2, {
@@ -102,7 +111,32 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
       );
 
 
+      /* set event listeners */
+
+      datatable.on( 'draw.dt', function () {
+
+        // console.log( 'DataTable redraw occurred at: '+new Date().getTime() );
+
+        // set bootstrap tooltips on truncated cells
+        jQuery('[data-toggle="tooltip"]').tooltip()
+  
+        // send message to parent window to set frame height
+        window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*');
+
+      });
+              
+      datatable.on('init.dt', function() {
+
+        // console.log( 'DataTable initialized occurred at: '+new Date().getTime() );
+
+        // send message to parent window to set frame height
+        window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*');
+
+      });
+
+
     }
+
   }
 });
 
@@ -157,7 +191,7 @@ $.fn.dataTableExt.oPagination.extStyle = {
     nEndRowBox = $('<span />', { type: 'text', text: oPaging.iLength, 'size': 4, 'class': 'end_row_input_box' });
 
 
-    console.log( oPaging );
+    // console.log( oPaging );
     // nPageOf = $('<span />', { text: '/' });
     // nTotalPages = $('<span />', { class :  "paginate_total" , text : oPaging.iTotalPages });
 
@@ -287,4 +321,122 @@ jQuery.fn.dataTableExt.oApi.fnPagingInfo = function ( oSettings )
     "iTotalPages":    oSettings._iDisplayLength === -1 ?
       0 : Math.ceil( oSettings.fnRecordsDisplay() / oSettings._iDisplayLength )
   };
+};
+
+
+
+/**
+ * This data rendering helper method can be useful for cases where you have
+ * potentially large data strings to be shown in a column that is restricted by
+ * width. The data for the column is still fully searchable and sortable, but if
+ * it is longer than a give number of characters, it will be truncated and
+ * shown with ellipsis. A browser provided tooltip will show the full string
+ * to the end user on mouse hover of the cell.
+ *
+ * This function should be used with the `dt-init columns.render` configuration
+ * option of DataTables.
+ *
+ * It accepts three parameters:
+ *
+ * 1. `-type integer` - The number of characters to restrict the displayed data
+ *    to.
+ * 2. `-type boolean` (optional - default `false`) - Indicate if the truncation
+ *    of the string should not occur in the middle of a word (`true`) or if it
+ *    can (`false`). This can allow the display of strings to look nicer, at the
+ *    expense of showing less characters.
+ * 2. `-type boolean` (optional - default `false`) - Escape HTML entities
+ *    (`true`) or not (`false` - default).
+ *
+ *  @name ellipsis
+ *  @summary Restrict output data to a particular length, showing anything
+ *      longer with ellipsis and a browser provided tooltip on hover.
+ *  @author [Allan Jardine](http://datatables.net)
+ *  @requires DataTables 1.10+
+ *
+ * @returns {Number} Calculated average
+ *
+ *  @example
+ *    // Restrict a column to 17 characters, don't split words
+ *    $('#example').DataTable( {
+ *      columnDefs: [ {
+ *        targets: 1,
+ *        render: $.fn.dataTable.render.ellipsis( 17, true )
+ *      } ]
+ *    } );
+ *
+ *  @example
+ *    // Restrict a column to 10 characters, do split words
+ *    $('#example').DataTable( {
+ *      columnDefs: [ {
+ *        targets: 2,
+ *        render: $.fn.dataTable.render.ellipsis( 10 )
+ *      } ]
+ *    } );
+ */
+
+ jQuery.fn.dataTable.render.ellipsis = function ( cutoff, wordbreak, escapeHtml ) {
+	var esc = function ( t ) {
+		return t
+			.replace( /&/g, '&amp;' )
+			.replace( /</g, '&lt;' )
+			.replace( />/g, '&gt;' )
+			.replace( /"/g, '&quot;' );
+	};
+
+	return function ( d, type, row ) {
+		// Order, search and type get the original data
+		if ( type !== 'display' ) {
+			return d;
+		}
+
+		if ( typeof d !== 'number' && typeof d !== 'string' ) {
+			return d;
+		}
+
+		d = d.toString(); // cast numbers
+
+    // d = d.replace("\n", "<br/>"); // HTML encode newline characters
+
+		if ( d.length <= cutoff ) {
+			return d;
+		}
+
+		var shortened = d.substr(0, cutoff-1);
+
+		// Find the last white space character in the string
+		if ( wordbreak ) {
+			shortened = shortened.replace(/\s([^\s]*)$/, '');
+		}
+
+		// Protect against uncontrolled HTML input
+		if ( escapeHtml ) {
+			shortened = esc( shortened );
+		}
+
+
+    /* 
+    Set up tooltips so that the first 50% of rows in a page have the tooltipon the bottom and the second 50% of rows have the tooltip on the top.
+    This is necessary because otherwise there are cases where a tooltip falls outside the iframe and is invisible in either the first or last row.
+    This could be set up so that only the first (or last) row changes tooltip direction, but it 'feels' better on the page to have it switch locations at the mid-point
+    */
+
+    var tooltip_location = '';
+    var tooltip_class = '';
+
+    if ( ( row[0] % table_rows_per_page ) / table_rows_per_page > 0.5 | ( row[0] % table_rows_per_page ) == 0  ) {
+
+      tooltip_location = 'top';
+      tooltip_class = 'tooltip-top';
+
+    } else {
+
+      tooltip_location = 'bottom';
+      tooltip_class = 'tooltip-bottom';
+
+    }
+    
+    return '<div class="ellipsis ' + tooltip_class + '" data-toggle="tooltip" data-placement="' + tooltip_location + '" title="'+esc(d)+'">'+shortened+'&#8230;</div>';
+
+	};
+
 };

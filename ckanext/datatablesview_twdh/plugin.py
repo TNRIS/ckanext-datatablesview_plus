@@ -9,6 +9,25 @@ boolean_validator = toolkit.get_validator(u'boolean_validator')
 ignore_missing = toolkit.get_validator(u'ignore_missing')
 
 
+def dtprv_date(iso_date_string):
+    """
+    Return a MM/DD/YYYY formatted text date string 
+
+    Args: iso date string
+        
+    Returns:
+        string: MM/DD/YYYY formatted text date string
+
+    """
+
+    import dateutil 
+    
+    date = dateutil.parser.parse(iso_date_string)
+    native = date.replace(tzinfo=None)
+    format='%b %d, %Y'
+    return native.strftime(format) 
+
+
 class DatatablesviewPlusPlugin(p.SingletonPlugin):
     u'''
     DataTables table view plugin using v1.12.1 of DataTables
@@ -16,6 +35,8 @@ class DatatablesviewPlusPlugin(p.SingletonPlugin):
     p.implements(p.IConfigurer, inherit=True)
     p.implements(p.IResourceView, inherit=True)
     p.implements(p.IBlueprint)
+    p.implements(p.ITemplateHelpers)
+
 
     # IBlueprint
 
@@ -32,6 +53,16 @@ class DatatablesviewPlusPlugin(p.SingletonPlugin):
         toolkit.add_template_directory(config, u'templates')
         toolkit.add_public_directory(config, 'public')
         toolkit.add_resource(u'assets', u'ckanext-datatablesview_twdh')
+
+   # ITemplateHelpers
+
+    def get_helpers(self):
+            """Register twdh helper functions"""
+
+            return {
+                'dtprv_date': dtprv_date,
+            }
+    
 
     # IResourceView
 

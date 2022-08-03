@@ -123,6 +123,9 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
         // send message to parent window to set frame height
         window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*');
 
+        // send another message 1 second later to clean up because sometimes the first height is a miscalculation
+        setTimeout(function() { window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*'); }, 1000 );
+
       });
               
       datatable.on('init.dt', function() {
@@ -132,8 +135,14 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
         // send message to parent window to set frame height
         window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*');
 
+        // send another message 1 second later to clean up because sometimes the first height is a miscalculation
+        setTimeout(function() { window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*'); }, 1000 );
+
+
       });
 
+      /* Replace built in rotating ellipsis animation with TWDH preferred FontAwesome circle-o-notch animation */
+      $( 'div.dataTables_processing' ).html( '<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>' );
 
     }
 

@@ -113,6 +113,24 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
 
       /* set event listeners */
 
+      var resizeTO;
+
+      $( window ).on( 'resize' , function () {
+
+
+        // send message to parent window to set frame height
+        clearTimeout( resizeTO );
+        resizeTO = setTimeout(function() { 
+          // console.log( 'DataTable window resize postMessage occurred at: '+new Date().getTime() );
+          // console.log( $( '#dtprv_wrapper' ).height() );
+          window.parent.postMessage({ frameHeight: $( '#dtprv_wrapper' ).height() }, '*'); 
+        }, 1000 );
+
+        // send another message 1 second later to clean up because sometimes the first height is a miscalculation
+        // setTimeout(function() { window.parent.postMessage({ frameHeight: $( '#dtprv_wrapper' ).height() }, '*'); }, 1000 );
+        
+      });
+
       datatable.on( 'draw.dt', function () {
 
         // console.log( 'DataTable redraw occurred at: '+new Date().getTime() );
@@ -186,18 +204,18 @@ $.fn.dataTableExt.oPagination.extStyle = {
 
     var oPaging = oSettings.oInstance.fnExtStylePagingInfo();
 
-    nFirst = $('<span/>', { 'class': 'paginate_button first' , text : "" }).append('<i class="fa fa-angle-double-left" aria-hidden="true"></i>');
-    nPrevious = $('<span/>', { 'class': 'paginate_button previous' , text : "" }).append('<i class="fa fa-angle-left" aria-hidden="true"></i>');
-    nNext = $('<span/>', { 'class': 'paginate_button next' , text : "" }).append('<i class="fa fa-angle-right" aria-hidden="true"></i>');
-    nLast = $('<span/>', { 'class': 'paginate_button last' , text : "" }).append('<i class="fa fa-angle-double-right" aria-hidden="true"></i>');
+    var nFirst = $('<span/>', { 'class': 'paginate_button first' , text : "" }).append('<i class="fa fa-angle-double-left" aria-hidden="true"></i>');
+    var nPrevious = $('<span/>', { 'class': 'paginate_button previous' , text : "" }).append('<i class="fa fa-angle-left" aria-hidden="true"></i>');
+    var nNext = $('<span/>', { 'class': 'paginate_button next' , text : "" }).append('<i class="fa fa-angle-right" aria-hidden="true"></i>');
+    var nLast = $('<span/>', { 'class': 'paginate_button last' , text : "" }).append('<i class="fa fa-angle-double-right" aria-hidden="true"></i>');
     // nPageTxt = $("<span />", { text: '' });
 
     // nPageNumBox = $('<input />', { type: 'text', val: 1, 'size': 4, 'class': 'paginate_input_box' });
 
     
-    nStartRowBox = $('<span />', { type: 'text', text: 1, 'size': 4, 'class': 'start_row_input_box' });
-    nRowHyphen = $('<span />', { text: '-', 'class': 'range_separator' });
-    nEndRowBox = $('<span />', { type: 'text', text: oPaging.iLength, 'size': 4, 'class': 'end_row_input_box' });
+    var nStartRowBox = $('<span />', { type: 'text', text: 1, 'size': 4, 'class': 'start_row_input_box' });
+    var nRowHyphen = $('<span />', { text: '-', 'class': 'range_separator' });
+    var nEndRowBox = $('<span />', { type: 'text', text: oPaging.iLength, 'size': 4, 'class': 'end_row_input_box' });
 
 
     // console.log( oPaging );

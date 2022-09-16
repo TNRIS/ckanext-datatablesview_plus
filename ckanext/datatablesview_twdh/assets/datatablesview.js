@@ -62,14 +62,15 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
       var dtprv_date_modified = $( '#dtprv_metadata_modified' ).val();
 
       if( dtprv_is_preview == 'True' ) {
-        var dtprv_status = $( '<div id="dtprv_status"><p class="warning"><span title="" class="error-icon"></span>Data shown below reflects a snapshot of the full dataset. This preview includes the first ' + dtprv_preview_rows + ' records out of ' + dtprv_total_record_count + ' records and was last updated on ' + dtprv_date_modified + '. Use the DOWNLOAD ALL button at the top of this page to access the full dataset.</p></div>' );
+        var dtprv_status = $( '<div id="dtprv_status"><p class="warning"><span title="" class="error-icon"></span>Data shown below reflects a snapshot of the full dataset. This preview includes the first ' + dtprv_preview_rows + ' records out of ' + dtprv_total_record_count + ' records and was last updated on ' + dtprv_date_modified + '.</p></div>' );
       dtprv_status.insertBefore( '#dtprv_processing' );
       } else {
-        var dtprv_status = $( '<div id="dtprv_status"><p class="">This data was last updated on ' + dtprv_date_modified + '. Use the DOWNLOAD ALL button at the top of this page to access the full dataset.</p></div>' );
+        var dtprv_status = $( '<div id="dtprv_status"><p class="">This data was last updated on ' + dtprv_date_modified + '.</p></div>' );
       dtprv_status.insertBefore( '#dtprv_processing' );
       }
 
       // Adds download dropdown to buttons menu
+      /*
       datatable.button().add(2, {
         text: 'Download Preview',
         extend: 'collection',
@@ -109,7 +110,7 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
           }]
         }
       );
-
+      */
 
       /* set event listeners */
 

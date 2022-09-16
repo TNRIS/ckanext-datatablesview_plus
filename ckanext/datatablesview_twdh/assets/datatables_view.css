@@ -105,6 +105,12 @@ table.dataTable
 
 }
 
+div.dataTables_wrapper div.dataTables_filter
+{
+
+  float: right;
+
+}
 
 div.dataTables_wrapper div.dataTables_filter input
 {
@@ -113,7 +119,7 @@ div.dataTables_wrapper div.dataTables_filter input
   border-radius: 0.8rem;
   font-size: 1.4rem;
   padding: 0.7rem;
-
+  width: 100%;
 
 }
 
@@ -136,7 +142,7 @@ div.dataTables_wrapper div.dataTables_filter input
 {
 
   clear: both;
-  margin: 0.5rem auto;
+  margin: 0.5rem auto 1rem;
 
 }
 
@@ -153,7 +159,8 @@ div.dataTables_wrapper div.dataTables_filter input
 #dtprv_status .warning .error-icon 
 {
 
-  margin: 1rem;
+  display: inline-block;
+  margin: 0.5rem 1rem 1rem;
 
 }
 
@@ -526,4 +533,87 @@ box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.1);
   -webkit-box-shadow: none;
 
 }
+
+
+
+
+@media (min-width: 0) 
+{
+
+  div.dataTables_wrapper div.dataTables_filter
+  {
+
+    float: none;
+    width: 98%;
+    margin: 0 1%;
+
+  }
+
+  div.dataTables_wrapper div.dataTables_filter label
+  {
+
+    display: inline;
+
+  }
+
+  div.dataTables_wrapper div.dataTables_filter input
+  {
+
+    margin-left: 0;
+
+  }
+
+}
+
+@media (min-width: 400px) 
+{
+
+}
+
+@media (min-width: 550px) 
+{
+
+  div.dataTables_wrapper div.dataTables_filter
+  {
+
+    float: right;
+    width: auto;
+    margin: 0 0.7rem 0 0;
+
+  }
+
+  div.dataTables_wrapper div.dataTables_filter label
+  {
+
+    display: inline-block;
+
+  }
+
+  div.dataTables_wrapper div.dataTables_filter input
+  {
+
+    margin-left: 0.5rem;
+
+  }
+
+
+}
+
+@media (min-width: 768px) 
+{
+
+}
+
+@media (min-width: 992px) 
+{
+
+}
+
+@media (min-width: 1200px) 
+{
+
+}
+
+
+
 

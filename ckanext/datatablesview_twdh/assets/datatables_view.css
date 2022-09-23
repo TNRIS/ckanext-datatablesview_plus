@@ -1,9 +1,12 @@
 body {
+
   background: none;
   /* padding: 0.3rem 0.3rem 0 0; */
   padding: 0;
-  
+  min-width: 270px;
+
 }
+
 
 table.dataTable
 {

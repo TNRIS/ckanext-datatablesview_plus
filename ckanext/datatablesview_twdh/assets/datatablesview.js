@@ -51,7 +51,7 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
         // truncate cell text to 17 characters and add tooltip for remainder
         columnDefs: [ {
           targets: '_all',
-          render: $.fn.dataTable.render.ellipsis( 50, true )
+          render: $.fn.dataTable.render.ellipsis( 50, true, true )
         } ]
 
       });
@@ -440,7 +440,6 @@ jQuery.fn.dataTableExt.oApi.fnPagingInfo = function ( oSettings )
 		if ( escapeHtml ) {
 			shortened = esc( shortened );
 		}
-
 
     /* 
     Set up tooltips so that the first 50% of rows in a page have the tooltipon the bottom and the second 50% of rows have the tooltip on the top.

@@ -26,18 +26,104 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
       // Initialize datatable. To set options on DataTable, use data- attribute 
       // tags in templates/datatables/datatables_view.html
       var datatable = jQuery('#dtprv').DataTable({
-        "language": {
+
+        // turn on desired visible dom components
+        // dom: 'BQlfrtip',
+        // dom: 'QBlfrtip',
+        // dom: 'QBipfrt',
+
+        // turn on search highlighting
+        mark: true,
+
+        // turn on row selection
+        select: true,
+
+        // turn on row searchBuilder
+        searchBuilder: {
+          depthLimit: 2
+        },
+        
+        // turn on column reordering
+        colReorder: false,
+
+        // Set search placeholder text
+        language: {
           search: "",
           searchPlaceholder: "Search..."
         },
-        "sPaginationType": "extStyle",
+
+        // turn on state saving
+        stateSave: true,
+
+        // ajax: "/datatables/ajax/c0c41b19-8373-4bef-8482-d1d1cd214514",
+
+        /*
+
+        "ajax": {
+          "url": "/datatables/ajax/c0c41b19-8373-4bef-8482-d1d1cd214514",
+          "type": "POST",
+          "data": ""
+        },
+        */
+
+        // turn on scroller
+        scrollY:        "50vh",
+        deferRender:    true,
+        scrollCollapse: true,
+        scroller:       true,
+
+        // buttons:['copy','colvis','print','createState', 'savedStates'],
+        buttons:[
+          'copy',
+          'csvHtml5',
+          {
+            extend: 'csvHtml5',
+            text: 'TSV',
+            fieldSeparator: '\t',
+            filename: 'my-tsv',
+            extension: '.tsv'
+          },
+          'excelHtml5',
+          'colvis',
+          'print',
+          /*
+          {
+            extend: 'searchBuilder',
+            config: {
+                depthLimit: 2
+            }
+          }
+          */
+
+        ],
+        // buttons:['colvis','excel','print','searchBuilder'],
+        // buttons:['colvis','print','createState', 'savedStates'],
+        // buttons:['colvis','print'],
+
+        // "sPaginationType": "extStyle",
+        pagingType: 'full_numbers',
         "pageLength": table_rows_per_page,
-        "infoCallback": function( settings, start, end, max, total, pre ) {
+
+
+        "initComplete": function(settings, json) {
+          console.log( 'DataTables has finished its initialisation.' );
+        },
+
+        search: {
+          "smart": true,
+          "regex": false,
+          "return": false
+        },
+      
+
+        // turn on table metadata display
+        infoCallback: function( settings, start, end, max, total, pre ) {
           return total + " record" + ( total != 1 ? 's' : '' );
         },
-        "headerCallback": function( thead, data, start, end, display ) {
 
-          $(thead).find('th').eq(0).html( 'ID' );
+        headerCallback: function( thead, data, start, end, display ) {
+
+          $(thead).find('th').eq(0).html( '' );
 
           // replace column header labels with those from the data dictionary if available
           var datadict = JSON.parse( $('#dtprv_wrapper table').attr( 'data-datadictionary' ) );
@@ -46,13 +132,88 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
               $(thead).find('th').eq(i+1).html( datadict[i].info.label );
             }
           });
+
+
+          // set column widths based on information in summary statistics
+          var data_summary_json = $('#dtprv_wrapper table').attr( 'data-summary-statistics' );
+          if (typeof data_summary_json !== 'undefined' && data_summary_json !== false) {
+            var data_summary = JSON.parse( data_summary_json );
+            $( data_summary ).each( function( i ) {
+              var column_class = '';
+              if( 'type' in data_summary[i] && data_summary[i].type == 'String' ) {
+                console.log( data_summary[i].type )
+                if( 'max_length' in data_summary[i] ) {
+                  if( data_summary[i].max_length > 1000 ) {
+                    column_class = 'gt1000';
+                  } else if( data_summary[i].max_length > 500 ) {
+                    column_class = 'gt500';
+                  } else if( data_summary[i].max_length > 100 ) {
+                    column_class = 'gt100';
+                  }
+                }
+                if( 'field' in data_summary[i] && data_summary[i].field != '' ) {
+                    $(thead).find('th#'+data_summary[i].field).addClass( column_class );
+                }
+              }
+            });
+          }
+
+
+
+
         },
+
         // "bAutoWidth": false,
-        // truncate cell text to 17 characters and add tooltip for remainder
+
+        /*
+        // truncate cell text to 50 characters and add tooltip for remainder
         columnDefs: [ {
           targets: '_all',
           render: $.fn.dataTable.render.ellipsis( 50, true, true )
-        } ]
+        } ],
+        */
+
+        /*
+        columnDefs: [
+          {
+              targets: 1,
+              render: DataTable.render.datetime('MMM Do YYYY'),
+          },
+        ],
+        */
+
+        /* 
+          stateSaveCallback and stateLoadCallback are configured here in order to allow us to have a 'share' link for table state
+          Inspired by this helpful stackexchange post:
+          https://stackoverflow.com/questions/55446923/datatables-1-10-using-savestate-to-remember-filtering-and-order-but-need-to-upd/60708638#60708638
+        */
+        stateSaveCallback: function (settings, data) {
+          //encode current state to base64
+          const state = btoa(JSON.stringify(data));
+          //get query part of the url
+          let searchParams = new URLSearchParams(window.location.search);
+          //add encoded state into query part
+          searchParams.set($(this).attr('id') + '_state', state);
+          //form url with new query parameter
+          const newRelativePathQuery = window.location.pathname + '?' + searchParams.toString() + window.location.hash;
+          //push new url into history object, this will change the current url without need of reload
+          history.pushState(null, '', newRelativePathQuery);
+        },
+        stateLoadCallback: function (settings) {
+          const url = new URL(window.location.href);
+          let state = url.searchParams.get($(this).attr('id') + '_state');
+      
+          //check the current url to see if we've got a state to restore
+          if (!state) {
+              return null;
+          }
+      
+          //if we got the state, decode it and add current timestamp
+          state = JSON.parse(atob(state));
+          state['time'] = Date.now();
+      
+          return state;
+      }
 
       });
 
@@ -70,8 +231,7 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
       }
 
       // Adds download dropdown to buttons menu
-      /*
-      datatable.button().add(2, {
+      datatable.button().add(0, {
         text: 'Download Preview',
         extend: 'collection',
         className: 'btn-primary dropdown-toggle btn-download-toggle',
@@ -110,12 +270,43 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
           }]
         }
       );
+      /*
       */
+
+
+
+      datatable.columns( '.select-filter' ).every( function () {
+        var that = this;
+     
+        console.log( this );
+        
+        // Create the select list and search operation
+        var select = $('<select />')
+            .appendTo(
+                this.footer()
+            )
+            .on( 'change', function () {
+                that
+                    .search( $(this).val() )
+                    .draw();
+            } );
+     
+        // Get the search data for the first column and add to the select list
+        this
+            .cache( 'search' )
+            .sort()
+            .unique()
+            .each( function ( d ) {
+                select.append( $('<option value="'+d+'">'+d+'</option>') );
+            } );
+    } );
+
+
 
       /* set event listeners */
 
+      /*
       var resizeTO;
-
       $( window ).on( 'resize' , function () {
 
 
@@ -131,6 +322,41 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
         // setTimeout(function() { window.parent.postMessage({ frameHeight: $( '#dtprv_wrapper' ).height() }, '*'); }, 1000 );
         
       });
+      */
+
+      var resizeTO;
+      $( window ).on( 'resize' , function () {
+
+        // send message to parent window to set frame height
+        clearTimeout( resizeTO );
+        resizeTO = setTimeout(function() { 
+          // console.log( 'DataTable window resize postMessage occurred at: '+new Date().getTime() );
+          // console.log( $( '#dtprv_wrapper' ).height() );
+          // window.parent.postMessage({ frameHeight: $( '#dtprv_wrapper' ).height() }, '*'); 
+          console.log( $( document ).height() );
+          var document_height = $( document ).height();
+
+          console.log( $( '#twdh_dtprv_wrapper' ).height() );
+          var wrapper_height = $( '#twdh_dtprv_wrapper' ).height();
+
+          console.log( $( '#dtprv_wrapper' ).height() );
+          var table_height = $( '#dtprv_wrapper' ).height();
+
+          var new_table_height = table_height + ( document_height - wrapper_height );
+          console.log( new_table_height );
+
+          $( '#dtprv' ).height( new_table_height );
+
+
+        }, 1000 );
+
+        // send another message 1 second later to clean up because sometimes the first height is a miscalculation
+        // setTimeout(function() { window.parent.postMessage({ frameHeight: $( '#dtprv_wrapper' ).height() }, '*'); }, 1000 );
+        
+      });
+
+
+
 
       datatable.on( 'draw.dt', function () {
 

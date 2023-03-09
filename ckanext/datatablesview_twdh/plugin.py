@@ -30,7 +30,7 @@ def dtprv_date(iso_date_string):
 
 class DatatablesviewPlusPlugin(p.SingletonPlugin):
     u'''
-    DataTables table view plugin using v1.12.1 of DataTables
+    DataTables table view plugin using v1.13.1 of DataTables
     '''
     p.implements(p.IConfigurer, inherit=True)
     p.implements(p.IResourceView, inherit=True)

@@ -1,16 +1,17 @@
 {% extends "base.html" %}
 
 {% block page %}
-
+  
+  <div id="twdh_dtprv_wrapper">
   <input type="hidden" id="dtprv_is_preview" value="{{ resource.preview }}"/>
   <input type="hidden" id="dtprv_preview_rows" value="{{ resource.preview_rows }}"/>
   <input type="hidden" id="dtprv_total_record_count" value="{{ resource.total_record_count }}"/>
   <input type="hidden" id="dtprv_metadata_modified" value="{{ h.dtprv_date(resource.metadata_modified) }}"/>  
-
     <table id="dtprv"
       class="table table-bordered"
       data-module="datatablesview_twdh"
       data-datadictionary='{{ h.datastore_dictionary(resource.id)|tojson }}'
+      data-summary-statistics='{{ h.get_dataset_summary_statistics( resource.package_id )|tojson }}'
       data-paging="true"
       data-server-side="true"
       data-processing="true"
@@ -21,6 +22,7 @@
           "type": "POST",
           "data": { "filters": "{{ request.args.get('filters', '')|e }}" }
         }'
+
       {% if resource_view.get('responsive') %}
         data-responsive="true"
         data-scroll-x="false"
@@ -28,26 +30,18 @@
         data-responsive="false"
         data-scroll-x="true"
       {% endif %}
+
       data-fixed-header="true"
       data-fixed-columns="true"
-      data-dom='"Bipfrt"'
-      {#
-      data-buttons='[
-        {
-          "extend": "colvis",
-          "text": "{{ _('Hide/Unhide Columns') }}"
-        }
-        {{ ', "copy", "print"' | safe if resource_view.get('export_buttons') else ''}}
-      ]'
-      #}
-      data-keys='true'
+      data-dom="QBifrlptlpS"
+      data-keys="false"
       style="width: 100%;">
     <thead>
       <tr>
         {% for field in [{'id': '_id'}] + h.datastore_dictionary(resource.id) %}
           {% if 'show_fields' not in resource_view
             or field.id in resource_view.show_fields %}
-            <th scope="col">{{ field.id }}</th>
+            <th scope="col" id="{{ field.id }}">{{ field.id }}</th>
           {% endif %}
         {% endfor %}
       </tr>
@@ -60,19 +54,7 @@
                                                                   resource_view_id=resource_view.id) }}">
     <input type="hidden" name="filters" value="{{ request.args.get('filters', '')|e }}" />
   </form>
-
-  <script>
-    /* Set height of iframe to avoid vertical scrolling */
-    /*
-    let height;
-    const sendPostMessage = () => {
-      window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*');
-    }
-    window.onload = () => sendPostMessage();
-    window.onresize = () => sendPostMessage();
-    */
-  </script>
-
+  </div>
 {% endblock %}
 
 {% block styles %}

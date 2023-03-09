@@ -89,7 +89,7 @@ table.dataTable
 {
 
   display: inline-block;
-  width: 2rem;
+  /* width: 2rem; */
   text-align: center;
   font-size: 2rem;
   margin: 0 0 0;
@@ -537,7 +537,39 @@ box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.1);
 
 }
 
+#dtprv_wrapper .dtsb-searchBuilder
+{
 
+  width: 100%;
+  clear: both;
+  margin: 0;
+
+}
+
+#dtprv_wrapper table.dataTable>tbody>tr.selected>* {
+  box-shadow: inset 0 0 0 9999px #0B7D8E;
+  color: #fff;
+}
+
+#dtprv_wrapper th.gt100
+{
+
+  width: 300px !important;
+
+}
+#dtprv_wrapper th.gt500
+{
+
+  width: 500px !important;
+
+}
+
+#dtprv_wrapper th.gt1000
+{
+
+  width: 700px !important;
+
+}
 
 
 @media (min-width: 0) 

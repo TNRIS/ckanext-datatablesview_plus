@@ -1,4 +1,4 @@
-var table_rows_per_page = 10;
+var table_rows_per_page = 100;
 
 var run_query = function(params, format) {
 
@@ -42,7 +42,7 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
         searchBuilder: {
           depthLimit: 2
         },
-        
+
         // turn on column reordering
         colReorder: false,
 
@@ -101,6 +101,7 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
         // buttons:['colvis','print'],
 
         // "sPaginationType": "extStyle",
+        paging: false,
         pagingType: 'full_numbers',
         "pageLength": table_rows_per_page,
 

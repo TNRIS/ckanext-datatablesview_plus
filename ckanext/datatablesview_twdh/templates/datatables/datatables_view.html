@@ -11,7 +11,7 @@
       class="table table-bordered"
       data-module="datatablesview_twdh"
       data-datadictionary='{{ h.datastore_dictionary(resource.id)|tojson }}'
-      data-summary-statistics='{{ h.get_dataset_summary_statistics( resource.package_id )|tojson }}'
+      {# data-summary-statistics='{{ h.get_dataset_summary_statistics( resource.package_id )|tojson }}' #}
       data-paging="true"
       data-server-side="true"
       data-processing="true"

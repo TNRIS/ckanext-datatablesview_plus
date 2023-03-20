@@ -88,7 +88,7 @@ def ajax(resource_view_id):
 
         log.debug( 'datatables search')
         log.debug( request.form )
-        
+
         response = datastore_search(
             None, {
                 u"q": search_text,
@@ -145,7 +145,7 @@ def ajax(resource_view_id):
 
         response_sql = datastore_search_sql(
             None,
-        { 
+            { 
                 u"sql": query 
             }
         )
@@ -154,7 +154,7 @@ def ajax(resource_view_id):
         return json.dumps({
             u'draw': draw,
             u'iTotalRecords': unfiltered_response.get(u'total', 0),
-            u'iTotalDisplayRecords': response_sql.get(u'total', 0),
+            u'iTotalDisplayRecords': response_sql.get(u'total', 1000),
             u'aaData': [[text_type(row.get(colname, u''))
                         for colname in cols]
                         for row in response_sql[u'records']],
@@ -167,7 +167,7 @@ def ajax(resource_view_id):
         u'iTotalDisplayRecords': response.get(u'total', 0),
         u'aaData': [[text_type(row.get(colname, u''))
                      for colname in cols]
-                    for row in response_sql[u'records']],
+                    for row in response[u'records']],
     })
 
 

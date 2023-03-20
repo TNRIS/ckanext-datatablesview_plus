@@ -38,6 +38,20 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
         // turn on row selection
         select: true,
 
+
+        columnDefs: [ {
+          orderable: true,
+          className: 'select-checkbox',
+          targets:   0
+        } ],
+        select: {
+          style:    'os',
+          selector: 'td:first-child'
+        },
+        order: [[ 1, 'asc' ]],
+/*
+*/
+
         // turn on row searchBuilder
         searchBuilder: {
           depthLimit: 2
@@ -54,6 +68,12 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
 
         // turn on state saving
         stateSave: true,
+
+
+        lengthMenu: [
+          [ 10, 25, 50, 100, 1000 ],
+          [ '10', '25', '50', '100', '1,000' ]
+        ],
 
         // ajax: "/datatables/ajax/c0c41b19-8373-4bef-8482-d1d1cd214514",
 

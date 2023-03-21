@@ -4,10 +4,10 @@
  *
  * To rebuild or modify this file with the latest versions of the included
  * software please visit:
- *   https://datatables.net/download/#bs/dt-1.13.4/b-2.3.6/b-colvis-2.3.6/b-print-2.3.6/date-1.4.0/r-2.4.1/sb-1.4.2/sl-1.6.2/sr-1.2.2
+ *   https://datatables.net/download/#bs/dt-1.13.4/b-2.3.6/b-colvis-2.3.6/b-html5-2.3.6/b-print-2.3.6/cr-1.6.2/date-1.4.0/kt-2.8.2/r-2.4.1/sb-1.4.2/sl-1.6.2/sr-1.2.2
  *
  * Included libraries:
- *   DataTables 1.13.4, Buttons 2.3.6, Column visibility 2.3.6, Print view 2.3.6, DateTime 1.4.0, Responsive 2.4.1, SearchBuilder 1.4.2, Select 1.6.2, StateRestore 1.2.2
+ *   DataTables 1.13.4, Buttons 2.3.6, Column visibility 2.3.6, HTML5 export 2.3.6, Print view 2.3.6, ColReorder 1.6.2, DateTime 1.4.0, KeyTable 2.8.2, Responsive 2.4.1, SearchBuilder 1.4.2, Select 1.6.2, StateRestore 1.2.2
  */
 
 @charset "UTF-8";
@@ -816,6 +816,19 @@ div.dt-button-collection span.dt-button-spacer {
 }
 
 
+table.DTCR_clonedTable.dataTable {
+  position: absolute !important;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 202;
+}
+
+div.DTCR_pointer {
+  width: 1px;
+  background-color: #337ab7;
+  z-index: 201;
+}
+
+
 div.dt-datetime {
   position: absolute;
   background-color: white;
@@ -1034,6 +1047,19 @@ div.dt-datetime-error {
   text-align: center;
   color: #b11f1f;
 }
+
+table.dataTable tbody th.focus,
+table.dataTable tbody td.focus {
+  outline: 2px solid #337ab7;
+  outline-offset: -2px;
+}
+
+div.dtk-focus-alt table.dataTable tbody th.focus,
+div.dtk-focus-alt table.dataTable tbody td.focus {
+  outline: 2px solid #ff8b33;
+  outline-offset: -2px;
+}
+
 
 table.dataTable.dtr-inline.collapsed > tbody > tr > td.child,
 table.dataTable.dtr-inline.collapsed > tbody > tr > th.child,

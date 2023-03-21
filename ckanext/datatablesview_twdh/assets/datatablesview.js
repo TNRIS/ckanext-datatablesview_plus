@@ -87,7 +87,7 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
         */
 
         // turn on scroller
-        scrollY:        "50vh",
+        scrollY:        "60vh",
         deferRender:    true,
         scrollCollapse: true,
         scroller:       true,
@@ -326,7 +326,6 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
 
       /* set event listeners */
 
-      /*
       var resizeTO;
       $( window ).on( 'resize' , function () {
 
@@ -337,20 +336,22 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
           // console.log( 'DataTable window resize postMessage occurred at: '+new Date().getTime() );
           // console.log( $( '#dtprv_wrapper' ).height() );
           window.parent.postMessage({ frameHeight: $( '#dtprv_wrapper' ).height() }, '*'); 
+          // window.parent.postMessage({ frameHeight: 1200 }, '*'); 
         }, 1000 );
 
         // send another message 1 second later to clean up because sometimes the first height is a miscalculation
         // setTimeout(function() { window.parent.postMessage({ frameHeight: $( '#dtprv_wrapper' ).height() }, '*'); }, 1000 );
         
       });
-      */
 
+      /*
       var resizeTO;
       $( window ).on( 'resize' , function () {
 
         // send message to parent window to set frame height
         clearTimeout( resizeTO );
         resizeTO = setTimeout(function() { 
+
           // console.log( 'DataTable window resize postMessage occurred at: '+new Date().getTime() );
           // console.log( $( '#dtprv_wrapper' ).height() );
           // window.parent.postMessage({ frameHeight: $( '#dtprv_wrapper' ).height() }, '*'); 
@@ -366,8 +367,8 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
           var new_table_height = table_height + ( document_height - wrapper_height );
           console.log( new_table_height );
 
-          $( '#dtprv' ).height( new_table_height );
-
+          // $( '#dtprv' ).height( new_table_height );
+          $( '#dtprv' ).height( 300 );
 
         }, 1000 );
 
@@ -375,6 +376,7 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
         // setTimeout(function() { window.parent.postMessage({ frameHeight: $( '#dtprv_wrapper' ).height() }, '*'); }, 1000 );
         
       });
+      */
 
 
 

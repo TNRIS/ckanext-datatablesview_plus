@@ -11,7 +11,7 @@
       class="table table-bordered"
       data-module="datatablesview_twdh"
       data-datadictionary='{{ h.datastore_dictionary(resource.id)|tojson }}'
-      {# data-summary-statistics='{{ h.get_dataset_summary_statistics( resource.package_id )|tojson }}' #}
+      data-summary-statistics='{{ h.get_dataset_summary_statistics( resource.name )|tojson }}'
       data-paging="true"
       data-server-side="true"
       data-processing="true"
@@ -35,7 +35,8 @@
       data-fixed-columns="true"
       data-dom="QBifrlptS"
       data-keys="false"
-      style="width: 100%;">
+      style="width: 100%;"
+    >
     <thead>
       <tr>
         {% for field in [{'id': '_id'}] + h.datastore_dictionary(resource.id) %}

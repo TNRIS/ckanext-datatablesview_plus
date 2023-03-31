@@ -1,7 +1,0 @@
-
-        [ckan.plugins]
-        datatablesview_twdh=ckanext.datatablesview_twdh.plugin:DatatablesviewPlusPlugin
-
-        [babel.extractors]
-        ckan = ckan.lib.extract:extract_ckan
-    

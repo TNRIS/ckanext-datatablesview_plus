@@ -8,6 +8,9 @@ from six import text_type
 from ckan.common import json
 from ckan.plugins.toolkit import get_action, request, h
 
+import logging
+log = logging.getLogger(__name__)
+
 datatablesview_twdh = Blueprint(u'datatablesview_twdh', __name__)
 
 
@@ -78,16 +81,85 @@ def ajax(resource_view_id):
         sort_list.append(cols[sort_by_num] + u' ' + sort_order)
         i += 1
 
-    response = datastore_search(
-        None, {
-            u"q": search_text,
-            u"resource_id": resource_view[u'resource_id'],
-            u"offset": offset,
-            u"limit": limit,
-            u"sort": u', '.join(sort_list),
-            u"filters": filters,
-        }
-    )
+    search_mode = 'datatables'
+    #search_mode = 'datatables_sql'
+
+    if search_mode == 'datatables':
+
+        log.debug( 'datatables search')
+        log.debug( request.form )
+
+        response = datastore_search(
+            None, {
+                u"q": search_text,
+                u"resource_id": resource_view[u'resource_id'],
+                u"offset": offset,
+                u"limit": limit,
+                u"sort": u', '.join(sort_list),
+                u"filters": filters,
+            }
+        )
+
+        return json.dumps({
+            u'draw': draw,
+            u'iTotalRecords': unfiltered_response.get(u'total', 0),
+            u'iTotalDisplayRecords': response.get(u'total', 0),
+            u'aaData': [[text_type(row.get(colname, u''))
+                        for colname in cols]
+                        for row in response[u'records']],
+        })
+
+
+    else:
+
+        datastore_search_sql = get_action(u'datastore_search_sql')
+        log.debug( 'datatables_sql search')
+        log.debug( request.form )
+        log.debug( 'resource_id = {}'.format( resource_view[u'resource_id'] ) )
+        log.debug( 'search_text = {}'.format( search_text ) )
+        log.debug( 'offset = {}'.format( offset ) )
+        log.debug( 'limit = {}'.format( limit ) )
+        log.debug( 'sort = {}'.format( sort_list ) )
+        log.debug( 'filters = {}'.format( filters ) )
+        log.debug( 'draw={}'.format( draw ) )
+        log.debug( cols )
+        
+        query_conditional = ''
+
+        if search_text != '':
+            for col in cols:
+                if col != '_id' and col != 'air_date' and col != 'show_number':
+                    if query_conditional != '' and col != '_id':
+                        query_conditional = query_conditional + ' OR '
+
+                    query_conditional = query_conditional + u" \"{col}\" ILIKE '%{search_text}%' ".format( col=col, search_text=search_text )
+
+            query = u"from public.\"{resource_id}\" where {query_conditional}".format( resource_id=resource_view[u'resource_id'], query_conditional=query_conditional )
+
+        else:
+            query = u"from public.\"{resource_id}\"".format( resource_id=resource_view[u'resource_id'] )
+
+        query = 'select * ' + query + ' ORDER BY {order_by} LIMIT {limit} OFFSET {offset}'.format( order_by=u', '.join(sort_list), limit=limit, offset=offset )
+            
+        log.debug( query )
+
+        response_sql = datastore_search_sql(
+            None,
+            { 
+                u"sql": query 
+            }
+        )
+        # log.debug( response_sql )
+
+        return json.dumps({
+            u'draw': draw,
+            u'iTotalRecords': unfiltered_response.get(u'total', 0),
+            u'iTotalDisplayRecords': response_sql.get(u'total', 1000),
+            u'aaData': [[text_type(row.get(colname, u''))
+                        for colname in cols]
+                        for row in response_sql[u'records']],
+        })
+        
 
     return json.dumps({
         u'draw': draw,

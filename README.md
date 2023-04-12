@@ -1,4 +1,4 @@
-# ckanext-datatablesview_twdh
+# ckanext-datatablesview_plus
 
 This is a fork of the core ckanext-datatables extension with DataTables upgraded to 
 versin 1.12.1 and styling and functionality configured for the Texas Water Data Hub
@@ -17,7 +17,7 @@ Compatibility with core CKAN versions:
 
 ## Installation
 
-To install ckanext-datatablesview_twdh:
+To install ckanext-datatablesview_plus:
 
 1. Activate your CKAN virtual environment, for example:
 
@@ -28,12 +28,12 @@ To install ckanext-datatablesview_twdh:
 2. Clone the source and install it on the virtualenv
 
     ```
-    git clone https://github.com/twdbben/ckanext-datatablesview_twdh.git
+    git clone https://github.com/TNRIS/ckanext-datatablesview_plus.git
     cd ckanext-datatablesview_twdh
     pip install -e .
     pip install -r requirements.txt
     ```
-3. Add `datatablesview_twdh` to the `ckan.plugins` setting in your CKAN
+3. Add `datatablesview_plus` to the `ckan.plugins` setting in your CKAN
    config file (by default the config file is located at
    `/etc/ckan/default/ckan.ini`).
 
@@ -48,10 +48,11 @@ To install ckanext-datatablesview_twdh:
 
 ## Developer installation
 
-To install ckanext-datatablesview_twdh for development, activate your CKAN virtualenv and
+To install ckanext-datatablesview_plus for development, activate your CKAN virtualenv and
 do:
-
-    git clone https://github.com/twdbben/ckanext-datatablesview_twdh.git
-    cd ckanext-datatablesview_twdh
+    ```
+    git clone https://github.com/twdbben/ckanext-datatablesview_plus.git
+    cd ckanext-datatablesview_plus
     python setup.py develop
     pip install -r dev-requirements.txt
+    ```

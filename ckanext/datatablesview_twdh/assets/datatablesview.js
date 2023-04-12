@@ -33,7 +33,7 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
         // Setup row selection
         select: true,
 
-        order: [[ 1, 'asc' ]],
+        order: [[ 0, 'asc' ]],
 
         // Setup searchBuilder
         searchBuilder: {
@@ -58,24 +58,83 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
           [ '10', '100', '1,000' ]
         ],
 
-        // turn on scroller
-        scrollY:        "60vh",
-        deferRender:    true,
-        scrollCollapse: true,
-        scroller:       true,
 
+        deferRender:    true,
+
+        // turn on scroller
+        paging: false,
+        scrollX:        true,
+        scrollY:        "60vh",
+
+        columnDefs: [
+          { 
+            width: '20px', 
+            targets: 0
+          }
+        ],
+        
         buttons:[
-          'copy',
-          'csvHtml5',
+          'createState', 'savedStates',
+          {
+            extend: 'copy',
+            text: 'COPY',
+            title: null,
+            exportOptions: {
+              format: {
+                header: function ( data, columnIdx ) {
+                  data = data.replace(/\s*<div.*<\/div>/g, '');
+                  return data;
+                }
+              },
+              columns: [ function ( idx, data, node ) {
+                return idx === 0 ?
+                  false : true;
+                } 
+              ] 
+            }
+          },
+          {
+            extend: 'csvHtml5',
+            text: 'CSV',
+            fieldSeparator: ',',
+            filename: 'my-csv',
+            extension: '.csv',
+            exportOptions: {
+              format: {
+                header: function ( data, columnIdx ) {
+                  data = data.replace(/\s*<div.*<\/div>/g, '');
+                  return data;
+                }
+              },
+              columns: [ function ( idx, data, node ) {
+                return idx === 0 ?
+                  false : true;
+                } 
+              ] 
+            }
+          },
           {
             extend: 'csvHtml5',
             text: 'TSV',
             fieldSeparator: '\t',
             filename: 'my-tsv',
-            extension: '.tsv'
+            extension: '.tsv',
+            exportOptions: {
+              format: {
+                header: function ( data, columnIdx ) {
+                  data = data.replace(/\s*<div.*<\/div>/g, '');
+                  return data;
+                }
+              },
+              columns: [ function ( idx, data, node ) {
+                return idx === 0 ?
+                  false : true;
+                } 
+              ] 
+            }
           },
           'excelHtml5',
-          'colvis',
+          // 'colvis',
           'print',
 
         ],
@@ -86,7 +145,7 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
 
         "initComplete": function(settings, json) {
           console.log( 'DataTables has finished its initialisation.' );
-          fit_datatable_to_window();
+          // fit_datatable_to_window();
         },
 
         search: {
@@ -102,34 +161,30 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
           var api = this.api();
  
           // Output the data for the visible rows to the browser's console
-          console.log( api.rows( {page:'current'} ).data() );
-          console.log( api.rows( {page:'current'} ).data().length );
-          console.log( table_rows_per_page );
-
-          console.log( $('select[name="dtprv_length"]').val() );
+          //console.log( api.rows( {page:'current'} ).data() );
+          //console.log( api.rows( {page:'current'} ).data().length );
+          //console.log( table_rows_per_page );
+          // console.log( $('select[name="dtprv_length"]').val() );
 
           var rows_per_page = $('select[name="dtprv_length"]').val();
 
           if( total <= rows_per_page ) {
 
-            console.log( 'hide pagination' );
+            // console.log( 'hide pagination' );
             $( '.dataTables_paginate' ).hide();
 
           } else {
 
-            console.log( 'show pagination' );
+            // console.log( 'show pagination' );
             $( '.dataTables_paginate' ).show();
 
           }
-
-
-
-          return total + " record" + ( total != 1 ? 's' : '' );
+          console.log( settings );
+          // return pre;
+          return "Showing " + start + "-" + end + " of " +  total + "  row" + ( total != 1 ? 's' : '' );
         },
 
         headerCallback: function( thead, data, start, end, display ) {
-
-
 
           $(thead).find('th').eq(0).html( '' );
 
@@ -137,7 +192,12 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
           var datadict = JSON.parse( $('#dtprv_wrapper table').attr( 'data-datadictionary' ) );
           $( datadict ).each( function( i ) {
             if( 'info' in datadict[i] && datadict[i].info.label != '' ) {
-              $(thead).find('th').eq(i+1).html( datadict[i].info.label );
+              
+              var label = datadict[i].info.label;
+              if( datadict[i].id != datadict[i].info.label ) {
+                label = label + '<div class="small dim">' + datadict[i].id + '</div>';
+              }
+              $(thead).find('th').eq(i+1).html( label );
             }
           });
 
@@ -149,7 +209,6 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
             $( data_summary ).each( function( i ) {
               var column_class = '';
               if( 'type' in data_summary[i] && data_summary[i].type == 'String' ) {
-                console.log( data_summary[i].type )
                 if( 'max_length' in data_summary[i] ) {
                   if( data_summary[i].max_length > 1000 ) {
                     column_class = 'gt1000';
@@ -217,6 +276,7 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
       }
 
       // Adds download dropdown to buttons menu
+      /*
       datatable.button().add(0, {
         text: 'Download Preview',
         extend: 'collection',
@@ -256,147 +316,22 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
           }]
         }
       );
-      /*
       */
-
-
-
-      datatable.columns( '.select-filter' ).every( function () {
-        var that = this;
-     
-        console.log( this );
-        
-        // Create the select list and search operation
-        var select = $('<select />')
-            .appendTo(
-                this.footer()
-            )
-            .on( 'change', function () {
-                that
-                    .search( $(this).val() )
-                    .draw();
-            } );
-     
-        // Get the search data for the first column and add to the select list
-        this
-            .cache( 'search' )
-            .sort()
-            .unique()
-            .each( function ( d ) {
-                select.append( $('<option value="'+d+'">'+d+'</option>') );
-            } );
-    } );
-
-
-    function fit_datatable_to_window() {
-
-      clearTimeout( resizeTO );
-      resizeTO = setTimeout(function() { 
-
-
-        console.log( 'DT resize' );
-
-        var tools_height = 
-          $( '#dtprv_wrapper .dtsb-searchBuilder' ).height()
-          + $( '#dtprv_wrapper .dt-buttons' ).height()
-          + $( '#dtprv_wrapper #dtprv_status' ).height()
-          + $( '#dtprv_wrapper .dataTables_paginate' ).height()
-          + $( '#dtprv_wrapper .dataTables_scrollHead' ).height()
-        ;
-  
-        var iframe_height = 
-          $( window ).height();
-  
-        var table_height = iframe_height - tools_height - 18;
-
-        /*
-        console.log( tools_height );
-        console.log( iframe_height );
-        console.log( table_height );
-        */
-       
-        $( '.dataTables_scrollBody' ).css( 'max-height', '100vh' );
-        $( '.dataTables_scrollBody' ).height( table_height );
-  
-      }, 1000 );
-
-    }
-
-      /* set event listeners */
-
-      $( window ).on( 'resize' , function () {
-
-        fit_datatable_to_window()
-        
-      });
-
-      /*
-      var resizeTO;
-      $( window ).on( 'resize' , function () {
-
-        // send message to parent window to set frame height
-        clearTimeout( resizeTO );
-        resizeTO = setTimeout(function() { 
-
-          // console.log( 'DataTable window resize postMessage occurred at: '+new Date().getTime() );
-          // console.log( $( '#dtprv_wrapper' ).height() );
-          // window.parent.postMessage({ frameHeight: $( '#dtprv_wrapper' ).height() }, '*'); 
-          console.log( $( document ).height() );
-          var document_height = $( document ).height();
-
-          console.log( $( '#twdh_dtprv_wrapper' ).height() );
-          var wrapper_height = $( '#twdh_dtprv_wrapper' ).height();
-
-          console.log( $( '#dtprv_wrapper' ).height() );
-          var table_height = $( '#dtprv_wrapper' ).height();
-
-          var new_table_height = table_height + ( document_height - wrapper_height );
-          console.log( new_table_height );
-
-          // $( '#dtprv' ).height( new_table_height );
-          $( '#dtprv' ).height( 300 );
-
-        }, 1000 );
-
-        // send another message 1 second later to clean up because sometimes the first height is a miscalculation
-        // setTimeout(function() { window.parent.postMessage({ frameHeight: $( '#dtprv_wrapper' ).height() }, '*'); }, 1000 );
-        
-      });
-      */
-
-
-
-
-      datatable.on( 'draw.dt', function () {
-
-        // console.log( 'DataTable redraw occurred at: '+new Date().getTime() );
-
-        // set bootstrap tooltips on truncated cells
-        jQuery('[data-toggle="tooltip"]').tooltip()
-  
-        // send message to parent window to set frame height
-        window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*');
-
-        // send another message 1 second later to clean up because sometimes the first height is a miscalculation
-        setTimeout(function() { window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*'); }, 1000 );
-
-      });
-              
-      datatable.on('init.dt', function() {
-
-        // console.log( 'DataTable initialized occurred at: '+new Date().getTime() );
-
-        // send message to parent window to set frame height
-        window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*');
-
-        // send another message 1 second later to clean up because sometimes the first height is a miscalculation
-        setTimeout(function() { window.parent.postMessage({ frameHeight: $( 'html' ).height() }, '*'); }, 1000 );
-
-
-      });
 
       /* Replace built in rotating ellipsis animation with TWDH preferred FontAwesome circle-o-notch animation */
       $( 'div.dataTables_processing' ).html( '<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>' );
+
+
+      /* observe iframe body height and post message to parend on resize */
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.contentBoxSize) {
+            const contentBoxSize = entry.contentBoxSize[0];
+            window.parent.postMessage({ frameHeight: contentBoxSize.blockSize }, '*'); 
+          }
+        }
+      });
+      resizeObserver.observe( document.querySelector("#dtprv_wrapper") );
 
     }
 

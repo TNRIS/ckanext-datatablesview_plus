@@ -1,3 +1,4 @@
 __pycache__
 *.egg-info/
 ckanext/datatablesview_twdh/assets/vendor.*
+ckanext/datatablesview_twdh/assets/vendor/tmp

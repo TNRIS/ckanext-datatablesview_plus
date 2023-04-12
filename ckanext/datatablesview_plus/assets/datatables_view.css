@@ -29,9 +29,22 @@ table.dataTable
 {
 
   padding: 0.5rem;
+  clear: both;
+  width: 100%;
 
 }
 
+#dtprv_wrapper  div.dataTables_paginate {
+
+  clear: both;
+  float: right;
+}
+
+.select-info::before
+{
+
+  content: ' / ';
+}
 
 .paging_extStyle
 {
@@ -341,6 +354,7 @@ div.dtfh-floatingparent  .table-bordered
 {
 
   border-color: #0D2856;
+
 }
 
 .dataTables_scroll
@@ -351,11 +365,13 @@ div.dtfh-floatingparent  .table-bordered
 
 }
 
+
 #dtprv_wrapper div.dataTables_scrollFootInner table.table-bordered tr th:first-child, 
 #dtprv_wrapper div.dataTables_scrollHeadInner table.table-bordered tr th:first-child,
 div.dtfh-floatingparent table.table-bordered tr th:first-child  
 {
   border-left: 1px solid #0D2856 !important;
+  
 }
 
 #dtprv_wrapper table.table-bordered tr th:first-child, 
@@ -365,7 +381,7 @@ div.dtfh-floatingparent table.table-bordered tr th:first-child
 div.dtfh-floatingparent table.table-bordered tr th:last-child  
 {
 
-  border-right-width: 1px !important;
+  border-right-width: 2px !important;
 
 }
 
@@ -383,7 +399,7 @@ div.dtfh-floatingparent table.table-bordered tr th
 {
 
   border-bottom-width: .3rem;
-
+  background: #E0E0E0;
 }
 
 #dtprv_wrapper table tr th,
@@ -556,8 +572,19 @@ box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.1);
 }
 
 #dtprv_wrapper table.dataTable>tbody>tr.selected>* {
-  box-shadow: inset 0 0 0 9999px #787177;
+  box-shadow: inset 0 0 0 9999px #0B7D8E;
   color: #fff;
+}
+
+#dtprv_wrapper table.dataTable>tbody>tr.selected>td:first-child {
+  box-shadow: inset 0 0 0 9999px #e0e0e0;
+  color: #59555B;
+}
+
+#dtprv tbody{
+
+  cursor: pointer;
+
 }
 
 #dtprv_wrapper th.gt100
@@ -593,6 +620,76 @@ box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.1);
 {
 
   margin-top: 0;
+
+}
+
+
+/* Column Headers and Left Row */
+
+
+#dtprv_wrapper table.table-bordered tr td.dtfc-fixed-left {
+
+  border-right: 20px solid #0D2856;
+  background: #E0E0E0;
+
+}
+
+/*
+table.dataTable thead > tr > th:first-child.sorting, 
+table.dataTable thead > tr > th:first-child.sorting_asc, 
+table.dataTable thead > tr > th:first-child.sorting_desc, 
+table.dataTable thead > tr > th:first-child.sorting_asc_disabled, 
+table.dataTable thead > tr > th:first-child.sorting_desc_disabled, 
+table.dataTable thead > tr > td:first-child.sorting, 
+table.dataTable thead > tr > td:first-child.sorting_asc, 
+table.dataTable thead > tr > td:first-child.sorting_desc, 
+table.dataTable thead > tr > td:first-child.sorting_asc_disabled, 
+table.dataTable thead > tr > td:first-child.sorting_desc_disabled 
+{
+  cursor: pointer;
+  position: relative;
+  padding-right: 46px;
+}
+*/
+
+table.dataTable thead > tr > th:first-child.sorting:before, 
+table.dataTable thead > tr > th:first-child.sorting:after, 
+table.dataTable thead > tr > th:first-child.sorting_asc:before, 
+table.dataTable thead > tr > th:first-child.sorting_asc:after, 
+table.dataTable thead > tr > th:first-child.sorting_desc:before, 
+table.dataTable thead > tr > th:first-child.sorting_desc:after, 
+table.dataTable thead > tr > th:first-child.sorting_asc_disabled:before, 
+table.dataTable thead > tr > th:first-child.sorting_asc_disabled:after, 
+table.dataTable thead > tr > th:first-child.sorting_desc_disabled:before, 
+table.dataTable thead > tr > th:first-child.sorting_desc_disabled:after, 
+table.dataTable thead > tr > td:first-child.sorting:before, 
+table.dataTable thead > tr > td:first-child.sorting:after, 
+table.dataTable thead > tr > td:first-child.sorting_asc:before, 
+table.dataTable thead > tr > td:first-child.sorting_asc:after, 
+table.dataTable thead > tr > td:first-child.sorting_desc:before, 
+table.dataTable thead > tr > td:first-child.sorting_desc:after, 
+table.dataTable thead > tr > td:first-child.sorting_asc_disabled:before, 
+table.dataTable thead > tr > td:first-child.sorting_asc_disabled:after, 
+table.dataTable thead > tr > td:first-child.sorting_desc_disabled:before, 
+table.dataTable thead > tr > td:first-child.sorting_desc_disabled:after 
+{
+  right: 20px;
+}
+
+div.dtfc-right-top-blocker, div.dtfc-left-top-blocker
+{
+
+  background: #e0e0e0 !important;
+  border-top: 1px solid #000;
+  border-bottom: 3px solid #000 !important;
+  margin-top: 0;
+
+}
+
+/* Prevent and/or logic box from breaking */
+div.dtsb-searchBuilder div.dtsb-group {
+
+  /* min-height: 100px; */
 
 }
 

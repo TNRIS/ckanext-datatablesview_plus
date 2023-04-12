@@ -1,8 +1,8 @@
 main-css:
   output: datapreview/%(version)s_main.css
   contents:
-    - vendor/datatables.min.css
-    - vendor/datatables.mark.min.css
+    - vendor/datatables.css
+    - vendor/datatables.mark.css
     - datatables_view.css
 main-js:
   output: datapreview/%(version)s_main.js
@@ -10,7 +10,7 @@ main-js:
     preload:
       - base/main
   contents:
-    - vendor/datatables.min.js
+    - vendor/datatables.js
     - vendor/mark.js
     - vendor/datatables.mark.js
     - datatablesview.js

@@ -47,7 +47,7 @@ To temporary patch the CKAN configuration for the duration of a test you can use
     def test_some_action():
         pass
 """
-import ckanext.datatablesview_twdh.plugin as plugin
+import ckanext.datatablesview_plus.plugin as plugin
 
 def test_plugin():
     pass

@@ -11,7 +11,7 @@ from ckan.plugins.toolkit import get_action, request, h
 import logging
 log = logging.getLogger(__name__)
 
-datatablesview_twdh = Blueprint(u'datatablesview_twdh', __name__)
+datatablesview_plus = Blueprint(u'datatablesview_plus', __name__)
 
 
 def merge_filters(view_filters, user_filters_str):
@@ -217,11 +217,11 @@ def filtered_download(resource_view_id):
     )
 
 
-datatablesview_twdh.add_url_rule(
+datatablesview_plus.add_url_rule(
     u'/datatables/ajax/<resource_view_id>', view_func=ajax, methods=[u'POST']
 )
 
-datatablesview_twdh.add_url_rule(
+datatablesview_plus.add_url_rule(
     u'/datatables/filtered-download/<resource_view_id>',
     view_func=filtered_download, methods=[u'POST']
 )

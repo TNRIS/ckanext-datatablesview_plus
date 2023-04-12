@@ -29,7 +29,7 @@ To install ckanext-datatablesview_plus:
 
     ```
     git clone https://github.com/TNRIS/ckanext-datatablesview_plus.git
-    cd ckanext-datatablesview_twdh
+    cd ckanext-datatablesview_plus
     pip install -e .
     pip install -r requirements.txt
     ```
@@ -37,7 +37,7 @@ To install ckanext-datatablesview_plus:
    config file (by default the config file is located at
    `/etc/ckan/default/ckan.ini`).
 
-4. Add `datatablesview_twdh` to the `ckan.ciews.default_views` setting in your CKAN
+4. Add `datatablesview_plus` to the `ckan.ciews.default_views` setting in your CKAN
    config file (by default the config file is located at
    `/etc/ckan/default/ckan.ini`).
 

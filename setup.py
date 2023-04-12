@@ -11,7 +11,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='''ckanext-datatablesview_twdh''',
+    name='''ckanext-datatablesview_plus''',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
@@ -23,7 +23,7 @@ setup(
     long_description_content_type="text/markdown",
 
     # The project's main homepage.
-    url='https://github.com/twdbben/ckanext-datatablesview_twdh',
+    url='https://github.com/twdbben/ckanext-datatablesview_plus',
 
     # Author details
     author='''Ben Bright''',
@@ -84,7 +84,7 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points='''
         [ckan.plugins]
-        datatablesview_twdh=ckanext.datatablesview_twdh.plugin:DatatablesviewPlusPlugin
+        datatablesview_plus=ckanext.datatablesview_plus.plugin:DatatablesviewPlusPlugin
 
         [babel.extractors]
         ckan = ckan.lib.extract:extract_ckan

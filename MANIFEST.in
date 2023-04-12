@@ -1,5 +1,5 @@
 include README.rst
 include LICENSE
 include requirements.txt
-recursive-include ckanext/datatablesview_twdh *.html *.json *.js *.less *.css *.mo *.yml
-recursive-include ckanext/datatablesview_twdh/migration *.ini *.py *.mako
+recursive-include ckanext/datatablesview_plus *.html *.json *.js *.less *.css *.mo *.yml
+recursive-include ckanext/datatablesview_plus/migration *.ini *.py *.mako

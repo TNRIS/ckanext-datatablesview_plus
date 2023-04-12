@@ -2,7 +2,7 @@
 
 import ckan.plugins as p
 import ckan.plugins.toolkit as toolkit
-from ckanext.datatablesview_twdh import blueprint
+from ckanext.datatablesview_plus import blueprint
 
 default = toolkit.get_validator(u'default')
 boolean_validator = toolkit.get_validator(u'boolean_validator')
@@ -41,7 +41,7 @@ class DatatablesviewPlusPlugin(p.SingletonPlugin):
     # IBlueprint
 
     def get_blueprint(self):
-        return blueprint.datatablesview_twdh
+        return blueprint.datatablesview_plus
 
     # IConfigurer
 
@@ -52,12 +52,12 @@ class DatatablesviewPlusPlugin(p.SingletonPlugin):
         '''
         toolkit.add_template_directory(config, u'templates')
         toolkit.add_public_directory(config, 'public')
-        toolkit.add_resource(u'assets', u'ckanext-datatablesview_twdh')
+        toolkit.add_resource(u'assets', u'ckanext-datatablesview_plus')
 
    # ITemplateHelpers
 
     def get_helpers(self):
-            """Register twdh helper functions"""
+            """Register helper functions"""
 
             return {
                 'dtprv_date': dtprv_date,
@@ -78,7 +78,7 @@ class DatatablesviewPlusPlugin(p.SingletonPlugin):
 
     def info(self):
         return {
-            u'name': u'datatablesview_twdh',
+            u'name': u'datatablesview_plus',
             u'title': u'Table',
             u'filterable': True,
             u'icon': u'table',

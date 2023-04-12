@@ -19,7 +19,7 @@ var run_query = function(params, format) {
   form.submit();
 }
 
-this.ckan.module('datatablesview_twdh', function (jQuery) {
+this.ckan.module('datatablesview_plus', function (jQuery) {
   return {
     initialize: function() {
 
@@ -344,8 +344,8 @@ this.ckan.module('datatablesview_twdh', function (jQuery) {
           console.log( $( document ).height() );
           var document_height = $( document ).height();
 
-          console.log( $( '#twdh_dtprv_wrapper' ).height() );
-          var wrapper_height = $( '#twdh_dtprv_wrapper' ).height();
+          console.log( $( '#plus_dtprv_wrapper' ).height() );
+          var wrapper_height = $( '#plus_dtprv_wrapper' ).height();
 
           console.log( $( '#dtprv_wrapper' ).height() );
           var table_height = $( '#dtprv_wrapper' ).height();

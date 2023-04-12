@@ -15,7 +15,6 @@ table.dataTable
 
 }
 
-#dtprv_wrapper .dt-buttons,
 #dtprv_wrapper .dataTables_length,
 #dtprv_wrapper .dataTables_info
 {
@@ -24,6 +23,14 @@ table.dataTable
     margin-right: 2rem;
 
 }
+
+#dtprv_wrapper .dt-buttons
+{
+
+  float: right;
+  
+}
+
 
 #dtprv_wrapper .dataTables_info
 {
@@ -177,6 +184,8 @@ div.dataTables_wrapper div.dataTables_filter input
   line-height: 1.8rem;
   margin: 0;
   padding: 1rem 0;
+  color: #E23014;
+
 
 }
 
@@ -732,11 +741,20 @@ div.dtsb-searchBuilder div.dtsb-group {
   div.dataTables_wrapper div.dataTables_filter
   {
 
-    float: right;
+    float: left;
     width: auto;
     margin: 0 0.7rem 0 0;
 
   }
+
+  #dtprv_wrapper div.dt-buttons
+  {
+
+    float: right;
+    width: auto;
+
+  }
+
 
   div.dataTables_wrapper div.dataTables_filter label
   {

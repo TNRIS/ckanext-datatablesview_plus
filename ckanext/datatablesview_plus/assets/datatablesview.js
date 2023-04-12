@@ -1,5 +1,4 @@
 var table_rows_per_page = 100;
-var resizeTO;
 
 var run_query = function(params, format) {
 
@@ -52,12 +51,10 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         // turn on state saving
         stateSave: true,
 
-
         lengthMenu: [
           [ 10, 100, 1000 ],
           [ '10', '100', '1,000' ]
         ],
-
 
         deferRender:    true,
 
@@ -74,28 +71,10 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         ],
         
         buttons:[
-          'createState', 'savedStates',
-          {
-            extend: 'copy',
-            text: 'COPY',
-            title: null,
-            exportOptions: {
-              format: {
-                header: function ( data, columnIdx ) {
-                  data = data.replace(/\s*<div.*<\/div>/g, '');
-                  return data;
-                }
-              },
-              columns: [ function ( idx, data, node ) {
-                return idx === 0 ?
-                  false : true;
-                } 
-              ] 
-            }
-          },
+          // 'createState', 'savedStates',
           {
             extend: 'csvHtml5',
-            text: 'CSV',
+            text: 'CSV <i class="fa fa-download" aria-hidden="true"></i>',
             fieldSeparator: ',',
             filename: 'my-csv',
             extension: '.csv',
@@ -115,15 +94,46 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           },
           {
             extend: 'csvHtml5',
-            text: 'TSV',
+            text: 'TSV <i class="fa fa-download" aria-hidden="true"></i>',
             fieldSeparator: '\t',
             filename: 'my-tsv',
             extension: '.tsv',
             exportOptions: {
               format: {
                 header: function ( data, columnIdx ) {
-                  data = data.replace(/\s*<div.*<\/div>/g, '');
-                  return data;
+                  return get_export_header( columnIdx );                }
+              },
+              columns: [ function ( idx, data, node ) {
+                return idx === 0 ?
+                  false : true;
+                } 
+              ] 
+            }
+          },
+          {
+            extend: 'copy',
+            text: 'COPY <i class="fa fa-copy" aria-hidden="true"></i>',
+            title: null,
+            exportOptions: {
+              format: {
+                header: function ( data, columnIdx ) {
+                  return get_export_header( columnIdx );                }
+              },
+              columns: [ function ( idx, data, node ) {
+                return idx === 0 ?
+                  false : true;
+                } 
+              ] 
+            }
+          },
+          {
+            extend: 'print',
+            text: 'PRINT <i class="fa fa-print" aria-hidden="true"></i>',
+            title: "",
+            exportOptions: {
+              format: {
+                header: function ( data, columnIdx ) {
+                  return get_export_header( columnIdx );
                 }
               },
               columns: [ function ( idx, data, node ) {
@@ -133,19 +143,14 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               ] 
             }
           },
-          'excelHtml5',
-          // 'colvis',
-          'print',
-
         ],
 
         pagingType: 'full_numbers',
         "pageLength": table_rows_per_page,
-
-
         "initComplete": function(settings, json) {
           console.log( 'DataTables has finished its initialisation.' );
-          // fit_datatable_to_window();
+          update_select_buttons();
+
         },
 
         search: {
@@ -154,17 +159,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           "return": false
         },
       
-
         // turn on table metadata display
         infoCallback: function( settings, start, end, max, total, pre ) {
-
-          var api = this.api();
- 
-          // Output the data for the visible rows to the browser's console
-          //console.log( api.rows( {page:'current'} ).data() );
-          //console.log( api.rows( {page:'current'} ).data().length );
-          //console.log( table_rows_per_page );
-          // console.log( $('select[name="dtprv_length"]').val() );
 
           var rows_per_page = $('select[name="dtprv_length"]').val();
 
@@ -181,7 +177,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           }
           console.log( settings );
           // return pre;
-          return "Showing " + start + "-" + end + " of " +  total + "  row" + ( total != 1 ? 's' : '' );
+          return "Showing " + start.toLocaleString("en-US") + "-" + end.toLocaleString("en-US") + " of " +  total.toLocaleString("en-US") + "  row" + ( total != 1 ? 's' : '' );
         },
 
         headerCallback: function( thead, data, start, end, display ) {
@@ -195,10 +191,14 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               
               var label = datadict[i].info.label;
               if( datadict[i].id != datadict[i].info.label ) {
-                label = label + '<div class="small dim">' + datadict[i].id + '</div>';
+                label = '<div class="dtlabel">' + label + '</div>' + '<span class="small dim">' + datadict[i].id + '</span>';
               }
               $(thead).find('th').eq(i+1).html( label );
             }
+
+            // Stash the original term as an attribute so that we can use it when exporting data
+            $(thead).find('th').eq(i+1).attr('data-term', datadict[i].id );
+
           });
 
 
@@ -258,70 +258,43 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           state['time'] = Date.now();
       
           return state;
-      }
+        }
 
       });
 
+
+
+      /* Update header based on whether DataTable is a preview or a full dataset */
       var dtprv_is_preview = $( '#dtprv_is_preview' ).val();
-      var dtprv_preview_rows = $( '#dtprv_preview_rows' ).val();
-      var dtprv_total_record_count = $( '#dtprv_total_record_count' ).val();
+      var dtprv_preview_rows = parseInt( $( '#dtprv_preview_rows' ).val() );
+      var dtprv_total_record_count = parseInt( $( '#dtprv_total_record_count' ).val() );
       var dtprv_date_modified = $( '#dtprv_metadata_modified' ).val();
 
       if( dtprv_is_preview == 'True' ) {
-        var dtprv_status = $( '<div id="dtprv_status"><p class="warning"><span title="" class="error-icon"></span>Data shown below reflects a snapshot of the full dataset. This preview includes the first ' + dtprv_preview_rows + ' records out of ' + dtprv_total_record_count + ' records and was last updated on ' + dtprv_date_modified + '.</p></div>' );
-      dtprv_status.insertBefore( '#dtprv_processing' );
-      } else {
-        var dtprv_status = $( '<div id="dtprv_status"><p class="">This data was last updated on ' + dtprv_date_modified + '.</p></div>' );
-      dtprv_status.insertBefore( '#dtprv_processing' );
-      }
 
-      // Adds download dropdown to buttons menu
-      /*
-      datatable.button().add(0, {
-        text: 'Download Preview',
-        extend: 'collection',
-        className: 'btn-primary dropdown-toggle btn-download-toggle',
-        buttons: [
-          {
-            text: 'CSV',
-            action: function (e, dt, button, config) {
-              var params = datatable.ajax.params();
-              params.visible = datatable.columns().visible().toArray();
-              run_query(params, 'csv');
-            }
-          }, 
-          {
-            text: 'TSV',
-            action: function (e, dt, button, config) {
-              var params = datatable.ajax.params();
-              params.visible = datatable.columns().visible().toArray();
-              run_query(params, 'tsv');
-            }
-          }, 
-          {
-            text: 'JSON',
-            action: function (e, dt, button, config) {
-              var params = datatable.ajax.params();
-              params.visible = datatable.columns().visible().toArray();
-              run_query(params, 'json');
-            }
-          }, 
-          {
-            text: 'XML',
-            action: function (e, dt, button, config) {
-              var params = datatable.ajax.params();
-              params.visible = datatable.columns().visible().toArray();
-              run_query(params, 'xml');
-            }
-          }]
-        }
-      );
-      */
+        var dtprv_status = $( 
+          '<div id="dtprv_status">' + 
+          '<p class="warning"><span title="" class="error-icon"></span> ' + 
+          'Only the first ' + dtprv_preview_rows.toLocaleString("en-US") + ' records of this dataset are shown in the data viewer due to storage restrictions. ' + 
+          'Download the full dataset to access all ' + dtprv_total_record_count.toLocaleString("en-US") + ' records.' + 
+          '</p>' + 
+          '</div>' 
+        );
+        dtprv_status.insertBefore( '#dtprv_processing' );
+      } else {
+        // var dtprv_status = $( '<div id="dtprv_status"><p class="">This data was last updated on ' + dtprv_date_modified + '.</p></div>' );
+        dtprv_status.insertBefore( '#dtprv_processing' );
+      }
 
       /* Replace built in rotating ellipsis animation with TWDH preferred FontAwesome circle-o-notch animation */
       $( 'div.dataTables_processing' ).html( '<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>' );
 
-      /* observe iframe body height and post message to parend on resize */
+      /* 
+      
+        Observe iframe body height and post message to parent on resize
+        window.onmessage in the theme js should catch this and resize the iframe as desired
+      
+      */
       const resizeObserver = new ResizeObserver((entries) => {
         for (const entry of entries) {
           if (entry.contentBoxSize) {
@@ -332,6 +305,58 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       });
       resizeObserver.observe( document.querySelector("#dtprv_wrapper") );
 
+
+      /* select button show/hide etc. */
+
+      var selectTimeout;
+
+      function update_select_buttons() {
+
+        console.log( 'Updating select buttons' );
+        var count = datatable.rows( { selected: true } ).count();
+
+        console.log( count + " rows selected" );
+
+        if( count > 0 ) {
+
+          if( !dtprv_is_preview ) {
+
+            console.log( 'showing select buttons' );
+            $( '#dtprv_wrapper .dt-buttons' ).fadeIn();
+
+          }
+
+        } else {
+
+          console.log( 'hiding select buttons' );
+          $( '#dtprv_wrapper .dt-buttons' ).fadeOut();
+
+        }
+
+      }
+
+      datatable.on( 'select', function ( e, dt, type, indexes ) {
+
+        console.log( 'select happened' );
+        update_select_buttons();
+
+      } );
+
+      datatable.on( 'deselect', function ( e, dt, type, indexes ) {
+
+        console.log( 'deselect happened' );
+        /* Use this timeout sequence to avoid 'flashing effect' when deselecting/reselecting in one click */
+        clearTimeout( selectTimeout ) ;
+        selectTimeout = setTimeout(() => { update_select_buttons(); }, 100);
+
+      } );
+
+      function get_export_header( i ) {
+
+        return $( '#dtprv thead').find('th').eq(i).attr('data-term' );
+      
+      }
+  
     }
 
   }

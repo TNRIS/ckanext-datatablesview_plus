@@ -88,13 +88,12 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             extend: 'csvHtml5',
             text: 'CSV <i class="fa fa-download" aria-hidden="true"></i>',
             fieldSeparator: ',',
-            filename: 'my-csv',
+            filename: $( '#dtprv' ).attr( 'data-filename' ),
             extension: '.csv',
             exportOptions: {
               format: {
                 header: function ( data, columnIdx ) {
-                  data = data.replace(/\s*<div.*<\/div>/g, '');
-                  return data;
+                  return get_export_header( columnIdx );
                 }
               },
               columns: [ function ( idx, data, node ) {
@@ -108,7 +107,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             extend: 'csvHtml5',
             text: 'TSV <i class="fa fa-download" aria-hidden="true"></i>',
             fieldSeparator: '\t',
-            filename: 'my-tsv',
+            filename: $( '#dtprv' ).attr( 'data-filename' ),
             extension: '.tsv',
             exportOptions: {
               format: {
@@ -159,9 +158,12 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         pagingType: 'full_numbers',
         "pageLength": table_rows_per_page,
+
         "initComplete": function(settings, json) {
+
           console.log( 'DataTables has finished its initialisation.' );
           update_select_buttons();
+          update_filenames();
 
         },
 
@@ -325,6 +327,12 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       /* select button show/hide etc. */
 
       var selectTimeout;
+
+      function update_filenames() {
+
+        console.log(  );
+
+      }
 
       function update_select_buttons() {
 

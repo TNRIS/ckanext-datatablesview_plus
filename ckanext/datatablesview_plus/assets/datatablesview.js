@@ -42,10 +42,22 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         // Set column reordering
         colReorder: false,
 
-        // Set search placeholder text
+        // Set strings
         language: {
-          search: "",
-          searchPlaceholder: "Search..."
+          paginate: {
+            first: '<i class="fa fa-angle-double-left" aria-hidden="true"></i>',
+            previous: '<i class="fa fa-angle-left" aria-hidden="true"></i>',
+            next: '<i class="fa fa-angle-right" aria-hidden="true"></i>',
+            last: '<i class="fa fa-angle-double-right" aria-hidden="true"></i>'
+          },
+          search: '',
+          searchPlaceholder: 'Search...',
+          searchBuilder: {
+              title: '',
+              add: 'Add Filter',
+              data: 'Field'
+
+          }
         },
 
         // turn on state saving
@@ -175,8 +187,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             $( '.dataTables_paginate' ).show();
 
           }
-          console.log( settings );
-          // return pre;
+          // console.log( settings );
+          
           return "Showing " + start.toLocaleString("en-US") + "-" + end.toLocaleString("en-US") + " of " +  total.toLocaleString("en-US") + "  row" + ( total != 1 ? 's' : '' );
         },
 
@@ -269,10 +281,11 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       var dtprv_preview_rows = parseInt( $( '#dtprv_preview_rows' ).val() );
       var dtprv_total_record_count = parseInt( $( '#dtprv_total_record_count' ).val() );
       var dtprv_date_modified = $( '#dtprv_metadata_modified' ).val();
+      var dtprv_status = $( '' );
 
       if( dtprv_is_preview == 'True' ) {
 
-        var dtprv_status = $( 
+        dtprv_status = $( 
           '<div id="dtprv_status">' + 
           '<p class="warning"><span title="" class="error-icon"></span> ' + 
           'Only the first ' + dtprv_preview_rows.toLocaleString("en-US") + ' records of this dataset are shown in the data viewer due to storage restrictions. ' + 
@@ -283,7 +296,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         dtprv_status.insertBefore( '#dtprv_processing' );
       } else {
         // var dtprv_status = $( '<div id="dtprv_status"><p class="">This data was last updated on ' + dtprv_date_modified + '.</p></div>' );
-        dtprv_status.insertBefore( '#dtprv_processing' );
+        // dtprv_status.insertBefore( '#dtprv_processing' );
       }
 
       /* Replace built in rotating ellipsis animation with TWDH preferred FontAwesome circle-o-notch animation */
@@ -296,9 +309,12 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       
       */
       const resizeObserver = new ResizeObserver((entries) => {
+        // console.log( 'resizeObserver' );
+        // console.log( entries );
         for (const entry of entries) {
           if (entry.contentBoxSize) {
             const contentBoxSize = entry.contentBoxSize[0];
+            // console.log( 'resizeObserver: ' + contentBoxSize.blockSize );
             window.parent.postMessage({ frameHeight: contentBoxSize.blockSize }, '*'); 
           }
         }
@@ -312,23 +328,23 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       function update_select_buttons() {
 
-        console.log( 'Updating select buttons' );
+        // console.log( 'Updating select buttons' );
         var count = datatable.rows( { selected: true } ).count();
 
-        console.log( count + " rows selected" );
+        // console.log( count + " rows selected" );
 
         if( count > 0 ) {
 
           if( !dtprv_is_preview ) {
 
-            console.log( 'showing select buttons' );
-            $( '#dtprv_wrapper .dt-buttons' ).fadeIn();
+            // console.log( 'showing select buttons' );
+            $( '  .dt-buttons' ).fadeIn();
 
           }
 
         } else {
 
-          console.log( 'hiding select buttons' );
+          // console.log( 'hiding select buttons' );
           $( '#dtprv_wrapper .dt-buttons' ).fadeOut();
 
         }
@@ -337,14 +353,14 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       datatable.on( 'select', function ( e, dt, type, indexes ) {
 
-        console.log( 'select happened' );
+        // console.log( 'select happened' );
         update_select_buttons();
 
       } );
 
       datatable.on( 'deselect', function ( e, dt, type, indexes ) {
 
-        console.log( 'deselect happened' );
+        // console.log( 'deselect happened' );
         /* Use this timeout sequence to avoid 'flashing effect' when deselecting/reselecting in one click */
         clearTimeout( selectTimeout ) ;
         selectTimeout = setTimeout(() => { update_select_buttons(); }, 100);

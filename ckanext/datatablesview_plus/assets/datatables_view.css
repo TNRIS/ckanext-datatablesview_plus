@@ -15,34 +15,46 @@ table.dataTable
 
 }
 
-#dtprv_wrapper .dt-buttons,
-#dtprv_wrapper .dataTables_length,
-#dtprv_wrapper .dataTables_info
+#dtprv_wrapper .dataTables_length
 {
 
-    float: left;
-    margin-right: 2rem;
+    width: 20%;
+    margin: 0.4rem 2rem 0 0;
 
 }
 
+#dtprv_wrapper .dt-buttons
+{
+
+  float: right;
+  
+}
+
+
 #dtprv_wrapper .dataTables_info
 {
 
-  padding: 0.5rem;
-  clear: both;
-  width: 100%;
+  margin: 1rem 0;
+  float: left;
+  clear: left;
+  width: 40%;
+
 
 }
 
 #dtprv_wrapper  div.dataTables_paginate {
 
-  clear: both;
+  width: 75%;
   float: right;
+}
+
+div.dataTables_wrapper span.select-info, div.dataTables_wrapper span.select-item
+{
+  
 }
 
 .select-info::before
 {
-
   content: ' / ';
 }
 
@@ -121,6 +133,17 @@ table.dataTable
 
 }
 
+.pagination > .disabled > span, 
+.pagination > .disabled > span:hover, 
+.pagination > .disabled > span:focus, 
+.pagination > .disabled > a, 
+.pagination > .disabled > a:hover, 
+.pagination > .disabled > a:focus 
+{
+
+  color: #E0E0E0;
+
+}
 div.dataTables_wrapper div.dataTables_filter
 {
 
@@ -157,7 +180,8 @@ div.dataTables_wrapper div.dataTables_filter input
 #dtprv_status
 {
 
-  clear: both;
+  float: right;
+  width: 60%;
   padding: 0;
 
 }
@@ -177,6 +201,8 @@ div.dataTables_wrapper div.dataTables_filter input
   line-height: 1.8rem;
   margin: 0;
   padding: 1rem 0;
+  color: #E23014;
+
 
 }
 
@@ -571,6 +597,11 @@ box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.1);
 
 }
 
+#dtprv_wrapper div.dtsb-searchBuilder div.dtsb-titleRow {
+  /* we don't want a separate title for SearchBuilder */
+  height: 0;
+}
+
 #dtprv_wrapper table.dataTable>tbody>tr.selected>* {
   box-shadow: inset 0 0 0 9999px #0B7D8E;
   color: #fff;
@@ -689,7 +720,22 @@ div.dtfc-right-top-blocker, div.dtfc-left-top-blocker
 /* Prevent and/or logic box from breaking */
 div.dtsb-searchBuilder div.dtsb-group {
 
-  /* min-height: 100px; */
+
+}
+
+div.dtsb-searchBuilder div.dtsb-group
+{
+
+  margin-bottom: 0;
+
+}
+
+div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria select.dtsb-dropDown, 
+div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria input.dtsb-input
+{
+
+  min-width: 12rem;
+  max-width: 30%;
 
 }
 
@@ -732,11 +778,20 @@ div.dtsb-searchBuilder div.dtsb-group {
   div.dataTables_wrapper div.dataTables_filter
   {
 
-    float: right;
+    float: left;
     width: auto;
     margin: 0 0.7rem 0 0;
 
   }
+
+  #dtprv_wrapper div.dt-buttons
+  {
+
+    float: right;
+    width: auto;
+
+  }
+
 
   div.dataTables_wrapper div.dataTables_filter label
   {

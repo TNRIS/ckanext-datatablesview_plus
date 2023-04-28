@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 
 {% block page %}
-  
+
+
   <div id="dtplus_dtprv_wrapper">
-  <input type="hidden" id="dtprv_is_preview" value="{{ resource.preview }}"/>
-  <input type="hidden" id="dtprv_preview_rows" value="{{ resource.preview_rows }}"/>
-  <input type="hidden" id="dtprv_total_record_count" value="{{ resource.total_record_count }}"/>
-  <input type="hidden" id="dtprv_metadata_modified" value="{{ h.dtprv_date(resource.metadata_modified) }}"/>  
+  <input type="hidden" id="dtprv_is_preview" value="{% if resource.get( 'preview' ) == True %}True{% else %}False{%endif%}"/>
+  <input type="hidden" id="dtprv_preview_rows" value="{{ resource.get( 'preview_rows' ) }}"/>
+  <input type="hidden" id="dtprv_total_record_count" value="{{ resource.get( 'total_record_count' ) }}"/>
+  <input type="hidden" id="dtprv_metadata_modified" value="{{ h.dtprv_date(resource.get( 'metadata_modified' ) ) }}"/>  
     <table id="dtprv"
       class="table table-bordered"
       data-module="datatablesview_plus"
@@ -31,9 +32,18 @@
         data-scroll-x="true"
       {% endif %}
 
+      {# only turn on row-selection if it is a full dataset #}
+      {% if resource.get( 'preview' ) == True %}
+        data-select="false"
+        data-dom="iBrtplS"
+      {% else %}
+        data-select="true"
+        data-dom="fQiBrtplS"
+      {% endif %}
+
       data-fixed-header="true"
       data-fixed-columns="true"
-      data-dom="QfiBrtplS"
+
       data-keys="false"
       style="width: 100%;"
       data-filename="TWDH-subset-{{ package.get( 'name', 'twdh-filtered-dataset') }}"

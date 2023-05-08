@@ -80,6 +80,10 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           { 
             width: '20px', 
             targets: 0
+          },
+          { 
+            targets: '_all', 
+            render: DataTable.render.text()
           }
         ],
         

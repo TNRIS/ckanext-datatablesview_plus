@@ -30,7 +30,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         mark: true,
 
         // Setup row selection
-        select: true,
+        // select: true,
 
         order: [[ 0, 'asc' ]],
 
@@ -44,6 +44,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         // Set strings
         language: {
+          lengthMenu: "Show _MENU_ rows per page",
           paginate: {
             first: '<i class="fa fa-angle-double-left" aria-hidden="true"></i>',
             previous: '<i class="fa fa-angle-left" aria-hidden="true"></i>',
@@ -79,6 +80,10 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           { 
             width: '20px', 
             targets: 0
+          },
+          { 
+            targets: '_all', 
+            render: DataTable.render.text()
           }
         ],
         
@@ -158,6 +163,26 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         pagingType: 'full_numbers',
         "pageLength": table_rows_per_page,
+
+        /* 
+        Trying to remove the _id option from the Term filter in SearchBuilder. 
+        Need to figure out how to do this generically for all columns instead 
+        of having to code it column-by-column which is untenable for our needs 
+        since we don't know the columns beforehand
+        https://datatables.net/extensions/searchbuilder/examples/customisation/plugin.html
+
+        init: function(that, fn, preDefined = null) {
+
+          alert( 'hello' );
+          let el = $('.dtsb-data');
+
+          $(el).on('dtsb-inserted', function(){
+            alert( 'hello' );
+          });
+
+        },
+
+        */
 
         "initComplete": function(settings, json) {
 
@@ -279,7 +304,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
 
       /* Update header based on whether DataTable is a preview or a full dataset */
-      var dtprv_is_preview = $( '#dtprv_is_preview' ).val();
+      var dtprv_is_preview = $( '#dtprv_is_preview' ).val();      
       var dtprv_preview_rows = parseInt( $( '#dtprv_preview_rows' ).val() );
       var dtprv_total_record_count = parseInt( $( '#dtprv_total_record_count' ).val() );
       var dtprv_date_modified = $( '#dtprv_metadata_modified' ).val();
@@ -290,13 +315,19 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         dtprv_status = $( 
           '<div id="dtprv_status">' + 
           '<p class="warning"><span title="" class="error-icon"></span> ' + 
-          'Only the first ' + dtprv_preview_rows.toLocaleString("en-US") + ' records of this dataset are shown in the data viewer due to storage restrictions. ' + 
-          'Download the full dataset to access all ' + dtprv_total_record_count.toLocaleString("en-US") + ' records.' + 
+          'Only the first ' + dtprv_preview_rows.toLocaleString("en-US") + ' rows of this dataset are shown in the data viewer due to storage restrictions. ' + 
+          'Download the full dataset to access all ' + dtprv_total_record_count.toLocaleString("en-US") + ' rows.' + 
           '</p>' + 
           '</div>' 
         );
         dtprv_status.insertBefore( '#dtprv_processing' );
+
       } else {
+
+        // Show pointer cursor when hovering over selectable body of table
+        $( '#dtprv tbody' ).css( 'cursor', 'pointer' );
+
+
         // var dtprv_status = $( '<div id="dtprv_status"><p class="">This data was last updated on ' + dtprv_date_modified + '.</p></div>' );
         // dtprv_status.insertBefore( '#dtprv_processing' );
       }
@@ -343,7 +374,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         if( count > 0 ) {
 
-          if( !dtprv_is_preview ) {
+          if( dtprv_is_preview == 'False' ) {
 
             // console.log( 'showing select buttons' );
             $( '  .dt-buttons' ).fadeIn();
@@ -361,7 +392,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       datatable.on( 'select', function ( e, dt, type, indexes ) {
 
-        // console.log( 'select happened' );
+        console.log( 'select happened' );
         update_select_buttons();
 
       } );

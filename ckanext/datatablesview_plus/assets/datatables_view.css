@@ -26,7 +26,8 @@ table.dataTable
 #dtprv_wrapper .dt-buttons
 {
 
-  float: right;
+  float: left;
+  clear: left;
   
 }
 
@@ -35,8 +36,9 @@ table.dataTable
 {
 
   margin: 1rem 0;
-  float: left;
-  clear: left;
+  float: right;
+  clear: both;
+  text-align: right;
   width: 40%;
 
 
@@ -51,6 +53,8 @@ table.dataTable
 div.dataTables_wrapper span.select-info, div.dataTables_wrapper span.select-item
 {
   
+  float: none; 
+
 }
 
 .select-info::before
@@ -612,12 +616,6 @@ box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.1);
   color: #59555B;
 }
 
-#dtprv tbody{
-
-  cursor: pointer;
-
-}
-
 #dtprv_wrapper th.gt100
 {
 
@@ -779,16 +777,17 @@ div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria input.dtsb-input
   {
 
     float: left;
-    width: auto;
-    margin: 0 0.7rem 0 0;
+    width: 98%;
+    margin: 0 0rem 0 0;
 
   }
 
   #dtprv_wrapper div.dt-buttons
   {
 
-    float: right;
+    float: left;
     width: auto;
+    margin-top: 1rem;
 
   }
 
@@ -796,7 +795,7 @@ div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria input.dtsb-input
   div.dataTables_wrapper div.dataTables_filter label
   {
 
-    display: inline-block;
+    /* display: inline-block; */
 
   }
 

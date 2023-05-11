@@ -5,11 +5,19 @@ from six.moves.urllib.parse import urlencode
 from flask import Blueprint
 from six import text_type
 
+import ckan.model as model
 from ckan.common import json
 from ckan.plugins.toolkit import get_action, request, h
+from ckan.plugins import toolkit as tk
+\
+from ckanext.datatablesview_plus.search_builder import parse
 
 import logging
 log = logging.getLogger(__name__)
+
+get_action = tk.get_action
+request = tk.request
+h = tk.h
 
 datatablesview_plus = Blueprint(u'datatablesview_plus', __name__)
 
@@ -46,7 +54,6 @@ def ajax(resource_view_id):
                                )(None, {
                                    u'id': resource_view_id
                                })
-
     draw = int(request.form[u'draw'])
     search_text = text_type(request.form[u'search[value]'])
     offset = int(request.form[u'start'])
@@ -55,39 +62,77 @@ def ajax(resource_view_id):
     user_filters = text_type(request.form[u'filters'])
     filters = merge_filters(view_filters, user_filters)
 
-    datastore_search = get_action(u'datastore_search')
-    unfiltered_response = datastore_search(
-        None, {
-            u"resource_id": resource_view[u'resource_id'],
-            u"limit": 0,
-            u"filters": view_filters,
+    if 'searchBuilder[logic]' in request.form.to_dict().keys():
+        sql = 'SELECT * FROM "{table_name}" WHERE '.format(table_name=str(resource_view[u'resource_id']))
+
+        search_params = [(key,value) for key, value in request.form.items(multi=True) if 'searchBuilder' in key]
+        tree = parse(search_params)
+        sql += tree.to_sql()
+        context = {
+            "model": model,
+            "user": tk.g.user,
+            "session": model.Session,
+            "ignore_auth": True
         }
-    )
-
-    cols = [f[u'id'] for f in unfiltered_response[u'fields']]
-    if u'show_fields' in resource_view:
-        cols = [c for c in cols if c in resource_view[u'show_fields']]
-
-    sort_list = []
-    i = 0
-    while True:
-        if u'order[%d][column]' % i not in request.form:
-            break
-        sort_by_num = int(request.form[u'order[%d][column]' % i])
-        sort_order = (
-            u'desc' if request.form[u'order[%d][dir]' %
-                                    i] == u'desc' else u'asc'
+        print(sql)
+        datastore_search = get_action(u'datastore_search_sql')
+        unfiltered_response = datastore_search(
+            context, {
+                u"sql": sql,
+                u"limit": 0,
+            }
         )
-        sort_list.append(cols[sort_by_num] + u' ' + sort_order)
-        i += 1
+        cols = [f[u'id'] for f in unfiltered_response[u'fields']]
+        if u'show_fields' in resource_view:
+            cols = [c for c in cols if c in resource_view[u'show_fields']]
 
-    search_mode = 'datatables'
-    #search_mode = 'datatables_sql'
+        sort_list = []
+        i = 0
+        while True:
+            if u'order[%d][column]' % i not in request.form:
+                break
+            sort_by_num = int(request.form[u'order[%d][column]' % i])
+            sort_order = (
+                u'desc' if request.form[u'order[%d][dir]' %
+                                        i] == u'desc' else u'asc'
+            )
+            sort_list.append(cols[sort_by_num] + u' ' + sort_order)
+            i += 1
 
-    if search_mode == 'datatables':
+        response = datastore_search(
+           context, {
+                u"sql": sql,
+                u"limit": 0,
+            }
+        )
+    else:
 
-        log.debug( 'datatables search')
-        log.debug( request.form )
+
+        datastore_search = get_action(u'datastore_search')
+        unfiltered_response = datastore_search(
+            None, {
+                u"resource_id": resource_view[u'resource_id'],
+                u"limit": 0,
+                u"filters": view_filters,
+            }
+        )
+
+        cols = [f[u'id'] for f in unfiltered_response[u'fields']]
+        if u'show_fields' in resource_view:
+            cols = [c for c in cols if c in resource_view[u'show_fields']]
+
+        sort_list = []
+        i = 0
+        while True:
+            if u'order[%d][column]' % i not in request.form:
+                break
+            sort_by_num = int(request.form[u'order[%d][column]' % i])
+            sort_order = (
+                u'desc' if request.form[u'order[%d][dir]' %
+                                        i] == u'desc' else u'asc'
+            )
+            sort_list.append(cols[sort_by_num] + u' ' + sort_order)
+            i += 1
 
         response = datastore_search(
             None, {
@@ -99,67 +144,6 @@ def ajax(resource_view_id):
                 u"filters": filters,
             }
         )
-
-        return json.dumps({
-            u'draw': draw,
-            u'iTotalRecords': unfiltered_response.get(u'total', 0),
-            u'iTotalDisplayRecords': response.get(u'total', 0),
-            u'aaData': [[text_type(row.get(colname, u''))
-                        for colname in cols]
-                        for row in response[u'records']],
-        })
-
-
-    else:
-
-        datastore_search_sql = get_action(u'datastore_search_sql')
-        log.debug( 'datatables_sql search')
-        log.debug( request.form )
-        log.debug( 'resource_id = {}'.format( resource_view[u'resource_id'] ) )
-        log.debug( 'search_text = {}'.format( search_text ) )
-        log.debug( 'offset = {}'.format( offset ) )
-        log.debug( 'limit = {}'.format( limit ) )
-        log.debug( 'sort = {}'.format( sort_list ) )
-        log.debug( 'filters = {}'.format( filters ) )
-        log.debug( 'draw={}'.format( draw ) )
-        log.debug( cols )
-        
-        query_conditional = ''
-
-        if search_text != '':
-            for col in cols:
-                if col != '_id' and col != 'air_date' and col != 'show_number':
-                    if query_conditional != '' and col != '_id':
-                        query_conditional = query_conditional + ' OR '
-
-                    query_conditional = query_conditional + u" \"{col}\" ILIKE '%{search_text}%' ".format( col=col, search_text=search_text )
-
-            query = u"from public.\"{resource_id}\" where {query_conditional}".format( resource_id=resource_view[u'resource_id'], query_conditional=query_conditional )
-
-        else:
-            query = u"from public.\"{resource_id}\"".format( resource_id=resource_view[u'resource_id'] )
-
-        query = 'select * ' + query + ' ORDER BY {order_by} LIMIT {limit} OFFSET {offset}'.format( order_by=u', '.join(sort_list), limit=limit, offset=offset )
-            
-        log.debug( query )
-
-        response_sql = datastore_search_sql(
-            None,
-            { 
-                u"sql": query 
-            }
-        )
-        # log.debug( response_sql )
-
-        return json.dumps({
-            u'draw': draw,
-            u'iTotalRecords': unfiltered_response.get(u'total', 0),
-            u'iTotalDisplayRecords': response_sql.get(u'total', 1000),
-            u'aaData': [[text_type(row.get(colname, u''))
-                        for colname in cols]
-                        for row in response_sql[u'records']],
-        })
-        
 
     return json.dumps({
         u'draw': draw,

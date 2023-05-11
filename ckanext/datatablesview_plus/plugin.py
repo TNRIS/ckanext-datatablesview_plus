@@ -3,6 +3,7 @@
 import ckan.plugins as p
 import ckan.plugins.toolkit as toolkit
 from ckanext.datatablesview_plus import blueprint
+from ckanext.datatablesview_plus.views import datatablessearch
 
 default = toolkit.get_validator(u'default')
 boolean_validator = toolkit.get_validator(u'boolean_validator')

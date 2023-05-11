@@ -3,7 +3,7 @@ main-css:
   contents:
     - vendor/datatables.css
     - vendor/datatables.mark.css
-    - datatables_view.css
+    - datatablesview_plus.css
 main-js:
   output: datapreview/%(version)s_main.js
   extra:
@@ -13,4 +13,4 @@ main-js:
     - vendor/datatables.js
     - vendor/mark.js
     - vendor/datatables.mark.js
-    - datatablesview.js
+    - datatablesview_plus.js

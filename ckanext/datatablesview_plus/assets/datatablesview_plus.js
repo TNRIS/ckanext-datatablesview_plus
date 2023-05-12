@@ -18,6 +18,8 @@ var run_query = function(params, format) {
   form.submit();
 }
 
+
+
 this.ckan.module('datatablesview_plus', function (jQuery) {
   return {
     initialize: function() {
@@ -362,13 +364,12 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         for (const entry of entries) {
           if (entry.contentBoxSize) {
             const contentBoxSize = entry.contentBoxSize[0];
-            console.log( 'resizeObserver: ' + contentBoxSize.blockSize );
+            // console.log( 'resizeObserver: ' + contentBoxSize.blockSize );
             window.parent.postMessage({ frameHeight: contentBoxSize.blockSize }, '*'); 
           }
         }
       });
-      resizeObserver.observe( document.querySelector("#dtprv_wrapper") );
-
+      resizeObserver.observe( document.querySelector("#dtplus_dtprv_wrapper") );
 
       /* select button show/hide etc. */
 
@@ -421,10 +422,14 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       });
 
+      /*
+      datatable.on( 'search.dt', function () {
+        console.log( 'Currently applied global search: '+datatable.search() );
+      } );
+      */
 
       $('#dtprv_filter input[type=search]').on( 'input', function() {
 
-        console.log( 'change' );
         if( $( this ).val() == '' ) {
 
           $('#dtprv_filter .dt-search-cancel').css( 'display', 'none' );
@@ -449,6 +454,135 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         return $( '#dtprv thead').find('th').eq(i).attr('data-term' );
       
       }
+
+
+      /*
+      const observer = new MutationObserver(function(mutations_list) {
+        mutations_list.forEach(function(mutation) {
+          console.log( 'removed nodes' );
+          mutation.removedNodes.forEach(function(removed_node) {
+            // if(removed_node.id == 'child') {
+            if( $( removed_node ).hasClass( 'dtsb-clearAll' ) ) {
+
+              console.log(removed_node);
+              $('#dtprv_filter').css( 'display', 'block' );
+              // observer.disconnect();
+            }
+          });
+        });
+      });
+      
+      observer.observe(document.querySelector("#dtprv_wrapper"), { subtree: true, childList: true });
+      */
+
+      function onElementInserted(containerSelector, elementSelector, callback) {
+
+        // console.log( 'onElementInserted' );
+        // console.log( containerSelector );
+        // console.log( elementSelector );
+        // console.log( callback );
+
+        var onMutationsObserved = function(mutations) {
+            //console.log( 'onMutationsObserved' );
+            mutations.forEach(function(mutation) {
+                if (mutation.addedNodes.length) {
+                    //console.log( 'elementSelector' );
+                    //console.log( elementSelector );
+                    var elements = $(containerSelector).find(elementSelector);
+                    //console.log( 'elements' );
+                    //console.log( elements );
+                    for (var i = 0, len = elements.length; i < len; i++) {
+                        callback(elements[i]);
+                    }
+                }
+            });
+        };
+      
+        var target = $(containerSelector)[0];
+        // console.log( target );
+        var config = { attributes: true, characterData: true, childList: true, subtree: true };
+        // console.log( config );
+        var MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+        var observer = new MutationObserver(onMutationsObserved);    
+        observer.observe(target, config);
+      
+      }
+      
+      onElementInserted('.dtsb-searchBuilder', '.dtsb-clearAll', function(element) {
+        // console.log(element);
+        $(element).click(function() {
+          console.log('.dtsb-clearAll clicked');
+          // console.log( $( element ).attr( 'class' ) );
+          $('#dtprv_filter').css( 'display', 'block' );
+        } );
+      });
+
+      onElementInserted('.dtsb-searchBuilder', '.dtsb-add', function(element) {
+        // console.log(element);
+        $(element).click(function() {
+          // console.log('.dtsb-add clicked');
+          $('#dtprv_filter').css( 'display', 'none' );
+        } );
+        var criteria = $('.dtsb-searchBuilder').find('.dtsb-criteria');
+        console.log( 'criteria' );
+        for (var i = 0, len = criteria.length; i < len-1; i++) {
+          console.log( $( criteria[i] ).find( '.dtsb-value').val() );
+          // console.log( $( criteria[i] ).find( '.dtsb-value').val() );
+          if( $( criteria[i] ).val().length == 0 ) {
+            // console.log( 'WARNING')
+            $( criteria[i] ).addClass( 'warning' );
+          } else {
+            $( criteria[i] ).removeClass( 'warning' );
+          }
+        };
+
+      });
+
+      onElementInserted('.dtsb-searchBuilder', '.dtsb-value', function(element) {
+        // console.log(element);
+        $(element).on( 'input', function() {
+          console.log('.dtsb-value edited');
+          if( $( element ).val().length > 0 ) {
+            $( element ).parent().parent().removeClass( 'warning' );
+          } else {
+            $( element ).parent().parent().addClass( 'warning' );
+          }
+        });
+      });
+
+      onElementInserted('.dtsb-searchBuilder', '.dtsb-delete', function(element) {
+        // console.log(element);
+        $(element).click(function() {
+          // console.log('.dtsb-delete clicked');
+          var conditions = $('.dtsb-searchBuilder').find('.dtsb-delete');
+          if( conditions.length == 0 ) {
+            $('#dtprv_filter').css( 'display', 'block' );
+          }
+
+        } );
+      
+      });
+
+      onElementInserted('.dtsb-searchBuilder', '.dtsb-clearGroup', function(element) {
+        // console.log(element);
+        $(element).click(function() {
+          // console.log('.dtsb-delete clicked');
+          var conditions = $('.dtsb-searchBuilder').find('.dtsb-clearGroup');
+          if( conditions.length == 0 ) {
+            $('#dtprv_filter').css( 'display', 'block' );
+          }
+
+        } );
+      
+      });
+
+
+
+
+
+
+
+
 
   
     }

@@ -778,6 +778,12 @@ div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria input.dtsb-input
 
 }
 
+.dtsb-criteria.warning{
+
+  background: #FFC107;
+
+}
+
 @media (min-width: 0) 
 {
 

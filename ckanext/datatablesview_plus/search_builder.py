@@ -1,5 +1,7 @@
 import re
+import logging
 
+log = logging.getLogger(__name__)
 
 def convert_type(type, value):
     #Convert according the type
@@ -220,7 +222,9 @@ class Node:
         # not a container of logical operator
         cond_fn = CONDITIONS.get(self.condition)
         if not cond_fn:
-            raise Exception('Unsupported condition: {}'.format(self.condition))
+            log.error('Unsupported condition: {}'.format(self.condition))
+            return '1=1'
+        
         return cond_fn(self)
 
     def print_tree(self, lvl=0):

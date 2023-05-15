@@ -74,12 +74,12 @@ def ajax(resource_view_id):
             "session": model.Session,
             "ignore_auth": True
         }
-        print(sql)
         datastore_search = get_action(u'datastore_search_sql')
         unfiltered_response = datastore_search(
             context, {
                 u"sql": sql,
                 u"limit": 0,
+                u"filters": view_filters,
             }
         )
         cols = [f[u'id'] for f in unfiltered_response[u'fields']]
@@ -99,12 +99,20 @@ def ajax(resource_view_id):
             sort_list.append(cols[sort_by_num] + u' ' + sort_order)
             i += 1
 
+        unfiltered_response['total'] = len(unfiltered_response.get('records'))
+
         response = datastore_search(
            context, {
                 u"sql": sql,
                 u"limit": 0,
+                u"offset": offset,
+                u"limit": limit,
+                u"sort": u', '.join(sort_list),
+                u"filters": filters,
             }
         )
+        # Need to be fxed to get the total number of records
+        response['total'] = len(response.get('records'))
     else:
 
 
@@ -144,7 +152,6 @@ def ajax(resource_view_id):
                 u"filters": filters,
             }
         )
-
     return json.dumps({
         u'draw': draw,
         u'iTotalRecords': unfiltered_response.get(u'total', 0),

@@ -523,6 +523,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           // console.log('.dtsb-add clicked');
           $('#dtprv_filter').css( 'display', 'none' );
         } );
+        /*
         var criteria = $('.dtsb-searchBuilder').find('.dtsb-criteria');
         console.log( 'criteria' );
         for (var i = 0, len = criteria.length; i < len-1; i++) {
@@ -535,7 +536,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             $( criteria[i] ).removeClass( 'warning' );
           }
         };
-
+        */
       });
 
       onElementInserted('.dtsb-searchBuilder', '.dtsb-value', function(element) {

@@ -100,6 +100,8 @@ def ajax(resource_view_id):
             i += 1
 
         unfiltered_response['total'] = len(unfiltered_response.get('records'))
+        cols.remove( '_full_text' )
+        sql = sql.replace('*', ','.join(cols))
 
         response = datastore_search(
            context, {
@@ -111,7 +113,7 @@ def ajax(resource_view_id):
                 u"filters": filters,
             }
         )
-        # Need to be fxed to get the total number of records
+        # Need to be fixed to get the total number of records
         response['total'] = len(response.get('records'))
     else:
 

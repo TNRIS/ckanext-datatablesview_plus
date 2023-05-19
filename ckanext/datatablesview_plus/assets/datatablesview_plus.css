@@ -7,11 +7,53 @@ body {
 
 }
 
+.row {
+
+  margin-left: 0;
+  margin-right: 0;
+
+}
+
+.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12
+{
+
+  padding-left: 0;
+  padding-right: 0;
+
+}
 
 table.dataTable
 {
 
   margin-top: 0px !important;
+
+}
+
+.dt-header-wrapper
+{
+
+  position: relative;
+
+}
+
+.dt-free-text-search
+{
+
+  margin: 2rem 0;
+
+}
+
+.dt-buttons
+{
+
+  margin: 0 0 2rem;
+
+}
+
+#dtprv_wrapper.form-inline .btn
+{
+
+  margin-left: 0;
 
 }
 
@@ -35,19 +77,18 @@ table.dataTable
 #dtprv_wrapper .dataTables_info
 {
 
-  margin: 1rem 0;
-  float: right;
-  clear: both;
-  text-align: right;
-  width: 40%;
-
-
 }
 
 #dtprv_wrapper  div.dataTables_paginate {
 
-  width: 75%;
   float: right;
+
+}
+
+.dataTables_length label::after{
+
+  content: ''
+
 }
 
 div.dataTables_wrapper span.select-info, div.dataTables_wrapper span.select-item
@@ -470,7 +511,7 @@ div.dtfh-floatingparent table.table-bordered tr th
 {
 
   border-bottom-width: .3rem;
-  background: #E0E0E0;
+  
 }
 
 #dtprv_wrapper table tr th,
@@ -623,6 +664,22 @@ box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.1);
 
 }
 
+
+/* custom height so that advanced search button matches free text saerch input */
+.advanced-search button.btn-secondary
+{
+
+  line-height: 2.0rem;
+
+}
+
+.advanced-search button.btn-secondary:hover
+{
+
+  line-height: 1.8rem;
+
+}
+
 /* Remove border and shadow from processing panel */
 .dataTables_processing.panel
 {
@@ -639,9 +696,77 @@ box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.1);
   width: 100%;
   clear: both;
   margin: 0 0 1em 0;
+  display: none;
 
 }
 
+
+/* Override criteria border coloring in search builder */
+div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria select.dtsb-data,
+div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria select.dtsb-condition,
+div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria select.dtsb-value, 
+div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria input.dtsb-value
+{
+
+   border: 1px solid #0D2856;
+   border-radius: 1rem;
+   background: #fff;
+
+}
+
+div.dtsb-searchBuilder div.dtsb-titleRow button.dtsb-clearAll 
+{
+
+  float: left;
+  font-size: 1.2rem;
+
+}
+
+div.dtsb-searchBuilder button.dtsb-add
+{
+
+  font-size: 1.2rem;
+
+}
+
+div.dtsb-searchBuilder div.dtsb-group div.dtsb-logicContainer
+{
+
+  border: 1px solid #0B7D8E;
+  border-radius: 1rem;
+  font-size: 1.2rem;
+
+}
+
+div.dtsb-searchBuilder div.dtsb-group div.dtsb-logicContainer button.dtsb-logic,
+div.dtsb-searchBuilder div.dtsb-group div.dtsb-logicContainer button.dtsb-clearGroup
+{
+
+  color: #0B7D8E;
+  border-radius: 1rem;
+
+}
+
+.dtsb-button
+{
+
+  border: 1px solid #0D2856;
+
+}
+
+.dtsb-buttonContainer
+{
+
+  font-size: 1rem;
+
+}
+
+.nav-tabs .fa:last-child, .module-heading .fa:last-child, .btn .fa:last-child
+{
+
+  margin: 0;
+
+}
 #dtprv_wrapper div.dtsb-searchBuilder div.dtsb-titleRow {
   /* we don't want a separate title for SearchBuilder */
   height: 0;
@@ -700,7 +825,7 @@ box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.1);
 #dtprv_wrapper table.table-bordered tr td.dtfc-fixed-left {
 
   border-right: 20px solid #0D2856;
-  background: #E0E0E0;
+  ;
 
 }
 
@@ -765,7 +890,7 @@ div.dtsb-searchBuilder div.dtsb-group {
 div.dtsb-searchBuilder div.dtsb-group
 {
 
-  margin-bottom: 0;
+  margin-bottom: 1rem;
 
 }
 
@@ -848,8 +973,6 @@ div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria input.dtsb-input
 
   div.dataTables_wrapper div.dataTables_filter input
   {
-
-    margin-left: 0.5rem;
 
   }
 

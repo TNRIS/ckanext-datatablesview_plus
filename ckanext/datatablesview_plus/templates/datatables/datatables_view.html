@@ -38,7 +38,25 @@
         data-dom="iBrtplS"
       {% else %}
         data-select="true"
-        data-dom="fQiBrtplS"
+        data-dom="<'dt-header-wrapper'
+        <'dt-free-text-search row'<'col-sm-4 col-md-4'f><'advanced-search col-sm-8 col-md-8'>>
+        <'row'<'col-sm-12 col-md-12'Q>>
+        <'row'<'col-sm-12 col-md-12'B>>
+        <'row'<'col-sm-5 col-md-5'i><'col-sm-2 col-md-2'l><'col-sm-5 col-md-5'p>>
+        S>rt
+        "
+        {#
+          f = free text search
+          Q = SearchBuilder
+          i = info summary
+          B = select buttons
+          r = processing indicator
+          p = pagination controls
+          l = length control
+          S = 
+          t = table
+        #}
+        {# data-dom="fQiBrtplS" #}
       {% endif %}
 
       data-fixed-header="true"

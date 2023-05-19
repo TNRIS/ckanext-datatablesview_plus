@@ -16,9 +16,8 @@ var run_query = function (params, format) {
   f.attr("value", format);
   form.append(f);
   form.submit();
+
 }
-
-
 
 this.ckan.module('datatablesview_plus', function (jQuery) {
   return {
@@ -31,9 +30,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         // Setup search highlighting
         mark: true,
 
-        // Setup row selection
-        // select: true,
-
+        // define default column order
         order: [[0, 'asc']],
 
         // Setup searchBuilder
@@ -44,9 +41,9 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         // Set column reordering
         colReorder: false,
 
-        // Set strings
+        // Set language strings
         language: {
-          lengthMenu: "Show _MENU_ rows per page",
+          lengthMenu: "_MENU_ rows per page",
           paginate: {
             first: '<i class="fa fa-angle-double-left" aria-hidden="true"></i>',
             previous: '<i class="fa fa-angle-left" aria-hidden="true"></i>',
@@ -57,7 +54,11 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           searchPlaceholder: 'Search...',
           searchBuilder: {
             title: '',
-            add: 'Add Filter',
+            add: '<i class="fa fa-plus" aria-hidden="true"></i> Add Filter',
+            clearAll: '<i class="fa fa-times" aria-hidden="true"></i> CLEAR ALL',
+            delete: '<i class="fa fa-times" aria-hidden="true"></i>',
+            right: '<i class="fa fa-chevron-right" aria-hidden="true"></i>',
+            left: '<i class="fa fa-chevron-left" aria-hidden="true"></i>',
             data: 'Field'
 
           }
@@ -91,7 +92,9 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         ],
 
         buttons: [
-          // 'createState', 'savedStates',
+          /*
+          Temporarily turning download buttons off
+          
           {
             extend: 'csvHtml5',
             text: 'CSV <i class="fa fa-download" aria-hidden="true"></i>',
@@ -130,9 +133,10 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               ]
             }
           },
+          */
           {
             extend: 'copy',
-            text: 'COPY <i class="fa fa-copy" aria-hidden="true"></i>',
+            text: '<i class="fa fa-copy" aria-hidden="true"></i> COPY SELECTED',
             title: null,
             exportOptions: {
               format: {
@@ -149,7 +153,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           },
           {
             extend: 'print',
-            text: 'PRINT <i class="fa fa-print" aria-hidden="true"></i>',
+            text: '<i class="fa fa-print" aria-hidden="true"></i> PRINT SELECTED',
             title: "",
             exportOptions: {
               format: {
@@ -192,7 +196,9 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         "initComplete": function (settings, json) {
 
           console.log('DataTables has finished its initialisation.');
-          update_select_buttons();
+          setup_select_buttons();
+          // update_select_buttons();
+          setup_searchbuilder_buttons();
           update_filenames();
           add_advanced_search_button();
 
@@ -220,7 +226,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             $('.dataTables_paginate').show();
 
           }
-          // console.log( settings );
 
           return "Showing " + start.toLocaleString("en-US") + "-" + end.toLocaleString("en-US") + " of " + total.toLocaleString("en-US") + "  row" + (total != 1 ? 's' : '');
         },
@@ -245,7 +250,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             $(thead).find('th').eq(i + 1).attr('data-term', datadict[i].id);
 
           });
-
 
           // set column widths based on information in summary statistics
           var data_summary_json = $('#dtprv_wrapper table').attr('data-summary-statistics');
@@ -307,21 +311,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       });
 
-
+      // Add a button to the search box to allow users to clear the search
       $('#dtprv_filter input[type="search"]').after('<button class="dt-search-cancel"><i class="fa fa-times-circle" aria-hidden="true"></i></button>');
-
-      /*
-      $( '#dtprv_filter label' ).remove();
-    
-      $( '#dtprv_filter' ).prepend('<div class="input-group input-group-lg search-input-group">\
-      <input aria-label="Search datasets..." id="field-giant-search" type="text" class="form-control" name="q" value="" autocomplete="off" placeholder="Search datasets...">\
-      <span class="input-group-btn">\
-        <button class="btn btn-default" type="submit" value="search" aria-label="Submit">\
-          <i class="fa fa-search"></i>\
-        </button>\
-      </span></div>' );
-      */
-      // <input type="search" class="form-control input-sm" placeholder="Search..." aria-controls="dtprv"></input>
 
       /* Update header based on whether DataTable is a preview or a full dataset */
       var dtprv_is_preview = $('#dtprv_is_preview').val();
@@ -341,6 +332,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           '</div>'
         );
         dtprv_status.insertBefore('#dtprv_processing');
+        $('.dt-buttons').css('display', 'none');
 
       } else {
 
@@ -350,6 +342,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         // var dtprv_status = $( '<div id="dtprv_status"><p class="">This data was last updated on ' + dtprv_date_modified + '.</p></div>' );
         // dtprv_status.insertBefore( '#dtprv_processing' );
+      
       }
 
       /* Replace built in rotating ellipsis animation with TWDH preferred FontAwesome circle-o-notch animation */
@@ -367,14 +360,14 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         for (const entry of entries) {
           if (entry.contentBoxSize) {
             const contentBoxSize = entry.contentBoxSize[0];
-            // console.log( 'resizeObserver: ' + contentBoxSize.blockSize );
+            console.log( 'resizeObserver: ' + contentBoxSize.blockSize );
             window.parent.postMessage({ frameHeight: contentBoxSize.blockSize }, '*');
           }
         }
       });
       resizeObserver.observe(document.querySelector("#dtplus_dtprv_wrapper"));
 
-      /* select button show/hide etc. */
+      /* select button show/hide */
 
       var selectTimeout;
 
@@ -384,69 +377,81 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       }
 
+      function setup_searchbuilder_buttons() {
+
+
+      }
+
+      function setup_select_buttons() {
+
+        $('.dt-buttons').removeClass('btn-group');
+        $('.dt-buttons button').addClass('btn-tertiary');
+        $('.dt-buttons button.btn-tertiary').css('display', 'none');
+        $('.dt-buttons').append('<button class="btn btn-disabled"><span><i class="fa fa-ban" aria-hidden="true"></i> COPY SELECTED</span></button> ');
+        $('.dt-buttons').append('<button class="btn btn-disabled"><span><i class="fa fa-ban" aria-hidden="true"></i> PRINT SELECTED</span></button> ');
+
+
+      }
+
+      /* Show/Hide selection toolbar */
       function update_select_buttons() {
 
-        // console.log( 'Updating select buttons' );
         var count = datatable.rows({ selected: true }).count();
-
-        // console.log( count + " rows selected" );
 
         if (count > 0) {
 
           if (dtprv_is_preview == 'False') {
 
-            // console.log( 'showing select buttons' );
-            $('  .dt-buttons').fadeIn();
-
+            $('.dt-buttons button.btn-tertiary').css('display', 'inline-block');
+            $('.dt-buttons button.btn-disabled').css('display', 'none');
+    
           }
 
         } else {
 
-          // console.log( 'hiding select buttons' );
-          $('#dtprv_wrapper .dt-buttons').fadeOut();
-
+          $('.dt-buttons button.btn-tertiary').css('display', 'none');
+          $('.dt-buttons button.btn-disabled').css('display', 'inline-block');
+  
         }
 
       }
 
       function add_advanced_search_button() {
 
+        // Add button
         var container = $('#dtprv_wrapper').find('.advanced-search');
-
-        console.log( container );
         container.append( '<button class="btn btn-default btn-secondary"><i class="fa fa-filter" aria-hidden="true"></i>Advanced Filters</button>' );
 
-        var button = $('#dtprv_wrapper .advanced-search').find(' button');
+        // Set click even ton button
+        var button = $('#dtprv_wrapper .advanced-search').find('button');
         $(button).click(function () {
 
+          $('.dt-free-text-search').css('display', 'none');
           console.log( 'advanced search button clicked' );
         
+          $( '#dtprv_wrapper .dtsb-searchBuilder > .dtsb-group > .dtsb-add' ).click();
+
+
         });
 
       }
 
       datatable.on('select', function (e, dt, type, indexes) {
 
-        console.log('select happened');
         update_select_buttons();
 
       });
 
       datatable.on('deselect', function (e, dt, type, indexes) {
 
-        // console.log( 'deselect happened' );
-        /* Use this timeout sequence to avoid 'flashing effect' when deselecting/reselecting in one click */
+        /* Use this timeout sequence to avoid 'flashing' effect when deselecting/reselecting in one click */
         clearTimeout(selectTimeout);
         selectTimeout = setTimeout(() => { update_select_buttons(); }, 100);
 
       });
 
-      /*
-      datatable.on( 'search.dt', function () {
-        console.log( 'Currently applied global search: '+datatable.search() );
-      } );
-      */
 
+      /* Toggle button on the search box allowing users to clear the search */
       $('#dtprv_filter input[type=search]').on('input', function () {
 
         if ($(this).val() == '') {
@@ -461,6 +466,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       });
 
+      /* React to click of search clear button */
       $('#dtprv_filter .dt-search-cancel').click(function () {
 
         datatable.search('').draw();
@@ -468,19 +474,18 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       });
 
+      /* Get column header with 'true' label for export files */
       function get_export_header(i) {
 
         return $('#dtprv thead').find('th').eq(i).attr('data-term');
 
       }
 
-
       /*
       const observer = new MutationObserver(function(mutations_list) {
         mutations_list.forEach(function(mutation) {
           console.log( 'removed nodes' );
           mutation.removedNodes.forEach(function(removed_node) {
-            // if(removed_node.id == 'child') {
             if( $( removed_node ).hasClass( 'dtsb-clearAll' ) ) {
 
               console.log(removed_node);
@@ -494,22 +499,19 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       observer.observe(document.querySelector("#dtprv_wrapper"), { subtree: true, childList: true });
       */
 
-      function onElementInserted(containerSelector, elementSelector, callback) {
 
-        // console.log( 'onElementInserted' );
-        // console.log( containerSelector );
-        // console.log( elementSelector );
-        // console.log( callback );
+      /* Set up a callback function when an element is inserted into the dom */
+      function onElementInserted(containerSelector, elementSelector, callback) {
+        /*
+          containerSelector: element under which to watch for a new element
+          elementSelector:   the element to watch for
+          callback:         the function to call when elementSelector is found
+        */
 
         var onMutationsObserved = function (mutations) {
-          //console.log( 'onMutationsObserved' );
           mutations.forEach(function (mutation) {
             if (mutation.addedNodes.length) {
-              //console.log( 'elementSelector' );
-              //console.log( elementSelector );
               var elements = $(containerSelector).find(elementSelector);
-              //console.log( 'elements' );
-              //console.log( elements );
               for (var i = 0, len = elements.length; i < len; i++) {
                 callback(elements[i]);
               }
@@ -518,30 +520,35 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         };
 
         var target = $(containerSelector)[0];
-        // console.log( target );
         var config = { attributes: true, characterData: true, childList: true, subtree: true };
-        // console.log( config );
         var MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
         var observer = new MutationObserver(onMutationsObserved);
         observer.observe(target, config);
 
       }
 
+
+      /* Add click callback to handle when the clear all button is clicked in Search Builder */
       onElementInserted('.dtsb-searchBuilder', '.dtsb-clearAll', function (element) {
-        // console.log(element);
         $(element).click(function () {
-          console.log('.dtsb-clearAll clicked');
-          // console.log( $( element ).attr( 'class' ) );
-          $('#dtprv_filter').css('display', 'block');
+          $('.dt-free-text-search').css('display', 'block');
+          $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'none');
         });
+        $( element ).addClass( 'btn btn-secondary' );
       });
 
+      /* Add click callback to handle when the Search Builder is activated */
       onElementInserted('.dtsb-searchBuilder', '.dtsb-add', function (element) {
-        // console.log(element);
         $(element).click(function () {
-          // console.log('.dtsb-add clicked');
-          $('#dtprv_filter').css('display', 'none');
+          $('.dt-free-text-search').css('display', 'none');
+          $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'block');
         });
+        $( element ).addClass( 'btn btn-secondary' );
+
+        // $( '.dtsb-add' ).html( '<i class="fa fa-times" aria-hidden="true"></i> ADD FILTER' );
+
+        // $( element ).prepend( 'hello world' );
+
         /*
         var criteria = $('.dtsb-searchBuilder').find('.dtsb-criteria');
         console.log( 'criteria' );
@@ -558,6 +565,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         */
       });
 
+      /* Add input callback to monitor criteria settings and add/remove warning class for empty criteria */
       onElementInserted('.dtsb-searchBuilder', '.dtsb-value', function (element) {
         // console.log(element);
         $(element).on('input', function () {
@@ -570,34 +578,35 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         });
       });
 
+      /* Add click callback to display free text search input when 
+         Search Builder is deactivated by removing the last filter 
+         criteria 
+      */
       onElementInserted('.dtsb-searchBuilder', '.dtsb-delete', function (element) {
-        // console.log(element);
         $(element).click(function () {
-          // console.log('.dtsb-delete clicked');
           var conditions = $('.dtsb-searchBuilder').find('.dtsb-delete');
           if (conditions.length == 0) {
-            $('#dtprv_filter').css('display', 'block');
+            $('.dt-free-text-search').css('display', 'block');
+            $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'none');
           }
-
         });
-
       });
 
+      /* Add callback to display free text search input when
+         Search Builder is deactivated by removing the last filter group
+      */         
       onElementInserted('.dtsb-searchBuilder', '.dtsb-clearGroup', function (element) {
-        // console.log(element);
         $(element).click(function () {
-          // console.log('.dtsb-delete clicked');
           var conditions = $('.dtsb-searchBuilder').find('.dtsb-clearGroup');
           if (conditions.length == 0) {
-            $('#dtprv_filter').css('display', 'block');
+            $('.dt-free-text-search').css('display', 'block');
+            $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'none');
           }
-
         });
-
       });
 
     }
 
   }
-
+  
 });

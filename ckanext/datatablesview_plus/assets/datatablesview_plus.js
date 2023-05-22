@@ -570,11 +570,13 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         // console.log(element);
         $(element).on('input', function () {
           console.log('.dtsb-value edited');
+          /*
           if ($(element).val().length > 0) {
             $(element).parent().parent().removeClass('warning');
           } else {
             $(element).parent().parent().addClass('warning');
           }
+          */
         });
       });
 

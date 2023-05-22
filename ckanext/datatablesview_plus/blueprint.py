@@ -100,9 +100,12 @@ def ajax(resource_view_id):
             i += 1
 
         unfiltered_response['total'] = len(unfiltered_response.get('records'))
-        cols.remove( '_full_text' )
-        sql = sql.replace('*', ','.join(cols))
 
+        if '_full_text' in cols:
+            cols.remove( '_full_text' )
+
+        sql = sql.replace('*', ','.join(cols))
+        
         response = datastore_search(
            context, {
                 u"sql": sql,

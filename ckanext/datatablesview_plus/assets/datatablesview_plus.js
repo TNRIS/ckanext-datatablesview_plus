@@ -420,7 +420,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         // Add button
         var container = $('#dtprv_wrapper').find('.advanced-search');
-        container.append( '<button class="btn btn-default btn-secondary"><i class="fa fa-filter" aria-hidden="true"></i>Advanced Filters</button>' );
+        container.append( '<button class="btn btn-default btn-secondary"><i class="fa fa-filter" aria-hidden="true"></i> Advanced Filters</button>' );
 
         // Set click even ton button
         var button = $('#dtprv_wrapper .advanced-search').find('button');

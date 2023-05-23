@@ -50,19 +50,21 @@
       {# only turn on row-selection if it is a full dataset #}
       {% if resource.get( 'preview' ) == True %}
         data-select="false"
+        {# FIX ME: Need to add 'l' back to the col-sm-2 div and 'p' to the col-sm-5 div below when we reenable rows-per-page selection #}
         data-dom="<'dt-header-wrapper'
           <'row'<'col-sm-12 col-md-12'r>>
-          <'row'<'col-sm-5 col-md-5'i><'col-sm-2 col-md-2'l><'col-sm-5 col-md-5'p>>        
+          <'row'<'col-sm-5 col-md-5'i><'col-sm-2 col-md-2'><'col-sm-5 col-md-5'>>        
         >St
         "
       {% else %}
         data-select="true"
+        {# FIX ME: Need to add 'l' back to the col-sm-2 div and 'p' to the col-sm-5 div below when we reenable rows-per-page selection #}
         data-dom="<'dt-header-wrapper'
           <'dt-free-text-search row'<'col-sm-4 col-md-4'f><'advanced-search col-sm-8 col-md-8'>>
           <'row'<'col-sm-12 col-md-12'Q>>
          <'row'<'col-sm-12 col-md-12'B>>
          <'row'<'col-sm-12 col-md-12'r>>
-          <'row'<'col-sm-5 col-md-5'i><'col-sm-2 col-md-2'l><'col-sm-5 col-md-5'p>>
+          <'row'<'col-sm-5 col-md-5'i><'col-sm-2 col-md-2'><'col-sm-5 col-md-5'>>
           >
           St
         "

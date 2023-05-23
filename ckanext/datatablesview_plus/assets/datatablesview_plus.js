@@ -1,4 +1,4 @@
-var table_rows_per_page = 100;
+var table_rows_per_page = 1000;
 
 var run_query = function (params, format) {
 

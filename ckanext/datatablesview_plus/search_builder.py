@@ -118,13 +118,15 @@ def cond_is_null(node):
     # Validate first
     if not node.data:
         raise Exception('Parse excepion: expected the data column to be specified')
-    return "{} is null".format(node.data)
+    #return "{} is null".format(node.data)
+    return '"{}" is null'.format(node.data)
 
 def cond_is_not_null(node):
     # Validate first
     if not node.data:
         raise Exception('Parse excepion: expected the data column to be specified')
-    return "{} is not null".format(node.data)
+    #return "{} is not null".format(node.data)
+    return '"{}" is not null'.format(node.data)
 
 def cond_greater_than_or_equal(node):
     # Validate first

@@ -276,6 +276,19 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         },
 
+        "rowCallback": function( row, data ) {
+
+          var count = 0;
+          for (const d of data) {
+            if( d == 'None' ){ $('td:eq('+count+')', row).html( '' ); }
+            count++;
+          }
+          /*
+          if ( data.grade == "A" ) {
+            $('td:eq(4)', row).html( '<b>A</b>' );
+          }
+          */
+        },
         /* 
           stateSaveCallback and stateLoadCallback are configured here in order to allow us to have a 'share' link for table state
           Inspired by this helpful stackexchange post:
@@ -360,7 +373,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         for (const entry of entries) {
           if (entry.contentBoxSize) {
             const contentBoxSize = entry.contentBoxSize[0];
-            console.log( 'resizeObserver: ' + contentBoxSize.blockSize );
+            // console.log( 'resizeObserver: ' + contentBoxSize.blockSize );
             window.parent.postMessage({ frameHeight: contentBoxSize.blockSize }, '*');
           }
         }
@@ -373,7 +386,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       function update_filenames() {
 
-        console.log();
+        // console.log();
 
       }
 
@@ -414,6 +427,14 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
   
         }
 
+      }
+
+      /* Deactivate select */
+      function deactivate_select() {
+
+        $('.dt-buttons button.btn-tertiary').css('display', 'none');
+        $('.dt-buttons button.btn-disabled').css('display', 'inline-block');
+        
       }
 
       function add_advanced_search_button() {
@@ -465,6 +486,14 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         }
 
       });
+
+      /* React to search event */
+      datatable.on( 'search.dt', function () {
+
+        // console.log('search happened');
+        deactivate_select();
+
+      } );
 
       /* React to click of search clear button */
       $('#dtprv_filter .dt-search-cancel').click(function () {

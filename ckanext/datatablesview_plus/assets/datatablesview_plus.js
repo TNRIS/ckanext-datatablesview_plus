@@ -43,7 +43,9 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         // Set language strings
         language: {
-          lengthMenu: "_MENU_ rows per page",
+          emptyTable: 'No matching rows found',
+          zeroRecords: 'No matching records found',
+          lengthMenu: '_MENU_ rows per page',
           paginate: {
             first: '<i class="fa fa-angle-double-left" aria-hidden="true"></i>',
             previous: '<i class="fa fa-angle-left" aria-hidden="true"></i>',
@@ -227,7 +229,17 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           }
 
-          return "Showing " + start.toLocaleString("en-US") + "-" + end.toLocaleString("en-US") + " of " + total.toLocaleString("en-US") + "  row" + (total != 1 ? 's' : '');
+          if( total == 0 ) {
+
+            // return "0 rows found";
+            return "";
+
+          } else {
+
+            return "Showing " + start.toLocaleString("en-US") + "-" + end.toLocaleString("en-US") + " of " + total.toLocaleString("en-US") + "  row" + (total != 1 ? 's' : '');
+
+          }
+          
         },
 
         headerCallback: function (thead, data, start, end, display) {
@@ -573,6 +585,10 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'block');
         });
         $( element ).addClass( 'btn btn-secondary' );
+
+        $('#dtprv_wrapper .dtsb-left').addClass('btn-secondary');
+        $('#dtprv_wrapper .dtsb-right').addClass('btn-secondary');
+        $('#dtprv_wrapper .dtsb-delete').addClass('btn-secondary');
 
         // $( '.dtsb-add' ).html( '<i class="fa fa-times" aria-hidden="true"></i> ADD FILTER' );
 

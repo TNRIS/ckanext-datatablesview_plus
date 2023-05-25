@@ -60,6 +60,8 @@ def cond_not_starts(node):
         raise Exception('Parse excepion: expected the data column to be specified')
     if len(node.values) != 1 and '1' not in node.values:
         raise Exception('Parse excepion: expected the value to be specified')
+    if not node.values['1']:
+        return "\"{}\" is not NULL".format(node.data)
     return "\"{}\" not ilike '{}%'".format(node.data, node.values['1'])
 
 def cond_contains(node):
@@ -76,6 +78,8 @@ def cond_not_contains(node):
         raise Exception('Parse excepion: expected the data column to be specified')
     if len(node.values) != 1 and '1' not in node.values:
         raise Exception('Parse excepion: expected the value to be specified')
+    if not node.values['1']:
+        return "\"{}\" is not NULL".format(node.data)
     return "\"{}\" not ilike '%{}%'".format(node.data, node.values['1'])
 
 def cond_ends(node):
@@ -92,6 +96,8 @@ def cond_not_ends(node):
         raise Exception('Parse excepion: expected the data column to be specified')
     if len(node.values) != 1 and '1' not in node.values:
         raise Exception('Parse excepion: expected the value to be specified')
+    if not node.values['1']:
+        return "\"{}\" is not NULL".format(node.data)
     return "\"{}\" not ilike '%{}'".format(node.data, node.values['1'])
 
 def cond_between(node):

@@ -99,10 +99,11 @@ def ajax(resource_view_id):
             sort_list.append(cols[sort_by_num] + u' ' + sort_order)
             i += 1
 
-        unfiltered_response['total'] = len(unfiltered_response.get('records'))
+        if '_full_text' in cols:    
+           cols.remove( '_full_text' )
+        #cols.pop('_full_text')
 
-        if '_full_text' in cols:
-            cols.remove( '_full_text' )
+        unfiltered_response['total'] = len(unfiltered_response.get('records'))
 
         sql = sql.replace('*', ','.join(['"{}"'.format(col) for col in cols]))
         

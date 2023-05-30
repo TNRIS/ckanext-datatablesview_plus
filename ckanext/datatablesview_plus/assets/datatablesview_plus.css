@@ -679,12 +679,14 @@ box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.1);
 }
 
 /* Remove border and shadow from processing panel */
-.dataTables_processing.panel
+div.dataTables_wrapper .dataTables_processing.panel
 {
 
   border: 0px;
   box-shadow: none;
   -webkit-box-shadow: none;
+  top: 15rem;
+
 
 }
 

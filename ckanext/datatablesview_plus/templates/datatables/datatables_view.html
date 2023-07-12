@@ -2,7 +2,6 @@
 
 {% block page %}
 
-
   <div id="dtplus_dtprv_wrapper">
   <input type="hidden" id="dtprv_is_preview" value="{% if resource.get( 'preview' ) == True %}True{% else %}False{%endif%}"/>
   <input type="hidden" id="dtprv_preview_rows" value="{{ resource.get( 'preview_rows' ) }}"/>
@@ -12,7 +11,7 @@
       class="table table-bordered"
       data-module="datatablesview_plus"
       data-datadictionary='{{ h.datastore_dictionary(resource.id)|tojson }}'
-      data-summary-statistics='{# h.get_dataset_summary_statistics( resource.name )|tojson #}'
+      data-summary-statistics='{{ h.get_dataset_summary_statistics( resource.name )|tojson }}'
       data-paging="true"
       data-server-side="true"
       data-processing="true"

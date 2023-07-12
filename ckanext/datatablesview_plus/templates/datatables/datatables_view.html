@@ -12,7 +12,7 @@
       class="table table-bordered"
       data-module="datatablesview_plus"
       data-datadictionary='{{ h.datastore_dictionary(resource.id)|tojson }}'
-      data-summary-statistics='{{ h.get_dataset_summary_statistics( resource.name )|tojson }}'
+      data-summary-statistics='{# h.get_dataset_summary_statistics( resource.name )|tojson #}'
       data-paging="true"
       data-server-side="true"
       data-processing="true"
@@ -32,13 +32,42 @@
         data-scroll-x="true"
       {% endif %}
 
+      {#
+
+        DT data-dom reference:
+        f = free text search
+        Q = SearchBuilder
+        i = info summary
+        B = select buttons
+        r = processing indicator
+        p = pagination controls
+        l = length control
+        S = status 
+        t = table
+
+      #}
+
       {# only turn on row-selection if it is a full dataset #}
       {% if resource.get( 'preview' ) == True %}
         data-select="false"
-        data-dom="iBrtplS"
+        {# FIX ME: Need to add 'l' back to the col-sm-2 div and 'p' to the col-sm-5 div below when we reenable rows-per-page selection #}
+        data-dom="<'dt-header-wrapper'
+          <'row'<'col-sm-12 col-md-12'r>>
+          <'row'<'col-sm-5 col-md-5'i><'col-sm-2 col-md-2'><'col-sm-5 col-md-5'>>        
+        >St
+        "
       {% else %}
         data-select="true"
-        data-dom="fQiBrtplS"
+        {# FIX ME: Need to add 'l' back to the col-sm-2 div and 'p' to the col-sm-5 div below when we reenable rows-per-page selection #}
+        data-dom="<'dt-header-wrapper'
+          <'dt-free-text-search row'<'col-sm-4 col-md-4'f><'advanced-search col-sm-8 col-md-8'>>
+          <'row'<'col-sm-12 col-md-12'Q>>
+         <'row'<'col-sm-12 col-md-12'B>>
+         <'row'<'col-sm-12 col-md-12'r>>
+          <'row'<'col-sm-5 col-md-5'i><'col-sm-2 col-md-2'><'col-sm-5 col-md-5'>>
+          >
+          St
+        "
       {% endif %}
 
       data-fixed-header="true"

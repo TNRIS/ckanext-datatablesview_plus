@@ -267,15 +267,25 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           // replace column header labels with those from the data dictionary if available
           var datadict = JSON.parse($('#dtprv_wrapper table').attr('data-datadictionary'));
-          var summdict = JSON.parse($('#dtprv_wrapper table').attr('data-datadictionary'));
+
           $(datadict).each(function (i) {
+
             var label = escapeHtml( datadict[i].id );
-            if ('info' in datadict[i] && datadict[i].info.label != '') {
+
+            if (
+              'info' in datadict[i] && 
+              typeof datadict[i].info.label !== 'undefined' && 
+              datadict[i].info.label !== false && 
+              datadict[i].info.label !== '' 
+
+            ) {
 
               label = escapeHtml( datadict[i].info.label );
+              column = escapeHtml( datadict[i].id );
+
               if (datadict[i].id != datadict[i].info.label) {
-                label = '<div class="dtlabel">' + label + '</div>' + 
-                  '<div class="small dim">' + escapeHtml( datadict[i].id ) + '</div>';
+                label = '<div class="dtlabel">' + column + '</div>' + 
+                  '<div class="small dim">' + label + '</div>';
               }
 
             }

@@ -158,7 +158,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           {
             extend: 'copy',
             text: '<i class="fa fa-copy" aria-hidden="true"></i> COPY SELECTED',
-            title: null,
+            title: 'Copy Selected',
+            className: 'btn-rowselect',
             exportOptions: {
               format: {
                 header: function (data, columnIdx) {
@@ -175,7 +176,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           {
             extend: 'print',
             text: '<i class="fa fa-print" aria-hidden="true"></i> PRINT SELECTED',
-            title: "",
+            title: 'Print Selected',
+            className: 'btn-rowselect',
             exportOptions: {
               format: {
                 header: function (data, columnIdx) {
@@ -189,7 +191,37 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               ]
             }
           },
+          /*
+          {
+            extend: 'createState',
+            text: '<i class="fa fa-filter" aria-hidden="true"></i> CREATE STATE',
+            title: "",
+          }, 
+          'savedStates',
+          */
+          {
+            text: '<i class="fa fa-filter" aria-hidden="true"></i> COPY STATE',
+            title: "",
+            action: function ( e, dt, node, config ) {
+              var state = datatable.stateRestore.state.add("COPY State" + Date.now() );
+
+              // parse the dtprv_state parameter out of the URL 
+              var url_params = function(name){
+                var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+                if (results==null) {
+                   return null;
+                }
+                return decodeURI(results[1]) || 0;
+              }
+              var dprv_state = url_params( 'dtprv_state' );
+              
+            }
+          }, 
         ],
+
+
+        // ?dtprv_state=eyJ0aW1lIjoxNjkwODI0NDA3NDY4LCJzdGFydCI6MCwibGVuZ3RoIjoxMDAwLCJvcmRlciI6W1swLCJhc2MiXV0sInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9LCJjb2x1bW5zIjpbeyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX0seyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX0seyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX0seyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX0seyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX1dLCJzZWxlY3QiOnsicm93cyI6W10sImNvbHVtbnMiOltdLCJjZWxscyI6W119LCJjaGlsZFJvd3MiOltdLCJzZWFyY2hCdWlsZGVyIjp7fSwicGFnZSI6MH0%3D
+
 
         pagingType: 'full_numbers',
         "pageLength": table_rows_per_page,
@@ -431,9 +463,11 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           $(element).click(function () {
             $('.dt-free-text-search').css('display', 'none');
             $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'block');
+            cancel_simple_search();
           });
-          $( element ).addClass( 'btn btn-secondary' );
 
+          // Set class to style SB buttons
+          $( element ).addClass( 'btn btn-secondary' );
           $('#dtprv_wrapper .dtsb-left').addClass('btn-secondary');
           $('#dtprv_wrapper .dtsb-right').addClass('btn-secondary');
           $('#dtprv_wrapper .dtsb-delete').addClass('btn-secondary');
@@ -474,11 +508,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             }
           });
         });
-
-        
-
-
-
 
       }
 
@@ -521,11 +550,13 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       function setup_select_buttons() {
 
+        // We don't want the btn-group styling
         $('.dt-buttons').removeClass('btn-group');
+
         $('.dt-buttons button').addClass('btn-tertiary');
-        $('.dt-buttons button.btn-tertiary').css('display', 'none');
-        $('.dt-buttons').append('<button class="btn btn-disabled"><span><i class="fa fa-ban" aria-hidden="true"></i> COPY SELECTED</span></button> ');
-        $('.dt-buttons').append('<button class="btn btn-disabled"><span><i class="fa fa-ban" aria-hidden="true"></i> PRINT SELECTED</span></button> ');
+        $('.dt-buttons button.btn-rowselect.btn-tertiary').css('display', 'none');
+        $('.dt-buttons').prepend('<button class="btn btn-rowselect btn-disabled"><span><i class="fa fa-ban" aria-hidden="true"></i> PRINT SELECTED</span></button> ');
+        $('.dt-buttons').prepend('<button class="btn btn-rowselect btn-disabled"><span><i class="fa fa-ban" aria-hidden="true"></i> COPY SELECTED</span></button> ');
 
 
       }
@@ -567,7 +598,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         var container = $('#dtprv_wrapper').find('.advanced-search');
         container.append( '<button class="btn btn-default btn-secondary"><i class="fa fa-filter" aria-hidden="true"></i> Advanced Filters</button>' );
 
-        // Set click even ton button
+        // Set click event on button
         var button = $('#dtprv_wrapper .advanced-search').find('button');
         $(button).click(function () {
 
@@ -622,10 +653,17 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       /* React to click of search clear button */
       $('#dtprv_filter .dt-search-cancel').click(function () {
 
+          cancel_simple_search();
+
+      });
+
+      function cancel_simple_search() {
+
         datatable.search('').draw();
         $('#dtprv_filter .dt-search-cancel').css('display', 'none');
 
-      });
+
+      }
 
       /* Get column header with 'true' label for export files */
       function get_export_header(i) {

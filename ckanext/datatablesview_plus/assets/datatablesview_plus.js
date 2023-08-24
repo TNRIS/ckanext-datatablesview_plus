@@ -199,6 +199,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           }, 
           'savedStates',
           */
+          /*
           {
             text: '<i class="fa fa-filter" aria-hidden="true"></i> COPY STATE',
             title: "",
@@ -216,7 +217,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               var dprv_state = url_params( 'dtprv_state' );
               
             }
-          }, 
+          },
+          */ 
         ],
 
 

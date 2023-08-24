@@ -20,6 +20,25 @@ var run_query = function (params, format) {
 }
 
 this.ckan.module('datatablesview_plus', function (jQuery) {
+
+  var entityMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+    '/': '&#x2F;',
+    '`': '&#x60;',
+    '=': '&#x3D;'
+  };
+  
+  function escapeHtml (string) {
+    return String(string).replace(/[&<>"'`=\/]/g, function fromEntityMap (s) {
+      return entityMap[s];
+    });
+  }
+  
+
   return {
     initialize: function () {
 
@@ -139,7 +158,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           {
             extend: 'copy',
             text: '<i class="fa fa-copy" aria-hidden="true"></i> COPY SELECTED',
-            title: null,
+            title: 'Copy Selected',
+            className: 'btn-rowselect',
             exportOptions: {
               format: {
                 header: function (data, columnIdx) {
@@ -156,7 +176,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           {
             extend: 'print',
             text: '<i class="fa fa-print" aria-hidden="true"></i> PRINT SELECTED',
-            title: "",
+            title: 'Print Selected',
+            className: 'btn-rowselect',
             exportOptions: {
               format: {
                 header: function (data, columnIdx) {
@@ -170,7 +191,39 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               ]
             }
           },
+          /*
+          {
+            extend: 'createState',
+            text: '<i class="fa fa-filter" aria-hidden="true"></i> CREATE STATE',
+            title: "",
+          }, 
+          'savedStates',
+          */
+          /*
+          {
+            text: '<i class="fa fa-filter" aria-hidden="true"></i> COPY STATE',
+            title: "",
+            action: function ( e, dt, node, config ) {
+              var state = datatable.stateRestore.state.add("COPY State" + Date.now() );
+
+              // parse the dtprv_state parameter out of the URL 
+              var url_params = function(name){
+                var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+                if (results==null) {
+                   return null;
+                }
+                return decodeURI(results[1]) || 0;
+              }
+              var dprv_state = url_params( 'dtprv_state' );
+              
+            }
+          },
+          */ 
         ],
+
+
+        // ?dtprv_state=eyJ0aW1lIjoxNjkwODI0NDA3NDY4LCJzdGFydCI6MCwibGVuZ3RoIjoxMDAwLCJvcmRlciI6W1swLCJhc2MiXV0sInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9LCJjb2x1bW5zIjpbeyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX0seyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX0seyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX0seyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX0seyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX1dLCJzZWxlY3QiOnsicm93cyI6W10sImNvbHVtbnMiOltdLCJjZWxscyI6W119LCJjaGlsZFJvd3MiOltdLCJzZWFyY2hCdWlsZGVyIjp7fSwicGFnZSI6MH0%3D
+
 
         pagingType: 'full_numbers',
         "pageLength": table_rows_per_page,
@@ -197,7 +250,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         "initComplete": function (settings, json) {
 
-          console.log('DataTables has finished its initialisation.');
+          // console.log('DataTables has finished its initialisation.');
           setup_select_buttons();
           // update_select_buttons();
           setup_searchbuilder_buttons();
@@ -248,14 +301,45 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           // replace column header labels with those from the data dictionary if available
           var datadict = JSON.parse($('#dtprv_wrapper table').attr('data-datadictionary'));
-          $(datadict).each(function (i) {
-            if ('info' in datadict[i] && datadict[i].info.label != '') {
 
-              var label = datadict[i].info.label;
+          $(datadict).each(function (i) {
+
+            var label = escapeHtml( datadict[i].id );
+
+            if (
+              'info' in datadict[i] && 
+              typeof datadict[i].info.label !== 'undefined' && 
+              datadict[i].info.label !== false && 
+              datadict[i].info.label !== '' 
+
+            ) {
+
+              label = escapeHtml( datadict[i].info.label );
+              column = escapeHtml( datadict[i].id );
+
               if (datadict[i].id != datadict[i].info.label) {
-                label = '<div class="dtlabel">' + label + '</div>' + '<span class="small dim">' + datadict[i].id + '</span>';
+                label = '<div class="dtlabel">' + column + '</div>' + 
+                  '<div class="small dim">' + label + '</div>';
               }
+
+            }
+
+            if (
+              'info' in datadict[i] && 
+              typeof datadict[i].info.unit !== 'undefined' && 
+              datadict[i].info.unit !== false && 
+              datadict[i].info.unit !== '' 
+            ) {
+
+              unit = escapeHtml( datadict[i].info.unit );
+              label = label + '<div class="small dim">(' + unit + ')</div>';
+              
+            }
+
+            if( label != '' ) {
+
               $(thead).find('th').eq(i + 1).html(label);
+
             }
 
             // Stash the original term as an attribute so that we can use it when exporting data
@@ -364,10 +448,69 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         // Show pointer cursor when hovering over selectable body of table
         $('#dtprv tbody').css('cursor', 'pointer');
 
-
         // var dtprv_status = $( '<div id="dtprv_status"><p class="">This data was last updated on ' + dtprv_date_modified + '.</p></div>' );
         // dtprv_status.insertBefore( '#dtprv_processing' );
-      
+
+        /* Add click callback to handle when the clear all button is clicked in Search Builder */
+        onElementInserted('.dtsb-searchBuilder', '.dtsb-clearAll', function (element) {
+          $(element).click(function () {
+            $('.dt-free-text-search').css('display', 'block');
+            $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'none');
+          });
+          $( element ).addClass( 'btn btn-secondary' );
+        });
+
+        /* Add click callback to handle when the Search Builder is activated */
+        onElementInserted('.dtsb-searchBuilder', '.dtsb-add', function (element) {
+          $(element).click(function () {
+            $('.dt-free-text-search').css('display', 'none');
+            $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'block');
+            cancel_simple_search();
+          });
+
+          // Set class to style SB buttons
+          $( element ).addClass( 'btn btn-secondary' );
+          $('#dtprv_wrapper .dtsb-left').addClass('btn-secondary');
+          $('#dtprv_wrapper .dtsb-right').addClass('btn-secondary');
+          $('#dtprv_wrapper .dtsb-delete').addClass('btn-secondary');
+
+        });
+
+        /* Add input callback to monitor criteria settings and add/remove warning class for empty criteria */
+        onElementInserted('.dtsb-searchBuilder', '.dtsb-value', function (element) {
+          // console.log(element);
+          $(element).on('input', function () {
+            console.log('.dtsb-value edited');
+          });
+        });
+
+        /* Add click callback to display free text search input when 
+          Search Builder is deactivated by removing the last filter 
+          criteria 
+        */
+        onElementInserted('.dtsb-searchBuilder', '.dtsb-delete', function (element) {
+          $(element).click(function () {
+            var conditions = $('.dtsb-searchBuilder').find('.dtsb-delete');
+            if (conditions.length == 0) {
+              $('.dt-free-text-search').css('display', 'block');
+              $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'none');
+            }
+          });
+        });
+
+        /* Add callback to display free text search input when
+          Search Builder is deactivated by removing the last filter group
+        */         
+        onElementInserted('.dtsb-searchBuilder', '.dtsb-clearGroup', function (element) {
+          $(element).click(function () {
+            var conditions = $('.dtsb-searchBuilder').find('.dtsb-clearGroup');
+            if (conditions.length == 0) {
+              $('.dt-free-text-search').css('display', 'block');
+              $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'none');
+            }
+          });
+        });
+
       }
 
       /* Replace built in rotating ellipsis animation with TWDH preferred FontAwesome circle-o-notch animation */
@@ -409,11 +552,13 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       function setup_select_buttons() {
 
+        // We don't want the btn-group styling
         $('.dt-buttons').removeClass('btn-group');
+
         $('.dt-buttons button').addClass('btn-tertiary');
-        $('.dt-buttons button.btn-tertiary').css('display', 'none');
-        $('.dt-buttons').append('<button class="btn btn-disabled"><span><i class="fa fa-ban" aria-hidden="true"></i> COPY SELECTED</span></button> ');
-        $('.dt-buttons').append('<button class="btn btn-disabled"><span><i class="fa fa-ban" aria-hidden="true"></i> PRINT SELECTED</span></button> ');
+        $('.dt-buttons button.btn-rowselect.btn-tertiary').css('display', 'none');
+        $('.dt-buttons').prepend('<button class="btn btn-rowselect btn-disabled"><span><i class="fa fa-ban" aria-hidden="true"></i> PRINT SELECTED</span></button> ');
+        $('.dt-buttons').prepend('<button class="btn btn-rowselect btn-disabled"><span><i class="fa fa-ban" aria-hidden="true"></i> COPY SELECTED</span></button> ');
 
 
       }
@@ -455,7 +600,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         var container = $('#dtprv_wrapper').find('.advanced-search');
         container.append( '<button class="btn btn-default btn-secondary"><i class="fa fa-filter" aria-hidden="true"></i> Advanced Filters</button>' );
 
-        // Set click even ton button
+        // Set click event on button
         var button = $('#dtprv_wrapper .advanced-search').find('button');
         $(button).click(function () {
 
@@ -510,10 +655,17 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       /* React to click of search clear button */
       $('#dtprv_filter .dt-search-cancel').click(function () {
 
+          cancel_simple_search();
+
+      });
+
+      function cancel_simple_search() {
+
         datatable.search('').draw();
         $('#dtprv_filter .dt-search-cancel').css('display', 'none');
 
-      });
+
+      }
 
       /* Get column header with 'true' label for export files */
       function get_export_header(i) {
@@ -567,90 +719,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         observer.observe(target, config);
 
       }
-
-
-      /* Add click callback to handle when the clear all button is clicked in Search Builder */
-      onElementInserted('.dtsb-searchBuilder', '.dtsb-clearAll', function (element) {
-        $(element).click(function () {
-          $('.dt-free-text-search').css('display', 'block');
-          $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'none');
-        });
-        $( element ).addClass( 'btn btn-secondary' );
-      });
-
-      /* Add click callback to handle when the Search Builder is activated */
-      onElementInserted('.dtsb-searchBuilder', '.dtsb-add', function (element) {
-        $(element).click(function () {
-          $('.dt-free-text-search').css('display', 'none');
-          $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'block');
-        });
-        $( element ).addClass( 'btn btn-secondary' );
-
-        $('#dtprv_wrapper .dtsb-left').addClass('btn-secondary');
-        $('#dtprv_wrapper .dtsb-right').addClass('btn-secondary');
-        $('#dtprv_wrapper .dtsb-delete').addClass('btn-secondary');
-
-        // $( '.dtsb-add' ).html( '<i class="fa fa-times" aria-hidden="true"></i> ADD FILTER' );
-
-        // $( element ).prepend( 'hello world' );
-
-        /*
-        var criteria = $('.dtsb-searchBuilder').find('.dtsb-criteria');
-        console.log( 'criteria' );
-        for (var i = 0, len = criteria.length; i < len-1; i++) {
-          console.log( $( criteria[i] ).find( '.dtsb-value').val() );
-          // console.log( $( criteria[i] ).find( '.dtsb-value').val() );
-          if( $( criteria[i] ).val().length == 0 ) {
-            // console.log( 'WARNING')
-            $( criteria[i] ).addClass( 'warning' );
-          } else {
-            $( criteria[i] ).removeClass( 'warning' );
-          }
-        };
-        */
-      });
-
-      /* Add input callback to monitor criteria settings and add/remove warning class for empty criteria */
-      onElementInserted('.dtsb-searchBuilder', '.dtsb-value', function (element) {
-        // console.log(element);
-        $(element).on('input', function () {
-          console.log('.dtsb-value edited');
-          /*
-          if ($(element).val().length > 0) {
-            $(element).parent().parent().removeClass('warning');
-          } else {
-            $(element).parent().parent().addClass('warning');
-          }
-          */
-        });
-      });
-
-      /* Add click callback to display free text search input when 
-         Search Builder is deactivated by removing the last filter 
-         criteria 
-      */
-      onElementInserted('.dtsb-searchBuilder', '.dtsb-delete', function (element) {
-        $(element).click(function () {
-          var conditions = $('.dtsb-searchBuilder').find('.dtsb-delete');
-          if (conditions.length == 0) {
-            $('.dt-free-text-search').css('display', 'block');
-            $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'none');
-          }
-        });
-      });
-
-      /* Add callback to display free text search input when
-         Search Builder is deactivated by removing the last filter group
-      */         
-      onElementInserted('.dtsb-searchBuilder', '.dtsb-clearGroup', function (element) {
-        $(element).click(function () {
-          var conditions = $('.dtsb-searchBuilder').find('.dtsb-clearGroup');
-          if (conditions.length == 0) {
-            $('.dt-free-text-search').css('display', 'block');
-            $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'none');
-          }
-        });
-      });
 
     }
 

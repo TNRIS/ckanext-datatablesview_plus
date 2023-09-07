@@ -81,6 +81,7 @@ class DatatablesviewPlusPlugin(p.SingletonPlugin):
             u'name': u'datatablesview_plus',
             u'title': u'Table',
             u'filterable': True,
+            u'iframed': True,
             u'icon': u'table',
             u'requires_datastore': True,
             u'default_title': p.toolkit._(u'Table'),

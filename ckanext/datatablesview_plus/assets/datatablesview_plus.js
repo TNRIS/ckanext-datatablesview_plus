@@ -37,7 +37,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       return entityMap[s];
     });
   }
-  
+
 
   return {
     initialize: function () {
@@ -84,9 +84,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           }
         },
-
-        // turn on state saving
-        stateSave: true,
 
         lengthMenu: [
           [10, 100, 1000],
@@ -191,39 +188,25 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               ]
             }
           },
-          /*
+/*
           {
             extend: 'createState',
             text: '<i class="fa fa-filter" aria-hidden="true"></i> CREATE STATE',
             title: "",
           }, 
-          'savedStates',
-          */
-          /*
+*/
           {
-            text: '<i class="fa fa-filter" aria-hidden="true"></i> COPY STATE',
+            text: '<i class="fa fa-link" aria-hidden="true"></i> Save State',
             title: "",
             action: function ( e, dt, node, config ) {
-              var state = datatable.stateRestore.state.add("COPY State" + Date.now() );
-
-              // parse the dtprv_state parameter out of the URL 
-              var url_params = function(name){
-                var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-                if (results==null) {
-                   return null;
-                }
-                return decodeURI(results[1]) || 0;
-              }
-              var dprv_state = url_params( 'dtprv_state' );
-              
+              var state = datatable.stateRestore.state.add("Saved State " + Date.now() );
+              const url = new URL(window.location.href);
+              let dtprv_state = url.searchParams.get('dtprv_state');
+              $( '#dtprv_state' ).val( dtprv_state );
+              window.parent.postMessage({ stateSave: dtprv_state }, '*');
             }
           },
-          */ 
         ],
-
-
-        // ?dtprv_state=eyJ0aW1lIjoxNjkwODI0NDA3NDY4LCJzdGFydCI6MCwibGVuZ3RoIjoxMDAwLCJvcmRlciI6W1swLCJhc2MiXV0sInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9LCJjb2x1bW5zIjpbeyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX0seyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX0seyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX0seyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX0seyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX1dLCJzZWxlY3QiOnsicm93cyI6W10sImNvbHVtbnMiOltdLCJjZWxscyI6W119LCJjaGlsZFJvd3MiOltdLCJzZWFyY2hCdWlsZGVyIjp7fSwicGFnZSI6MH0%3D
-
 
         pagingType: 'full_numbers',
         "pageLength": table_rows_per_page,
@@ -385,24 +368,44 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           }
           */
         },
+
+
+        // turn on state saving
+        stateSave: true,
+
+
         /* 
           stateSaveCallback and stateLoadCallback are configured here in order to allow us to have a 'share' link for table state
           Inspired by this helpful stackexchange post:
           https://stackoverflow.com/questions/55446923/datatables-1-10-using-savestate-to-remember-filtering-and-order-but-need-to-upd/60708638#60708638
         */
+
+        // This URL correctly restores state
+        // http://192.168.7.200:5000/dataset/springs-monitoring-program-flow-measurements/resource/c85caaa8-f16e-43c8-9cda-25d86e88d3a6/view/9bef11ef-c705-4589-a0b9-d89f0043162d?dtprv_state=eyJ0aW1lIjoxNjk0MDUzMTcwNzczLCJzdGFydCI6MCwibGVuZ3RoIjoxMDAwLCJvcmRlciI6W1swLCJhc2MiXV0sInNlYXJjaCI6eyJzZWFyY2giOiJIdWRzcGV0aCIsInNtYXJ0Ijp0cnVlLCJyZWdleCI6ZmFsc2UsImNhc2VJbnNlbnNpdGl2ZSI6dHJ1ZX0sImNvbHVtbnMiOlt7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fV0sInNlbGVjdCI6eyJyb3dzIjpbXSwiY29sdW1ucyI6W10sImNlbGxzIjpbXX0sImNoaWxkUm93cyI6W10sInNlYXJjaEJ1aWxkZXIiOnt9LCJwYWdlIjowfQ%3D%3D
+        
         stateSaveCallback: function (settings, data) {
+
           //encode current state to base64
           const state = btoa(JSON.stringify(data));
+
+          // console.log( data );
+          // console.log( state );
+
           //get query part of the url
           let searchParams = new URLSearchParams(window.location.search);
+
           //add encoded state into query part
           searchParams.set($(this).attr('id') + '_state', state);
+
           //form url with new query parameter
           const newRelativePathQuery = window.location.pathname + '?' + searchParams.toString() + window.location.hash;
+
           //push new url into history object, this will change the current url without need of reload
           history.pushState(null, '', newRelativePathQuery);
+
         },
         stateLoadCallback: function (settings) {
+          // console.log( 'stateLoadCallback' );
           const url = new URL(window.location.href);
           let state = url.searchParams.get($(this).attr('id') + '_state');
 
@@ -410,10 +413,20 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           if (!state) {
             return null;
           }
-
           //if we got the state, decode it and add current timestamp
-          state = JSON.parse(atob(state));
+          
+
+          console.log( state );
+
+          var tmp = atob(state)
+          console.log( tmp );
+          state = JSON.parse(tmp);
+          console.log( state );
           state['time'] = Date.now();
+
+          $( '#dtprv_state' ).val( state );
+
+          console.log( state );
 
           return state;
         }

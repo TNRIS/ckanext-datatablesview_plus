@@ -45,7 +45,7 @@ this.ckan.module('resource-view-statesave', function ($) {
     //form url with new query parameter
     const newURL = window.location.origin + window.location.pathname + '?' + searchParams.toString() + window.location.hash;
 
-    $('[name="code"]', modal).val(newURL);
+    $('[name="code"]', modal).html(newURL);
   }
 
   function _preventClick (event) {

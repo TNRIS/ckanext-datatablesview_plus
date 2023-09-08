@@ -528,6 +528,13 @@ div.dtfh-floatingparent tr th
 
 }
 
+#dtprv_wrapper table tr td.dataTables_empty
+{
+
+  text-align: left;
+
+}
+
 #dtprv_wrapper table tr th:last-child
 {
 

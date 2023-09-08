@@ -188,22 +188,30 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               ]
             }
           },
-/*
           {
-            extend: 'createState',
-            text: '<i class="fa fa-filter" aria-hidden="true"></i> CREATE STATE',
+            text: '<i class="fa fa-link" aria-hidden="true"></i> Share Search',
             title: "",
-          }, 
-*/
-          {
-            text: '<i class="fa fa-link" aria-hidden="true"></i> Save State',
-            title: "",
+            className: 'btn-sharesearch',
             action: function ( e, dt, node, config ) {
-              var state = datatable.stateRestore.state.add("Saved State " + Date.now() );
+              var state = datatable.stateRestore.state.add("Share Search " + Date.now() );
               const url = new URL(window.location.href);
               let dtprv_state = url.searchParams.get('dtprv_state');
               $( '#dtprv_state' ).val( dtprv_state );
-              window.parent.postMessage({ stateSave: dtprv_state }, '*');
+
+              if( _inIframe() ) {
+                if( _sameOrigin() ) {
+                  // In an iFrame on the same domain
+                  console.log( 'In an iframe on the same domain')
+                  window.parent.postMessage({ stateSave: dtprv_state }, '*');
+                } else {
+                  // In an iFrame not on the same domain
+                  console.log( 'In an iframe not on the same domain')
+                }
+              } else {
+                console.log( 'Not in an iframe, aka in "Fullscreen" mode')
+                // Not in an iFrame, aka in 'Fullscreen' mode
+              }
+              
             }
           },
         ],
@@ -246,6 +254,14 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           "smart": true,
           "regex": false,
           "return": false
+        },
+
+        "drawCallback": function( settings ) {
+
+          console.log( 'DataTables has redrawn the table' );
+          
+          update_share_search();
+
         },
 
         // turn on table metadata display
@@ -386,7 +402,15 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         stateSaveCallback: function (settings, data) {
 
           //encode current state to base64
-          const state = btoa(JSON.stringify(data));
+
+          // console.log( 'start stateLoadCallback +=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=' );
+
+          // console.log( data );
+          var json = JSON.stringify(data)
+          // console.log( json );
+          const state = btoa(json);
+          // console.log( state )
+
 
           // console.log( data );
           // console.log( state );
@@ -402,12 +426,21 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           //push new url into history object, this will change the current url without need of reload
           history.pushState(null, '', newRelativePathQuery);
+          
+          // console.log( 'end stateLoadCallback +=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=' );
 
         },
         stateLoadCallback: function (settings) {
           // console.log( 'stateLoadCallback' );
-          const url = new URL(window.location.href);
-          let state = url.searchParams.get($(this).attr('id') + '_state');
+
+          // DO NOT use URL: searchParams.get() for retrieving the dtprv_state param because it is base64 encoded and searchParams will URL decode this which corrupts the base64 encoding
+          // https://developer.mozilla.org/en-US/docs/Web/API/URL/searchParams
+          
+          var params = _getUrlVars()
+          let state = params['dtprv_state'];
+
+          // console.log( params['dtprv_state'] );
+
 
           //check the current url to see if we've got a state to restore
           if (!state) {
@@ -416,19 +449,24 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           //if we got the state, decode it and add current timestamp
           
 
-          console.log( state );
-
+          // console.log( state );
           var tmp = atob(state)
-          console.log( tmp );
+          // console.log( tmp );
           state = JSON.parse(tmp);
-          console.log( state );
+          // console.log( state );
           state['time'] = Date.now();
 
           $( '#dtprv_state' ).val( state );
 
-          console.log( state );
+          // console.log( state );
 
           return state;
+
+        },
+        stateLoaded: function(settings, data) {
+
+          console.log( 'Saved filter was: '+data.search.search );
+
         }
 
       });
@@ -493,7 +531,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         onElementInserted('.dtsb-searchBuilder', '.dtsb-value', function (element) {
           // console.log(element);
           $(element).on('input', function () {
-            console.log('.dtsb-value edited');
+            // console.log('.dtsb-value edited');
           });
         });
 
@@ -525,6 +563,51 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         });
 
       }
+
+
+      // Detect whether the window is in an iframe
+      function _inIframe() {
+        try {
+            return window.self !== window.top;
+        } catch (e) {
+            return true;
+        }
+      }
+
+      // Detect whether an iframe is from the same origin as the parent window
+      // Returns true if called from a parent window (i.e. not an iframe)
+      function _sameOrigin() {
+
+        if( window.self !== window.top ) {
+
+          const self = new URL(document.referrer);
+          const frame = new URL(document.location.href);
+
+          return self.origin === frame.origin;
+
+        } else {
+
+          return true;
+
+        }
+
+      }
+    
+
+      // Read a page's GET URL variables and return them as an associative array WITHOUT any url decoding.
+      function _getUrlVars()
+      {
+          var vars = [], hash;
+          var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+          for(var i = 0; i < hashes.length; i++)
+          {
+              hash = hashes[i].split('=');
+              vars.push(hash[0]);
+              vars[hash[0]] = hash[1];
+          }
+          return vars;
+      }
+
 
       /* Replace built in rotating ellipsis animation with TWDH preferred FontAwesome circle-o-notch animation */
       $('div.dataTables_processing').html('<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>');
@@ -570,9 +653,59 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         $('.dt-buttons button').addClass('btn-tertiary');
         $('.dt-buttons button.btn-rowselect.btn-tertiary').css('display', 'none');
-        $('.dt-buttons').prepend('<button class="btn btn-rowselect btn-disabled"><span><i class="fa fa-ban" aria-hidden="true"></i> PRINT SELECTED</span></button> ');
-        $('.dt-buttons').prepend('<button class="btn btn-rowselect btn-disabled"><span><i class="fa fa-ban" aria-hidden="true"></i> COPY SELECTED</span></button> ');
+        $('.dt-buttons button.btn-sharesearch.btn-tertiary').css('display', 'none');
 
+        $('<button class="btn btn-sharesearch btn-disabled"><span><i class="fa fa-link" aria-hidden="true"></i> SHARE SEARCH</span></button> ').insertBefore( $('.dt-buttons .btn-sharesearch') );
+        $('<button class="btn btn-rowselect btn-disabled"><span><i class="fa fa-print" aria-hidden="true"></i> PRINT SELECTED</span></button> ').insertBefore( $('.dt-buttons .buttons-print') );
+        $('<button class="btn btn-rowselect btn-disabled"><span><i class="fa fa-copy" aria-hidden="true"></i> COPY SELECTED</span></button> ').insertBefore( $('.dt-buttons .buttons-copy') );
+
+
+
+      }
+
+      /* Show/Hide Share Search button */
+      function update_share_search() {
+
+        var activate = false;
+        var state = datatable.state();
+        console.log( state );
+
+        if( state.searchBuilder !== undefined && state.searchBuilder.criteria !== undefined ) {
+          for (const c of state.searchBuilder.criteria) {
+            if (
+              c.condition !== undefined &&
+              c.data !== undefined &&
+              c.value.length > 0
+            ) {
+              activate = true;
+              break;
+            }
+
+          }
+        }
+        
+        if( 
+          state.search['search'].trim().length > 0  ||
+          ( state.searchBuilder && state.searchBuilder.length > 0 )
+        ) {
+
+          activate = true;
+
+        }
+
+        console.log( $('.dt-buttons button.btn-sharesearch.btn-tertiary').css('display') );
+
+        if( activate ) {
+
+          $('.dt-buttons button.btn-sharesearch.btn-tertiary').css('display', 'inline-block');
+          $('.dt-buttons button.btn-sharesearch.btn-disabled').css('display', 'none');
+
+        } else {
+
+          $('.dt-buttons button.btn-sharesearch.btn-tertiary').css('display', 'none');
+          $('.dt-buttons button.btn-sharesearch.btn-disabled').css('display', 'inline-block');
+
+        }
 
       }
 
@@ -585,15 +718,15 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           if (dtprv_is_preview == 'False') {
 
-            $('.dt-buttons button.btn-tertiary').css('display', 'inline-block');
-            $('.dt-buttons button.btn-disabled').css('display', 'none');
+            $('.dt-buttons button.btn-rowselect').css('display', 'inline-block');
+            $('.dt-buttons button.btn-rowselect.btn-disabled').css('display', 'none');
     
           }
 
         } else {
 
-          $('.dt-buttons button.btn-tertiary').css('display', 'none');
-          $('.dt-buttons button.btn-disabled').css('display', 'inline-block');
+          $('.dt-buttons button.btn-rowselect').css('display', 'none');
+          $('.dt-buttons button.btn-rowselect.btn-disabled').css('display', 'inline-block');
   
         }
 
@@ -618,7 +751,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         $(button).click(function () {
 
           $('.dt-free-text-search').css('display', 'none');
-          console.log( 'advanced search button clicked' );
+          // console.log( 'advanced search button clicked' );
         
           $( '#dtprv_wrapper .dtsb-searchBuilder > .dtsb-group > .dtsb-add' ).click();
 

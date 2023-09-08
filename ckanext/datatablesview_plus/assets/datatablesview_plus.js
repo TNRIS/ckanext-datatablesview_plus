@@ -1,4 +1,5 @@
 var table_rows_per_page = 1000;
+var show_sharesearch_banner = true;
 
 var run_query = function (params, format) {
 
@@ -202,7 +203,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
                 if( _sameOrigin() ) {
                   // In an iFrame on the same domain
                   console.log( 'In an iframe on the same domain')
-                  window.parent.postMessage({ stateSave: dtprv_state }, '*');
+                  window.parent.postMessage({ shareSearch: dtprv_state }, '*');
                 } else {
                   // In an iFrame not on the same domain
                   console.log( 'In an iframe not on the same domain')
@@ -241,9 +242,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         "initComplete": function (settings, json) {
 
-          // console.log('DataTables has finished its initialisation.');
+          // console.log('DataTables has finished init.');
           setup_select_buttons();
-          // update_select_buttons();
           setup_searchbuilder_buttons();
           update_filenames();
           add_advanced_search_button();
@@ -260,7 +260,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           console.log( 'DataTables has redrawn the table' );
           
-          update_share_search();
+          update_sharesearch();
 
         },
 
@@ -663,8 +663,31 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       }
 
+      function update_sharesearch_banner() {
+
+        var params = _getUrlVars()
+        let sharesearch = params['sharesearch'];
+        console.log( show_sharesearch_banner );
+
+        if( show_sharesearch_banner && sharesearch == 1 ) {
+
+          $( '#dtprv_wrapper' ).prepend( '<div id="sharesearch_status">This search was loaded from a Share Search link.</div>' );
+          // only show once upon arrival
+          show_sharesearch_banner = false;
+
+        } else {
+
+          $( '#sharesearch_status' ).remove();
+
+        }
+
+      }
+
+
       /* Show/Hide Share Search button */
-      function update_share_search() {
+      function update_sharesearch() {
+
+        update_sharesearch_banner();
 
         var activate = false;
         var state = datatable.state();
@@ -692,8 +715,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           activate = true;
 
         }
-
-        console.log( $('.dt-buttons button.btn-sharesearch.btn-tertiary').css('display') );
 
         if( activate ) {
 

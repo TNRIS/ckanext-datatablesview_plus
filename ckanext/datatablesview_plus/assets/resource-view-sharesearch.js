@@ -1,15 +1,16 @@
-this.ckan.module('resource-view-statesave', function ($) {
+this.ckan.module('resource-view-sharesearch', function ($) {
   var modal;
   var self;
 
   function initialize() {
     self = this;
-    modal = $('#statesave-'+this.options.id)
+    modal = $('#sharesearch-'+this.options.id)
     $('body').append(modal);
     this.el.on('click', _onClick);
-    $('textarea', modal).on('focus', _selectAllCode).on('mouseup', _preventClick);
-    $('input', modal).on('keyup change', _updateValues);
-    _updateSaveStateURL();
+    $('input', modal).on('focus', _selectAllCode).on('mouseup', _preventClick);
+    $('input', modal).attr('readonly', true);
+    // $('input', modal).on('keyup change', _updateValues);
+    _updateShareSearchURL();
   }
 
   function _onClick (event) {
@@ -19,21 +20,21 @@ this.ckan.module('resource-view-statesave', function ($) {
   }
 
   function _selectAllCode () {
-    $('textarea', modal).select();
+    $('input', modal).select();
   }
 
   function _updateValues () {
-    _updateSaveStateURL();
+    _updateShareSearchURL();
   }
 
-  function _updateSaveStateURL () {
+  function _updateShareSearchURL () {
 
     var state = _getState();
     var details = _getState(true);
 
 
     if( details.search['search'] != '' ) {
-      $('.statesave-details', modal).html('Search: ' + details.search['search'] + details);
+      $('.sharesearch-details', modal).html('Search: ' + details.search['search'] + details);
     }
     
     //get query part of the url
@@ -45,7 +46,7 @@ this.ckan.module('resource-view-statesave', function ($) {
     //form url with new query parameter
     const newURL = window.location.origin + window.location.pathname + '?' + searchParams.toString() + window.location.hash;
 
-    $('[name="code"]', modal).html(newURL);
+    $('[name="code"]', modal).val(newURL);
   }
 
   function _preventClick (event) {

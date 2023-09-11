@@ -1,5 +1,6 @@
 var table_rows_per_page = 1000;
 var show_sharesearch_banner = true;
+var initial_state = {};
 
 var run_query = function (params, format) {
 
@@ -248,6 +249,17 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           update_filenames();
           add_advanced_search_button();
 
+          console.log( initial_state );
+          if( initial_state.searchBuilder !== undefined && initial_state.searchBuilder.criteria !== undefined ) {
+
+            $('.dt-free-text-search').css('display', 'none');
+            $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'block');
+            $('.dt-buttons button.btn-sharesearch.btn-tertiary').css('display', 'inline-block');
+            $('.dt-buttons button.btn-sharesearch.btn-disabled').css('display', 'none');
+  
+          }
+
+
         },
 
         search: {
@@ -259,8 +271,9 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         "drawCallback": function( settings ) {
 
           console.log( 'DataTables has redrawn the table' );
-          
+          console.log( datatable.state() );
           update_sharesearch();
+          console.log( datatable.state() );
 
         },
 
@@ -458,14 +471,15 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           $( '#dtprv_state' ).val( state );
 
-          // console.log( state );
 
           return state;
 
         },
         stateLoaded: function(settings, data) {
 
-          console.log( 'Saved filter was: '+data.search.search );
+          console.log( 'Saved filter was: ' );
+          initial_state = data;
+          console.log( initial_state );
 
         }
 
@@ -513,6 +527,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         /* Add click callback to handle when the Search Builder is activated */
         onElementInserted('.dtsb-searchBuilder', '.dtsb-add', function (element) {
+          
           $(element).click(function () {
             $('.dt-free-text-search').css('display', 'none');
             $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'block');
@@ -655,22 +670,23 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         $('.dt-buttons button.btn-rowselect.btn-tertiary').css('display', 'none');
         $('.dt-buttons button.btn-sharesearch.btn-tertiary').css('display', 'none');
 
-        $('<button class="btn btn-sharesearch btn-disabled"><span><i class="fa fa-link" aria-hidden="true"></i> SHARE SEARCH</span></button> ').insertBefore( $('.dt-buttons .btn-sharesearch') );
-        $('<button class="btn btn-rowselect btn-disabled"><span><i class="fa fa-print" aria-hidden="true"></i> PRINT SELECTED</span></button> ').insertBefore( $('.dt-buttons .buttons-print') );
-        $('<button class="btn btn-rowselect btn-disabled"><span><i class="fa fa-copy" aria-hidden="true"></i> COPY SELECTED</span></button> ').insertBefore( $('.dt-buttons .buttons-copy') );
+        $('<button class="btn btn-sharesearch btn-disabled" tabindex="-1"><span><i class="fa fa-link" aria-hidden="true"></i> SHARE SEARCH</span></button> ').insertBefore( $('.dt-buttons .btn-sharesearch') );
+        $('<button class="btn btn-rowselect btn-disabled" tabindex="-1"><span><i class="fa fa-print" aria-hidden="true"></i> PRINT SELECTED</span></button> ').insertBefore( $('.dt-buttons .buttons-print') );
+        $('<button class="btn btn-rowselect btn-disabled" tabindex="-1"><span><i class="fa fa-copy" aria-hidden="true"></i> COPY SELECTED</span></button> ').insertBefore( $('.dt-buttons .buttons-copy') );
 
 
 
       }
 
-      function update_sharesearch_banner() {
+      function update_sharesearch_state() {
 
         var params = _getUrlVars()
         let sharesearch = params['sharesearch'];
-        console.log( show_sharesearch_banner );
+        // console.log( 'update_sharesearch_state' );
 
         if( show_sharesearch_banner && sharesearch == 1 ) {
 
+          // Show sharesearch banner
           $( '#dtprv_wrapper' ).prepend( '<div id="sharesearch_status">This search was loaded from a Share Search link.</div>' );
           // only show once upon arrival
           show_sharesearch_banner = false;
@@ -687,7 +703,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       /* Show/Hide Share Search button */
       function update_sharesearch() {
 
-        update_sharesearch_banner();
+        update_sharesearch_state();
 
         var activate = false;
         var state = datatable.state();
@@ -772,10 +788,13 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         $(button).click(function () {
 
           $('.dt-free-text-search').css('display', 'none');
-          // console.log( 'advanced search button clicked' );
+          $('.dtsb-searchBuilder').css('display', 'block');
         
-          $( '#dtprv_wrapper .dtsb-searchBuilder > .dtsb-group > .dtsb-add' ).click();
+          if( $('#dtprv_wrapper .dtsb-searchBuilder').find('.dtsb-criteria').length == 0 ) {
 
+            $( '#dtprv_wrapper .dtsb-searchBuilder > .dtsb-group > .dtsb-add' ).click();
+
+          }
 
         });
 

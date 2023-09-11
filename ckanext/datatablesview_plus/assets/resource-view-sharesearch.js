@@ -36,6 +36,22 @@ this.ckan.module('resource-view-sharesearch', function ($) {
     if( details.search['search'] != '' ) {
       $('.sharesearch-details', modal).html('Search: ' + details.search['search'] + details);
     }
+
+    if( details.search['searchBuilder'] != '' ) {
+
+      var html = '';
+
+      for (const c of details.searchBuilder.criteria ) {
+
+        console.log( c );
+
+        html = html + '<li>' + c['data'] + ' ' + c['condition'] + ' ' + c['value'][0] + '</li>';
+
+      }
+
+      $('.sharesearch-details', modal).html('Search: <br/><ul>' + html + '</ul>');
+    }
+
     
     //get query part of the url
     let searchParams = new URLSearchParams(window.location.search);
@@ -47,6 +63,7 @@ this.ckan.module('resource-view-sharesearch', function ($) {
     const newURL = window.location.origin + window.location.pathname + '?' + searchParams.toString() + window.location.hash;
 
     $('[name="code"]', modal).val(newURL);
+    $('#sharesearch-copy', modal).attr( 'data-url', newURL);
   }
 
   function _preventClick (event) {

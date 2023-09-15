@@ -32,26 +32,18 @@ this.ckan.module('resource-view-sharesearch', function ($) {
     var state = _getState();
     var details = _getState(true);
 
+    console.log( '_updateShareSearchURL()' );
+    console.log( details );
 
     if( details.search['search'] != '' ) {
-      $('.sharesearch-details', modal).html('Search: ' + details.search['search'] + details);
+
+      $('.sharesearch-details', modal).html('Search: ' + details.search['search'] );
+
+    } else if( details.searchBuilder ) {
+
+      $('.sharesearch-details', modal).html('Advanced Search: <br/><ul>' + searchbuilder_criteria_display( details.searchBuilder ) + '</ul>');
+
     }
-
-    if( details.search['searchBuilder'] != '' ) {
-
-      var html = '';
-
-      for (const c of details.searchBuilder.criteria ) {
-
-        console.log( c );
-
-        html = html + '<li>' + c['data'] + ' ' + c['condition'] + ' ' + c['value'][0] + '</li>';
-
-      }
-
-      $('.sharesearch-details', modal).html('Search: <br/><ul>' + html + '</ul>');
-    }
-
     
     //get query part of the url
     let searchParams = new URLSearchParams(window.location.search);
@@ -65,6 +57,44 @@ this.ckan.module('resource-view-sharesearch', function ($) {
     $('[name="code"]', modal).val(newURL);
     $('#sharesearch-copy', modal).attr( 'data-url', newURL);
   }
+
+  function searchbuilder_criteria_display( state ) {
+
+    if( state.criteria !== undefined  ) {
+
+      return _criteria_display( state.criteria, state.logic );
+    
+    }
+
+  }
+
+  function _criteria_display( criteria, logic ) {
+
+    var html = '';
+
+    for(var c = 0; c < criteria.length; c++) {
+      
+      if( criteria[c].criteria !== undefined  ) {
+
+        html = html + _criteria_display( criteria[c].criteria, criteria[c].logic );
+
+      } else {
+
+        html = html + '<li>' + criteria[c]['data'] + ' ' + criteria[c]['condition'] + ' ' + criteria[c]['value'][0] + '</li>';
+
+      }
+
+      if( c+1 != criteria.length ) {
+        html = html + '<li>' + logic + '</li>';
+      }
+    
+    }
+
+    return '<ul>' + html + '</ul>';
+
+  }
+
+
 
   function _preventClick (event) {
     event.preventDefault();

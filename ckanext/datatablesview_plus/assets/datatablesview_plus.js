@@ -258,6 +258,12 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             $('.dt-buttons button.btn-sharesearch.btn-disabled').css('display', 'none');
   
           }
+          if( ! _inIframe() || ! _sameOrigin() ) {
+
+            $('.dt-buttons button.btn-sharesearch.btn-tertiary').css('display', 'none');
+            $('.dt-buttons button.btn-sharesearch.btn-disabled').css('display', 'none');
+  
+          }
 
 
         },
@@ -274,6 +280,14 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           console.log( datatable.state() );
           update_sharesearch();
           console.log( datatable.state() );
+
+          if( ! _inIframe() || ! _sameOrigin() ) {
+
+            $('.dt-buttons button.btn-sharesearch.btn-tertiary').css('display', 'none');
+            $('.dt-buttons button.btn-sharesearch.btn-disabled').css('display', 'none');
+  
+          }
+  
 
         },
 

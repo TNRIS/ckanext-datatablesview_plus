@@ -119,6 +119,99 @@ def ajax(resource_view_id):
         )
         # Need to be fixed to get the total number of records
         response['total'] = len(response.get('records'))
+
+    elif search_text != '':
+        # perform SQL search
+
+        sql = 'SELECT * FROM "{table_name}" WHERE '.format(table_name=str(resource_view[u'resource_id']))
+        search_terms = search_text.split()
+
+        context = {
+            "model": model,
+            "user": tk.g.user,
+            "session": model.Session,
+            "ignore_auth": True
+        }
+
+        where = '1=1'
+
+        datastore_search = get_action(u'datastore_search_sql')
+        unfiltered_response = datastore_search(
+            None, {
+                u"sql": sql + where,
+                u"limit": 0,
+                u"filters": view_filters,
+            }
+        )
+
+        cols = [f[u'id'] for f in unfiltered_response[u'fields']]
+        if u'show_fields' in resource_view:
+            cols = [c for c in cols if c in resource_view[u'show_fields']]
+
+        sort_list = []
+        i = 0
+        while True:
+            if u'order[%d][column]' % i not in request.form:
+                break
+            sort_by_num = int(request.form[u'order[%d][column]' % i])
+            sort_order = (
+                u'desc' if request.form[u'order[%d][dir]' %
+                                        i] == u'desc' else u'asc'
+            )
+            sort_list.append(cols[sort_by_num] + u' ' + sort_order)
+            i += 1
+
+        if '_full_text' in cols:    
+           cols.remove( '_full_text' )
+        #cols.pop('_full_text')
+
+
+        sql = 'SELECT "{cols}" FROM "{table_name}" WHERE '.format(cols='","'.join(cols),table_name=str(resource_view[u'resource_id']))
+
+        where = ''
+
+        log.info( unfiltered_response['fields'] )
+
+        tmp = ''
+        need_and = False
+        for field in unfiltered_response['fields']:
+            for term in search_terms:
+                if field['type'] == 'text':
+                    if need_and:
+                        tmp += 'OR '
+                    tmp += '"{col}" ilike \'%{term}%\' '.format(col=field['id'], term=term)
+                    need_and = True
+                #elif field['type'] == 'numeric':
+                #    if need_and:
+                #        where += 'AND '
+                #    if term.isnumeric():
+                #        where += '"{col}" = {term} '.format(col=field['id'], term=term)
+                #    else:
+                #        where += '1=1 '
+                #    need_and = True
+                #elif field['type'] == 'timestamp':
+                #    #TODO figure out what to to here
+                #    if need_and: where += 'AND '
+                #    where += '1=1 '
+                #    need_and = True
+
+        where += tmp
+        sql += where
+        log.info( sql )
+
+        response = datastore_search(
+           context, {
+                u"sql": sql,
+                u"limit": 0,
+                u"offset": offset,
+                u"limit": limit,
+                #u"sort": u', '.join(sort_list),
+                u"filters": filters,
+            }
+        )
+        # Need to be fixed to get the total number of records
+        response['total'] = len(response.get('records'))
+
     else:
 
 

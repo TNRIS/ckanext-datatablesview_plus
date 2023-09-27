@@ -203,15 +203,17 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               if( _inIframe() ) {
                 if( _sameOrigin() ) {
                   // In an iFrame on the same domain
-                  console.log( 'In an iframe on the same domain')
+                  // Post message to parent window to show ShareSearch modal
                   window.parent.postMessage({ shareSearch: dtprv_state }, '*');
                 } else {
                   // In an iFrame not on the same domain
+                  // Do nothing, we don't want Share Search links on embedded tables
                   console.log( 'In an iframe not on the same domain')
                 }
               } else {
                 console.log( 'Not in an iframe, aka in "Fullscreen" mode')
                 // Not in an iFrame, aka in 'Fullscreen' mode
+                // Do nothing, we don't want Share Search links on fullscreen tables
               }
               
             }

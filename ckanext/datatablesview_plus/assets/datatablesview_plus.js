@@ -1,10 +1,10 @@
-var table_rows_per_page = 1000;
-
-// These are for 'Share Search'
-var show_sharesearch_banner = true;
-var initial_state = {};
-
 this.ckan.module('datatablesview_plus', function (jQuery) {
+
+  var table_rows_per_page = 1000;
+
+  // These are for stateSave aka 'Share Search'
+  var show_sharesearch_banner = true;
+  var initial_state = {};
 
   var entityMap = {
     '&': '&amp;',
@@ -23,11 +23,10 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
     });
   }
 
-
   return {
     initialize: function () {
 
-      // Initialize datatable. To set options on DataTable, use data- attribute 
+      // Initialize datatable. To set options on DataTable, use data-attribute 
       // tags in templates/datatables/datatables_view.html
       var datatable = jQuery('#dtprv').DataTable({
 
@@ -180,15 +179,12 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
   
           }
 
-
         },
-
         search: {
           "smart": true,
           "regex": false,
           "return": false
         },
-
         "drawCallback": function( settings ) {
 
           update_sharesearch();
@@ -202,8 +198,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
   
 
         },
-
-        // turn on table metadata display
         infoCallback: function (settings, start, end, max, total, pre) {
 
           var rows_per_page = $('select[name="dtprv_length"]').val();
@@ -230,7 +224,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           }
           
         },
-
         headerCallback: function (thead, data, start, end, display) {
 
           $(thead).find('th').eq(0).html('');
@@ -305,9 +298,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               }
             });
           }
-
         },
-
         "rowCallback": function( row, data ) {
 
           var count = 0;
@@ -315,21 +306,12 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             if( d == 'None' ){ $('td:eq('+count+')', row).html( '' ); }
             count++;
           }
-          /*
-          if ( data.grade == "A" ) {
-            $('td:eq(4)', row).html( '<b>A</b>' );
-          }
-          */
         },
-
-
-        // turn on state saving
+        // DT stateSave provides Share Sarech functionality
         stateSave: true,
-
         stateSaveCallback: function (settings, data) {
 
           // encode current state to base64
-
           var json = JSON.stringify(data)
           const state = btoa(json);
 
@@ -377,6 +359,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         }
 
       });
+      // End of DataTable initilization
 
       // Add a button to the search box to allow users to clear the search
       $('#dtprv_filter input[type="search"]').after('<button class="dt-search-cancel"><i class="fa fa-times-circle" aria-hidden="true"></i></button>');
@@ -470,7 +453,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       }
 
-
       // Detect whether the window is in an iframe
       function _inIframe() {
         try {
@@ -499,7 +481,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       }
     
-
       // Read a page's GET URL variables and return them as an associative array WITHOUT any url decoding.
       function _getUrlVars()
       {
@@ -514,15 +495,12 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           return vars;
       }
 
-
       /* Replace built in rotating ellipsis animation with TWDH preferred FontAwesome circle-o-notch animation */
       $('div.dataTables_processing').html('<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>');
 
       /* 
-      
         Observe iframe body height and post message to parent on resize
         window.onmessage in the theme js should catch this and resize the iframe as desired
-      
       */
       const resizeObserver = new ResizeObserver((entries) => {
         for (const entry of entries) {
@@ -534,8 +512,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       });
       resizeObserver.observe(document.querySelector("#dtplus_dtprv_wrapper"));
 
-      /* select button show/hide */
-
       var selectTimeout;
 
       function update_filenames() {
@@ -546,7 +522,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       function setup_select_buttons() {
 
-        // We don't want the btn-group styling
+        // TWDH doesn't want the btn-group styling
         $('.dt-buttons').removeClass('btn-group');
 
         $('.dt-buttons button').addClass('btn-tertiary');
@@ -578,7 +554,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         }
 
       }
-
 
       /* Show/Hide Share Search button */
       function update_sharesearch() {

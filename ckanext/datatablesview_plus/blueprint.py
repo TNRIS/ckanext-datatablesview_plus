@@ -121,10 +121,9 @@ def ajax(resource_view_id):
         response['total'] = len(response.get('records'))
 
     elif search_text != '':
-        # perform SQL search
+        # perform SQL search using exact search string, i.e. no tokenizing
 
         sql = 'SELECT * FROM "{table_name}" WHERE '.format(table_name=str(resource_view[u'resource_id']))
-        search_terms = search_text.split()
 
         context = {
             "model": model,
@@ -163,41 +162,34 @@ def ajax(resource_view_id):
 
         if '_full_text' in cols:    
            cols.remove( '_full_text' )
-        #cols.pop('_full_text')
-
 
         sql = 'SELECT "{cols}" FROM "{table_name}" WHERE '.format(cols='","'.join(cols),table_name=str(resource_view[u'resource_id']))
 
         where = ''
 
-        log.info( unfiltered_response['fields'] )
+        need_or = False
 
-        tmp = ''
-        need_and = False
         for field in unfiltered_response['fields']:
-            for term in search_terms:
-                if field['type'] == 'text':
-                    if need_and:
-                        tmp += 'OR '
-                    tmp += '"{col}" ilike \'%{term}%\' '.format(col=field['id'], term=term)
-                    need_and = True
-                #elif field['type'] == 'numeric':
-                #    if need_and:
-                #        where += 'AND '
-                #    if term.isnumeric():
-                #        where += '"{col}" = {term} '.format(col=field['id'], term=term)
-                #    else:
-                #        where += '1=1 '
-                #    need_and = True
-                #elif field['type'] == 'timestamp':
-                #    #TODO figure out what to to here
-                #    if need_and: where += 'AND '
-                #    where += '1=1 '
-                #    need_and = True
 
-        where += tmp
+            if need_or:
+                where += 'OR '
+
+            if field['type'] == 'text':
+                where += '"{col}" ilike \'%{term}%\' '.format(col=field['id'], term=search_text)
+                need_or = True
+            elif field['type'] == 'numeric':
+                # cast column using ::TEXT so that we can do an 'ilike' search
+                # this way substring matches work on numeric types
+                # For instance, string 0.01 will match on 0.01 and 0.011
+                # If we used numeric comarison this wouldn't work
+                where += '"{col}"::TEXT ilike \'%{term}%\' '.format(col=field['id'], term=search_text)
+                need_or = True
+            elif field['type'] == 'timestamp':
+                # cast column using ::TEXT for similar reasons as above
+                where += '"{col}"::TEXT ilike \'%{term}%\' '.format(col=field['id'], term=search_text)
+                need_or = True
+
         sql += where
-        log.info( sql )
 
         response = datastore_search(
            context, {
@@ -209,11 +201,14 @@ def ajax(resource_view_id):
                 u"filters": filters,
             }
         )
-        # Need to be fixed to get the total number of records
+
         response['total'] = len(response.get('records'))
 
     else:
-
+        # This currently should never run but 
+        # I've left it here in case we ever want to revert to 
+        # Postgres 'Free Text Search' style search using the 
+        # 'datastore_seach' endpoint
 
         datastore_search = get_action(u'datastore_search')
         unfiltered_response = datastore_search(

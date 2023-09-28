@@ -1,25 +1,8 @@
 var table_rows_per_page = 1000;
+
+// These are for 'Share Search'
 var show_sharesearch_banner = true;
 var initial_state = {};
-
-var run_query = function (params, format) {
-
-  var form = $('#filtered-datatables-download');
-
-  /* remove hidden inputs if they exist */
-  form.find('input[name="params"]').remove();
-  form.find('input[name="format"]').remove();
-
-  /* add current version of hidden inputs */
-  var p = $('<input name="params" type="hidden"/>');
-  p.attr("value", JSON.stringify(params));
-  form.append(p);
-  var f = $('<input name="format" type="hidden"/>');
-  f.attr("value", format);
-  form.append(f);
-  form.submit();
-
-}
 
 this.ckan.module('datatablesview_plus', function (jQuery) {
 
@@ -86,12 +69,10 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           }
         },
-
         lengthMenu: [
           [10, 100, 1000],
           ['10', '100', '1,000']
         ],
-
         deferRender: true,
 
         // turn on scroller
@@ -112,48 +93,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         ],
 
         buttons: [
-          /*
-          Temporarily turning download buttons off
-          
-          {
-            extend: 'csvHtml5',
-            text: 'CSV <i class="fa fa-download" aria-hidden="true"></i>',
-            fieldSeparator: ',',
-            filename: $('#dtprv').attr('data-filename'),
-            extension: '.csv',
-            exportOptions: {
-              format: {
-                header: function (data, columnIdx) {
-                  return get_export_header(columnIdx);
-                }
-              },
-              columns: [function (idx, data, node) {
-                return idx === 0 ?
-                  false : true;
-              }
-              ]
-            }
-          },
-          {
-            extend: 'csvHtml5',
-            text: 'TSV <i class="fa fa-download" aria-hidden="true"></i>',
-            fieldSeparator: '\t',
-            filename: $('#dtprv').attr('data-filename'),
-            extension: '.tsv',
-            exportOptions: {
-              format: {
-                header: function (data, columnIdx) {
-                  return get_export_header(columnIdx);
-                }
-              },
-              columns: [function (idx, data, node) {
-                return idx === 0 ?
-                  false : true;
-              }
-              ]
-            }
-          },
-          */
           {
             extend: 'copy',
             text: '<i class="fa fa-copy" aria-hidden="true"></i> COPY SELECTED',
@@ -208,10 +147,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
                 } else {
                   // In an iFrame not on the same domain
                   // Do nothing, we don't want Share Search links on embedded tables
-                  console.log( 'In an iframe not on the same domain')
                 }
               } else {
-                console.log( 'Not in an iframe, aka in "Fullscreen" mode')
                 // Not in an iFrame, aka in 'Fullscreen' mode
                 // Do nothing, we don't want Share Search links on fullscreen tables
               }
@@ -219,39 +156,15 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             }
           },
         ],
-
         pagingType: 'full_numbers',
         "pageLength": table_rows_per_page,
-
-        /* 
-        Trying to remove the _id option from the Term filter in SearchBuilder. 
-        Need to figure out how to do this generically for all columns instead 
-        of having to code it column-by-column which is untenable for our needs 
-        since we don't know the columns beforehand
-        https://datatables.net/extensions/searchbuilder/examples/customisation/plugin.html
-
-        init: function(that, fn, preDefined = null) {
-
-          alert( 'hello' );
-          let el = $('.dtsb-data');
-
-          $(el).on('dtsb-inserted', function(){
-            alert( 'hello' );
-          });
-
-        },
-
-        */
-
         "initComplete": function (settings, json) {
 
-          // console.log('DataTables has finished init.');
           setup_select_buttons();
           setup_searchbuilder_buttons();
           update_filenames();
           add_advanced_search_button();
 
-          console.log( initial_state );
           if( initial_state.searchBuilder !== undefined && initial_state.searchBuilder.criteria !== undefined ) {
 
             $('.dt-free-text-search').css('display', 'none');
@@ -278,10 +191,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         "drawCallback": function( settings ) {
 
-          console.log( 'DataTables has redrawn the table' );
-          console.log( datatable.state() );
           update_sharesearch();
-          console.log( datatable.state() );
 
           if( ! _inIframe() || ! _sameOrigin() ) {
 
@@ -300,12 +210,10 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           if (total <= rows_per_page) {
 
-            // console.log( 'hide pagination' );
             $('.dataTables_paginate').hide();
 
           } else {
 
-            // console.log( 'show pagination' );
             $('.dataTables_paginate').show();
 
           }
@@ -418,31 +326,12 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         // turn on state saving
         stateSave: true,
 
-
-        /* 
-          stateSaveCallback and stateLoadCallback are configured here in order to allow us to have a 'share' link for table state
-          Inspired by this helpful stackexchange post:
-          https://stackoverflow.com/questions/55446923/datatables-1-10-using-savestate-to-remember-filtering-and-order-but-need-to-upd/60708638#60708638
-        */
-
-        // This URL correctly restores state
-        // http://192.168.7.200:5000/dataset/springs-monitoring-program-flow-measurements/resource/c85caaa8-f16e-43c8-9cda-25d86e88d3a6/view/9bef11ef-c705-4589-a0b9-d89f0043162d?dtprv_state=eyJ0aW1lIjoxNjk0MDUzMTcwNzczLCJzdGFydCI6MCwibGVuZ3RoIjoxMDAwLCJvcmRlciI6W1swLCJhc2MiXV0sInNlYXJjaCI6eyJzZWFyY2giOiJIdWRzcGV0aCIsInNtYXJ0Ijp0cnVlLCJyZWdleCI6ZmFsc2UsImNhc2VJbnNlbnNpdGl2ZSI6dHJ1ZX0sImNvbHVtbnMiOlt7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fV0sInNlbGVjdCI6eyJyb3dzIjpbXSwiY29sdW1ucyI6W10sImNlbGxzIjpbXX0sImNoaWxkUm93cyI6W10sInNlYXJjaEJ1aWxkZXIiOnt9LCJwYWdlIjowfQ%3D%3D
-        
         stateSaveCallback: function (settings, data) {
 
-          //encode current state to base64
+          // encode current state to base64
 
-          // console.log( 'start stateLoadCallback +=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=' );
-
-          // console.log( data );
           var json = JSON.stringify(data)
-          // console.log( json );
           const state = btoa(json);
-          // console.log( state )
-
-
-          // console.log( data );
-          // console.log( state );
 
           //get query part of the url
           let searchParams = new URLSearchParams(window.location.search);
@@ -456,11 +345,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           //push new url into history object, this will change the current url without need of reload
           history.pushState(null, '', newRelativePathQuery);
           
-          // console.log( 'end stateLoadCallback +=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=' );
-
         },
         stateLoadCallback: function (settings) {
-          // console.log( 'stateLoadCallback' );
 
           // DO NOT use URL: searchParams.get() for retrieving the dtprv_state param because it is base64 encoded and searchParams will URL decode this which corrupts the base64 encoding
           // https://developer.mozilla.org/en-US/docs/Web/API/URL/searchParams
@@ -468,34 +354,25 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           var params = _getUrlVars()
           let state = params['dtprv_state'];
 
-          // console.log( params['dtprv_state'] );
-
-
           //check the current url to see if we've got a state to restore
           if (!state) {
             return null;
           }
-          //if we got the state, decode it and add current timestamp
-          
 
-          // console.log( state );
+          //if we got the state, decode it and add current timestamp
           var tmp = atob(state)
-          // console.log( tmp );
           state = JSON.parse(tmp);
-          // console.log( state );
           state['time'] = Date.now();
 
+          // why is this here?
           $( '#dtprv_state' ).val( state );
-
 
           return state;
 
         },
         stateLoaded: function(settings, data) {
 
-          console.log( 'Saved filter was: ' );
           initial_state = data;
-          console.log( initial_state );
 
         }
 
@@ -560,9 +437,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         /* Add input callback to monitor criteria settings and add/remove warning class for empty criteria */
         onElementInserted('.dtsb-searchBuilder', '.dtsb-value', function (element) {
-          // console.log(element);
           $(element).on('input', function () {
-            // console.log('.dtsb-value edited');
           });
         });
 
@@ -650,12 +525,9 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       
       */
       const resizeObserver = new ResizeObserver((entries) => {
-        // console.log( 'resizeObserver' );
-        // console.log( entries );
         for (const entry of entries) {
           if (entry.contentBoxSize) {
             const contentBoxSize = entry.contentBoxSize[0];
-            // console.log( 'resizeObserver: ' + contentBoxSize.blockSize );
             window.parent.postMessage({ frameHeight: contentBoxSize.blockSize }, '*');
           }
         }
@@ -667,14 +539,9 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       var selectTimeout;
 
       function update_filenames() {
-
-        // console.log();
-
       }
 
       function setup_searchbuilder_buttons() {
-
-
       }
 
       function setup_select_buttons() {
@@ -690,15 +557,12 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         $('<button class="btn btn-rowselect btn-disabled" tabindex="-1"><span><i class="fa fa-print" aria-hidden="true"></i> PRINT SELECTED</span></button> ').insertBefore( $('.dt-buttons .buttons-print') );
         $('<button class="btn btn-rowselect btn-disabled" tabindex="-1"><span><i class="fa fa-copy" aria-hidden="true"></i> COPY SELECTED</span></button> ').insertBefore( $('.dt-buttons .buttons-copy') );
 
-
-
       }
 
       function update_sharesearch_state() {
 
         var params = _getUrlVars()
         let sharesearch = params['sharesearch'];
-        // console.log( 'update_sharesearch_state' );
 
         if( show_sharesearch_banner && sharesearch == 1 ) {
 
@@ -723,7 +587,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         var activate = false;
         var state = datatable.state();
-        console.log( state );
 
         if( state.searchBuilder !== undefined && state.searchBuilder.criteria !== undefined ) {
           for (const c of state.searchBuilder.criteria) {
@@ -849,7 +712,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       /* React to search event */
       datatable.on( 'search.dt', function () {
 
-        // console.log('search happened');
         deactivate_select();
 
       } );
@@ -875,25 +737,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         return $('#dtprv thead').find('th').eq(i).attr('data-term');
 
       }
-
-      /*
-      const observer = new MutationObserver(function(mutations_list) {
-        mutations_list.forEach(function(mutation) {
-          console.log( 'removed nodes' );
-          mutation.removedNodes.forEach(function(removed_node) {
-            if( $( removed_node ).hasClass( 'dtsb-clearAll' ) ) {
-
-              console.log(removed_node);
-              $('#dtprv_filter').css( 'display', 'block' );
-              // observer.disconnect();
-            }
-          });
-        });
-      });
-      
-      observer.observe(document.querySelector("#dtprv_wrapper"), { subtree: true, childList: true });
-      */
-
 
       /* Set up a callback function when an element is inserted into the dom */
       function onElementInserted(containerSelector, elementSelector, callback) {

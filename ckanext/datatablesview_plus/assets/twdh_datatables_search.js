@@ -1,3 +1,22 @@
+var run_query = function (params, format) {
+
+  var form = $('#filtered-datatables-download');
+
+  /* remove hidden inputs if they exist */
+  form.find('input[name="params"]').remove();
+  form.find('input[name="format"]').remove();
+
+  /* add current version of hidden inputs */
+  var p = $('<input name="params" type="hidden"/>');
+  p.attr("value", JSON.stringify(params));
+  form.append(p);
+  var f = $('<input name="format" type="hidden"/>');
+  f.attr("value", format);
+  form.append(f);
+  form.submit();
+
+}
+
 this.ckan.module("datatables_search", function (jQuery) {
     return {
       initialize: function () {

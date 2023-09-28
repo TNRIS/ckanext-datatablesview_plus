@@ -123,8 +123,8 @@ def ajax(resource_view_id):
     elif search_text != '':
         # perform SQL search using exact search string, i.e. no tokenizing
 
-        # remove leading and trailing spaces from search_text
-        search_text = search_text.strip()
+        # remove leading and trailing spaces and sql-escape single quotes as two single quotes
+        search_text = search_text.strip().replace("'", "''")
 
         sql = 'SELECT * FROM "{table_name}" WHERE '.format(table_name=str(resource_view[u'resource_id']))
 

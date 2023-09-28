@@ -1,4 +1,6 @@
 var table_rows_per_page = 1000;
+var show_sharesearch_banner = true;
+var initial_state = {};
 
 var run_query = function (params, format) {
 
@@ -37,7 +39,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       return entityMap[s];
     });
   }
-  
+
 
   return {
     initialize: function () {
@@ -84,9 +86,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           }
         },
-
-        // turn on state saving
-        stateSave: true,
 
         lengthMenu: [
           [10, 100, 1000],
@@ -191,39 +190,35 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               ]
             }
           },
-          /*
           {
-            extend: 'createState',
-            text: '<i class="fa fa-filter" aria-hidden="true"></i> CREATE STATE',
+            text: '<i class="fa fa-link" aria-hidden="true"></i> Share Search',
             title: "",
-          }, 
-          'savedStates',
-          */
-          /*
-          {
-            text: '<i class="fa fa-filter" aria-hidden="true"></i> COPY STATE',
-            title: "",
+            className: 'btn-sharesearch',
             action: function ( e, dt, node, config ) {
-              var state = datatable.stateRestore.state.add("COPY State" + Date.now() );
+              var state = datatable.stateRestore.state.add("Share Search " + Date.now() );
+              const url = new URL(window.location.href);
+              let dtprv_state = url.searchParams.get('dtprv_state');
+              $( '#dtprv_state' ).val( dtprv_state );
 
-              // parse the dtprv_state parameter out of the URL 
-              var url_params = function(name){
-                var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-                if (results==null) {
-                   return null;
+              if( _inIframe() ) {
+                if( _sameOrigin() ) {
+                  // In an iFrame on the same domain
+                  // Post message to parent window to show ShareSearch modal
+                  window.parent.postMessage({ shareSearch: dtprv_state }, '*');
+                } else {
+                  // In an iFrame not on the same domain
+                  // Do nothing, we don't want Share Search links on embedded tables
+                  console.log( 'In an iframe not on the same domain')
                 }
-                return decodeURI(results[1]) || 0;
+              } else {
+                console.log( 'Not in an iframe, aka in "Fullscreen" mode')
+                // Not in an iFrame, aka in 'Fullscreen' mode
+                // Do nothing, we don't want Share Search links on fullscreen tables
               }
-              var dprv_state = url_params( 'dtprv_state' );
               
             }
           },
-          */ 
         ],
-
-
-        // ?dtprv_state=eyJ0aW1lIjoxNjkwODI0NDA3NDY4LCJzdGFydCI6MCwibGVuZ3RoIjoxMDAwLCJvcmRlciI6W1swLCJhc2MiXV0sInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9LCJjb2x1bW5zIjpbeyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX0seyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX0seyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX0seyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX0seyJ2aXNpYmxlIjp0cnVlLCJzZWFyY2giOnsic2VhcmNoIjoiIiwic21hcnQiOnRydWUsInJlZ2V4IjpmYWxzZSwiY2FzZUluc2Vuc2l0aXZlIjp0cnVlfX1dLCJzZWxlY3QiOnsicm93cyI6W10sImNvbHVtbnMiOltdLCJjZWxscyI6W119LCJjaGlsZFJvd3MiOltdLCJzZWFyY2hCdWlsZGVyIjp7fSwicGFnZSI6MH0%3D
-
 
         pagingType: 'full_numbers',
         "pageLength": table_rows_per_page,
@@ -250,12 +245,28 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         "initComplete": function (settings, json) {
 
-          // console.log('DataTables has finished its initialisation.');
+          // console.log('DataTables has finished init.');
           setup_select_buttons();
-          // update_select_buttons();
           setup_searchbuilder_buttons();
           update_filenames();
           add_advanced_search_button();
+
+          console.log( initial_state );
+          if( initial_state.searchBuilder !== undefined && initial_state.searchBuilder.criteria !== undefined ) {
+
+            $('.dt-free-text-search').css('display', 'none');
+            $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'block');
+            $('.dt-buttons button.btn-sharesearch.btn-tertiary').css('display', 'inline-block');
+            $('.dt-buttons button.btn-sharesearch.btn-disabled').css('display', 'none');
+  
+          }
+          if( ! _inIframe() || ! _sameOrigin() ) {
+
+            $('.dt-buttons button.btn-sharesearch.btn-tertiary').css('display', 'none');
+            $('.dt-buttons button.btn-sharesearch.btn-disabled').css('display', 'none');
+  
+          }
+
 
         },
 
@@ -263,6 +274,23 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           "smart": true,
           "regex": false,
           "return": false
+        },
+
+        "drawCallback": function( settings ) {
+
+          console.log( 'DataTables has redrawn the table' );
+          console.log( datatable.state() );
+          update_sharesearch();
+          console.log( datatable.state() );
+
+          if( ! _inIframe() || ! _sameOrigin() ) {
+
+            $('.dt-buttons button.btn-sharesearch.btn-tertiary').css('display', 'none');
+            $('.dt-buttons button.btn-sharesearch.btn-disabled').css('display', 'none');
+  
+          }
+  
+
         },
 
         // turn on table metadata display
@@ -385,37 +413,90 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           }
           */
         },
+
+
+        // turn on state saving
+        stateSave: true,
+
+
         /* 
           stateSaveCallback and stateLoadCallback are configured here in order to allow us to have a 'share' link for table state
           Inspired by this helpful stackexchange post:
           https://stackoverflow.com/questions/55446923/datatables-1-10-using-savestate-to-remember-filtering-and-order-but-need-to-upd/60708638#60708638
         */
+
+        // This URL correctly restores state
+        // http://192.168.7.200:5000/dataset/springs-monitoring-program-flow-measurements/resource/c85caaa8-f16e-43c8-9cda-25d86e88d3a6/view/9bef11ef-c705-4589-a0b9-d89f0043162d?dtprv_state=eyJ0aW1lIjoxNjk0MDUzMTcwNzczLCJzdGFydCI6MCwibGVuZ3RoIjoxMDAwLCJvcmRlciI6W1swLCJhc2MiXV0sInNlYXJjaCI6eyJzZWFyY2giOiJIdWRzcGV0aCIsInNtYXJ0Ijp0cnVlLCJyZWdleCI6ZmFsc2UsImNhc2VJbnNlbnNpdGl2ZSI6dHJ1ZX0sImNvbHVtbnMiOlt7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fSx7InZpc2libGUiOnRydWUsInNlYXJjaCI6eyJzZWFyY2giOiIiLCJzbWFydCI6dHJ1ZSwicmVnZXgiOmZhbHNlLCJjYXNlSW5zZW5zaXRpdmUiOnRydWV9fV0sInNlbGVjdCI6eyJyb3dzIjpbXSwiY29sdW1ucyI6W10sImNlbGxzIjpbXX0sImNoaWxkUm93cyI6W10sInNlYXJjaEJ1aWxkZXIiOnt9LCJwYWdlIjowfQ%3D%3D
+        
         stateSaveCallback: function (settings, data) {
+
           //encode current state to base64
-          const state = btoa(JSON.stringify(data));
+
+          // console.log( 'start stateLoadCallback +=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=' );
+
+          // console.log( data );
+          var json = JSON.stringify(data)
+          // console.log( json );
+          const state = btoa(json);
+          // console.log( state )
+
+
+          // console.log( data );
+          // console.log( state );
+
           //get query part of the url
           let searchParams = new URLSearchParams(window.location.search);
+
           //add encoded state into query part
           searchParams.set($(this).attr('id') + '_state', state);
+
           //form url with new query parameter
           const newRelativePathQuery = window.location.pathname + '?' + searchParams.toString() + window.location.hash;
+
           //push new url into history object, this will change the current url without need of reload
           history.pushState(null, '', newRelativePathQuery);
+          
+          // console.log( 'end stateLoadCallback +=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=' );
+
         },
         stateLoadCallback: function (settings) {
-          const url = new URL(window.location.href);
-          let state = url.searchParams.get($(this).attr('id') + '_state');
+          // console.log( 'stateLoadCallback' );
+
+          // DO NOT use URL: searchParams.get() for retrieving the dtprv_state param because it is base64 encoded and searchParams will URL decode this which corrupts the base64 encoding
+          // https://developer.mozilla.org/en-US/docs/Web/API/URL/searchParams
+          
+          var params = _getUrlVars()
+          let state = params['dtprv_state'];
+
+          // console.log( params['dtprv_state'] );
+
 
           //check the current url to see if we've got a state to restore
           if (!state) {
             return null;
           }
-
           //if we got the state, decode it and add current timestamp
-          state = JSON.parse(atob(state));
+          
+
+          // console.log( state );
+          var tmp = atob(state)
+          // console.log( tmp );
+          state = JSON.parse(tmp);
+          // console.log( state );
           state['time'] = Date.now();
 
+          $( '#dtprv_state' ).val( state );
+
+
           return state;
+
+        },
+        stateLoaded: function(settings, data) {
+
+          console.log( 'Saved filter was: ' );
+          initial_state = data;
+          console.log( initial_state );
+
         }
 
       });
@@ -462,6 +543,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         /* Add click callback to handle when the Search Builder is activated */
         onElementInserted('.dtsb-searchBuilder', '.dtsb-add', function (element) {
+          
           $(element).click(function () {
             $('.dt-free-text-search').css('display', 'none');
             $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'block');
@@ -480,7 +562,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         onElementInserted('.dtsb-searchBuilder', '.dtsb-value', function (element) {
           // console.log(element);
           $(element).on('input', function () {
-            console.log('.dtsb-value edited');
+            // console.log('.dtsb-value edited');
           });
         });
 
@@ -512,6 +594,51 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         });
 
       }
+
+
+      // Detect whether the window is in an iframe
+      function _inIframe() {
+        try {
+            return window.self !== window.top;
+        } catch (e) {
+            return true;
+        }
+      }
+
+      // Detect whether an iframe is from the same origin as the parent window
+      // Returns true if called from a parent window (i.e. not an iframe)
+      function _sameOrigin() {
+
+        if( window.self !== window.top ) {
+
+          const self = new URL(document.referrer);
+          const frame = new URL(document.location.href);
+
+          return self.origin === frame.origin;
+
+        } else {
+
+          return true;
+
+        }
+
+      }
+    
+
+      // Read a page's GET URL variables and return them as an associative array WITHOUT any url decoding.
+      function _getUrlVars()
+      {
+          var vars = [], hash;
+          var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+          for(var i = 0; i < hashes.length; i++)
+          {
+              hash = hashes[i].split('=');
+              vars.push(hash[0]);
+              vars[hash[0]] = hash[1];
+          }
+          return vars;
+      }
+
 
       /* Replace built in rotating ellipsis animation with TWDH preferred FontAwesome circle-o-notch animation */
       $('div.dataTables_processing').html('<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>');
@@ -557,9 +684,81 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         $('.dt-buttons button').addClass('btn-tertiary');
         $('.dt-buttons button.btn-rowselect.btn-tertiary').css('display', 'none');
-        $('.dt-buttons').prepend('<button class="btn btn-rowselect btn-disabled"><span><i class="fa fa-ban" aria-hidden="true"></i> PRINT SELECTED</span></button> ');
-        $('.dt-buttons').prepend('<button class="btn btn-rowselect btn-disabled"><span><i class="fa fa-ban" aria-hidden="true"></i> COPY SELECTED</span></button> ');
+        $('.dt-buttons button.btn-sharesearch.btn-tertiary').css('display', 'none');
 
+        $('<button class="btn btn-sharesearch btn-disabled" tabindex="-1"><span><i class="fa fa-link" aria-hidden="true"></i> SHARE SEARCH</span></button> ').insertBefore( $('.dt-buttons .btn-sharesearch') );
+        $('<button class="btn btn-rowselect btn-disabled" tabindex="-1"><span><i class="fa fa-print" aria-hidden="true"></i> PRINT SELECTED</span></button> ').insertBefore( $('.dt-buttons .buttons-print') );
+        $('<button class="btn btn-rowselect btn-disabled" tabindex="-1"><span><i class="fa fa-copy" aria-hidden="true"></i> COPY SELECTED</span></button> ').insertBefore( $('.dt-buttons .buttons-copy') );
+
+
+
+      }
+
+      function update_sharesearch_state() {
+
+        var params = _getUrlVars()
+        let sharesearch = params['sharesearch'];
+        // console.log( 'update_sharesearch_state' );
+
+        if( show_sharesearch_banner && sharesearch == 1 ) {
+
+          // Show sharesearch banner
+          $( '#dtprv_wrapper' ).prepend( '<div id="sharesearch_status">This search was loaded from a Share Search link.</div>' );
+          // only show once upon arrival
+          show_sharesearch_banner = false;
+
+        } else {
+
+          $( '#sharesearch_status' ).remove();
+
+        }
+
+      }
+
+
+      /* Show/Hide Share Search button */
+      function update_sharesearch() {
+
+        update_sharesearch_state();
+
+        var activate = false;
+        var state = datatable.state();
+        console.log( state );
+
+        if( state.searchBuilder !== undefined && state.searchBuilder.criteria !== undefined ) {
+          for (const c of state.searchBuilder.criteria) {
+            if (
+              c.condition !== undefined &&
+              c.data !== undefined &&
+              c.value.length > 0
+            ) {
+              activate = true;
+              break;
+            }
+
+          }
+        }
+        
+        if( 
+          state.search['search'].trim().length > 0  ||
+          ( state.searchBuilder && state.searchBuilder.length > 0 )
+        ) {
+
+          activate = true;
+
+        }
+
+        if( activate ) {
+
+          $('.dt-buttons button.btn-sharesearch.btn-tertiary').css('display', 'inline-block');
+          $('.dt-buttons button.btn-sharesearch.btn-disabled').css('display', 'none');
+
+        } else {
+
+          $('.dt-buttons button.btn-sharesearch.btn-tertiary').css('display', 'none');
+          $('.dt-buttons button.btn-sharesearch.btn-disabled').css('display', 'inline-block');
+
+        }
 
       }
 
@@ -572,15 +771,15 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           if (dtprv_is_preview == 'False') {
 
-            $('.dt-buttons button.btn-tertiary').css('display', 'inline-block');
-            $('.dt-buttons button.btn-disabled').css('display', 'none');
+            $('.dt-buttons button.btn-rowselect').css('display', 'inline-block');
+            $('.dt-buttons button.btn-rowselect.btn-disabled').css('display', 'none');
     
           }
 
         } else {
 
-          $('.dt-buttons button.btn-tertiary').css('display', 'none');
-          $('.dt-buttons button.btn-disabled').css('display', 'inline-block');
+          $('.dt-buttons button.btn-rowselect').css('display', 'none');
+          $('.dt-buttons button.btn-rowselect.btn-disabled').css('display', 'inline-block');
   
         }
 
@@ -605,10 +804,13 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         $(button).click(function () {
 
           $('.dt-free-text-search').css('display', 'none');
-          console.log( 'advanced search button clicked' );
+          $('.dtsb-searchBuilder').css('display', 'block');
         
-          $( '#dtprv_wrapper .dtsb-searchBuilder > .dtsb-group > .dtsb-add' ).click();
+          if( $('#dtprv_wrapper .dtsb-searchBuilder').find('.dtsb-criteria').length == 0 ) {
 
+            $( '#dtprv_wrapper .dtsb-searchBuilder > .dtsb-group > .dtsb-add' ).click();
+
+          }
 
         });
 

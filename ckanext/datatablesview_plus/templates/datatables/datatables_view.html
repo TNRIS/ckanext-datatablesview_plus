@@ -3,6 +3,12 @@
 {% block page %}
 
   <div id="dtplus_dtprv_wrapper">
+
+    <div id="dt-state-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="Copy State">
+      Hello, world!
+    </div>
+
+  <input type="hidden" id="dtprv_state" value="{{ request.args.get('dtprv_state', '')|e }}"/>
   <input type="hidden" id="dtprv_is_preview" value="{% if resource.get( 'preview' ) == True %}True{% else %}False{%endif%}"/>
   <input type="hidden" id="dtprv_preview_rows" value="{{ resource.get( 'preview_rows' ) }}"/>
   <input type="hidden" id="dtprv_total_record_count" value="{{ resource.get( 'total_record_count' ) }}"/>

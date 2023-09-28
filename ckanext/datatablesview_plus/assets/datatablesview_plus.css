@@ -528,6 +528,13 @@ div.dtfh-floatingparent tr th
 
 }
 
+#dtprv_wrapper table tr td.dataTables_empty
+{
+
+  text-align: left;
+
+}
+
 #dtprv_wrapper table tr th:last-child
 {
 
@@ -906,6 +913,14 @@ div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria input.dtsb-input
 .dtsb-criteria.warning{
 
   background: #FFC107;
+
+}
+
+#sharesearch_status {
+
+  margin-top: 1rem;
+  color: #E23014;
+  font-weight: bold;
 
 }
 

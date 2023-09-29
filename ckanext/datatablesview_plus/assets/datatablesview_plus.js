@@ -26,6 +26,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
   return {
     initialize: function () {
 
+      $.fn.dataTable.ext.errMode = 'throw';
+      
       // Initialize datatable. To set options on DataTable, use data-attribute 
       // tags in templates/datatables/datatables_view.html
       var datatable = jQuery('#dtprv').DataTable({

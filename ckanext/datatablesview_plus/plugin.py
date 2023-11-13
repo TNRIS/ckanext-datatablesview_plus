@@ -3,6 +3,7 @@
 import ckan.plugins as p
 import ckan.plugins.toolkit as toolkit
 from ckanext.datatablesview_plus import blueprint
+import ckanext.datatablesview_plus.cli as cli
 
 default = toolkit.get_validator(u'default')
 boolean_validator = toolkit.get_validator(u'boolean_validator')
@@ -35,6 +36,7 @@ class DatatablesviewPlusPlugin(p.SingletonPlugin):
     p.implements(p.IConfigurer, inherit=True)
     p.implements(p.IResourceView, inherit=True)
     p.implements(p.IBlueprint)
+    p.implements(p.IClick)
     p.implements(p.ITemplateHelpers)
 
 
@@ -42,6 +44,10 @@ class DatatablesviewPlusPlugin(p.SingletonPlugin):
 
     def get_blueprint(self):
         return blueprint.datatablesview_plus
+
+    # IClick
+    def get_commands(self):
+        return cli.get_commands()
 
     # IConfigurer
 

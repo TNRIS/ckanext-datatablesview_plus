@@ -2,7 +2,7 @@
 
 from six.moves.urllib.parse import urlencode
 
-from flask import Blueprint
+from flask import Blueprint, jsonify
 from six import text_type
 
 import ckan.model as model
@@ -11,6 +11,9 @@ from ckan.plugins.toolkit import get_action, request, h
 from ckan.plugins import toolkit as tk
 \
 from ckanext.datatablesview_plus.search_builder import parse
+
+from ckanext.datatablesview_plus.model import DTSharedSearch
+import base64
 
 import logging
 log = logging.getLogger(__name__)
@@ -304,6 +307,37 @@ def filtered_download(resource_view_id):
         })
     )
 
+def sharesearch():
+    '''
+    create a sharesearch record and return it's uuid
+
+    :return: uuid
+    '''
+
+    searchstate = request.form.get( 'searchstate', '' )
+    
+    searchstate = base64.b64decode(searchstate).decode('ascii')
+
+    uuid = DTSharedSearch.create_shared_search( searchstate )
+
+    return jsonify({ 'uuid': uuid })
+
+def get_sharesearch():
+    '''
+    retrieve json describine a sharesearch
+
+    :return: sharesarech record json
+    '''
+
+    uuid = request.form.get( 'uuid', '' )
+
+    sharesearch = DTSharedSearch.get_shared_search( uuid )
+
+    if sharesearch is not None:
+        return jsonify(sharesearch.json)
+    else:
+        return ''
+
 
 datatablesview_plus.add_url_rule(
     u'/datatables/ajax/<resource_view_id>', view_func=ajax, methods=[u'POST']
@@ -312,4 +346,12 @@ datatablesview_plus.add_url_rule(
 datatablesview_plus.add_url_rule(
     u'/datatables/filtered-download/<resource_view_id>',
     view_func=filtered_download, methods=[u'POST']
+)
+
+datatablesview_plus.add_url_rule(
+    u'/datatables/sharesearch/', view_func=sharesearch, methods=[u'GET',u'POST']
+)
+
+datatablesview_plus.add_url_rule(
+    u'/datatables/sharesearch/get/', view_func=get_sharesearch, methods=[u'GET',u'POST']
 )

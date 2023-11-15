@@ -5,6 +5,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
   // These are for stateSave aka 'Share Search'
   var show_sharesearch_banner = true;
   var initial_state = {};
+  var is_sharesearch = false;
 
   var entityMap = {
     '&': '&amp;',
@@ -135,16 +136,20 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             title: "",
             className: 'btn-sharesearch',
             action: function ( e, dt, node, config ) {
+              /*
               var state = datatable.stateRestore.state.add("Share Search " + Date.now() );
               const url = new URL(window.location.href);
               let dtprv_state = url.searchParams.get('dtprv_state');
               $( '#dtprv_state' ).val( dtprv_state );
+              */
+
+              var state = datatable.state();
 
               if( _inIframe() ) {
                 if( _sameOrigin() ) {
                   // In an iFrame on the same domain
                   // Post message to parent window to show ShareSearch modal
-                  window.parent.postMessage({ shareSearch: dtprv_state }, '*');
+                  window.parent.postMessage({ shareSearch: state }, '*');
                 } else {
                   // In an iFrame not on the same domain
                   // Do nothing, we don't want Share Search links on embedded tables
@@ -316,7 +321,9 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           // encode current state to base64
           var json = JSON.stringify(data)
           const state = btoa(json);
-
+          $('#dtprv_state').val( state );
+      
+          /*
           //get query part of the url
           let searchParams = new URLSearchParams(window.location.search);
 
@@ -328,35 +335,28 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           //push new url into history object, this will change the current url without need of reload
           history.pushState(null, '', newRelativePathQuery);
+          */
           
         },
         stateLoadCallback: function (settings) {
 
-          // DO NOT use URL: searchParams.get() for retrieving the dtprv_state param because it is base64 encoded and searchParams will URL decode this which corrupts the base64 encoding
-          // https://developer.mozilla.org/en-US/docs/Web/API/URL/searchParams
-          
-          var params = _getUrlVars()
-          let state = params['dtprv_state'];
-
-          //check the current url to see if we've got a state to restore
-          if (!state) {
-            return null;
+          console.log( 'state stateLoadCallback' );
+          let params = new URLSearchParams(document.location.search);
+          let uuid = params.get( 'ss' );
+          let json = _getShareSearchUUID( uuid );
+          if( json ) {
+            is_sharesearch = true;
+            json['time'] = Date.now();
           }
-
-          //if we got the state, decode it and add current timestamp
-          var tmp = atob(state)
-          state = JSON.parse(tmp);
-          state['time'] = Date.now();
-
-          // why is this here?
-          $( '#dtprv_state' ).val( state );
-
-          return state;
+          
+          return json;
 
         },
         stateLoaded: function(settings, data) {
 
-          initial_state = data;
+          console.log( 'state loaded' );
+          console.log( data );
+          // initial_state = data;
 
         }
 
@@ -540,9 +540,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       function update_sharesearch_state() {
 
         var params = _getUrlVars()
-        let sharesearch = params['sharesearch'];
 
-        if( show_sharesearch_banner && sharesearch == 1 ) {
+        if( show_sharesearch_banner && is_sharesearch ) {
 
           // Show sharesearch banner
           $( '#dtprv_wrapper' ).prepend( '<div id="sharesearch_status">This search was loaded from a Share Search link.</div>' );
@@ -745,5 +744,43 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
     }
 
   }
-  
+
+  function _getShareSearchUUID( uuid ) {
+
+    var query = 'uuid=' + uuid;
+
+    var response = $.ajax({
+
+      type:'POST',
+      url: '/datatables/sharesearch/get/',
+      data: query,
+      cache: false,
+      async: false,
+
+      success: function(response, status, xhr) {
+
+      },
+
+      error: function (xhr, ajaxOptions, thrownError) {
+
+        console.log( 'AJAX sharesearch retrieval error' );
+        console.log( thrownError );
+
+      },
+
+    });
+
+    if( response.responseJSON != undefined ) {
+
+      return JSON.parse( response.responseJSON );
+
+    } else {
+
+      return false;
+
+    }
+    
+
+  }
+
 });

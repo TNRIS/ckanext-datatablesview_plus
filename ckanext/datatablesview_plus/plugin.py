@@ -5,6 +5,9 @@ import ckan.plugins.toolkit as toolkit
 from ckanext.datatablesview_plus import blueprint
 import ckanext.datatablesview_plus.cli as cli
 
+from ckanext.datatablesview_plus.model import define_shared_search_tables, db_setup, DTSharedSearch
+import base64
+
 default = toolkit.get_validator(u'default')
 boolean_validator = toolkit.get_validator(u'boolean_validator')
 ignore_missing = toolkit.get_validator(u'ignore_missing')
@@ -28,6 +31,25 @@ def dtprv_date(iso_date_string):
     format='%b %d, %Y'
     return native.strftime(format) 
 
+def get_sharesearch_state(uuid, encoded=False):
+    """
+    Retrieve sharesearch record
+
+    Args: sharesearch record uuid
+        
+    Returns:
+        sharesearch record
+
+    """
+
+    sharesearch = DTSharedSearch.get_shared_search(uuid)
+
+    if sharesearch:
+        if encoded:
+            return base64.b64encode(sharesearch.json.encode('utf-8'))
+        else:
+            return sharesearch.json
+    return None
 
 class DatatablesviewPlusPlugin(p.SingletonPlugin):
     u'''
@@ -52,6 +74,10 @@ class DatatablesviewPlusPlugin(p.SingletonPlugin):
     # IConfigurer
 
     def update_config(self, config):
+
+        # map shared search model to db schema
+        define_shared_search_tables()
+
         u'''
         Set up the resource library, public directory and
         template directory for the view
@@ -67,6 +93,8 @@ class DatatablesviewPlusPlugin(p.SingletonPlugin):
 
             return {
                 'dtprv_date': dtprv_date,
+                'get_sharesearch_state': get_sharesearch_state,
+
             }
     
 

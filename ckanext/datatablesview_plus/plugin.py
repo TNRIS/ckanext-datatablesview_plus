@@ -46,7 +46,8 @@ def get_sharesearch_state(uuid, encoded=False):
 
     if sharesearch:
         if encoded:
-            return base64.b64encode(sharesearch.json.encode('utf-8'))
+            b64 =  base64.b64encode(sharesearch.json.encode('UTF-8'))
+            return b64.decode('UTF-8')
         else:
             return sharesearch.json
     return None

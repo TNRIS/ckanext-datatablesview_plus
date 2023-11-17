@@ -1,28 +1,15 @@
 this.ckan.module('datatablesview_plus', function (jQuery) {
 
+  // pager variables
   var table_rows_per_page = 1000;
 
-  // These are for stateSave aka 'Share Search'
-  var show_sharesearch_banner = true;
-  var initial_state = {};
+  // 'Share Search' status variables
   var is_sharesearch = false;
+  var is_failedsharesearch = false;
+  var is_changedsharesearch = false;
+  var is_advancedsearch = false;
+  var is_stateloaded = false;
 
-  var entityMap = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;',
-    '/': '&#x2F;',
-    '`': '&#x60;',
-    '=': '&#x3D;'
-  };
-  
-  function escapeHtml (string) {
-    return String(string).replace(/[&<>"'`=\/]/g, function fromEntityMap (s) {
-      return entityMap[s];
-    });
-  }
 
   return {
     initialize: function () {
@@ -33,19 +20,22 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       // tags in templates/datatables/datatables_view.html
       var datatable = jQuery('#dtprv').DataTable({
 
-        // Setup search highlighting
+        // turn on search highlighting
         mark: true,
 
-        // define default column order
+        // turn on stateSave
+        stateSave: true,
+
+        //  column order
         order: [[0, 'asc']],
 
-        // Setup searchBuilder
+        // disallow column reordering
+        colReorder: false,
+
+        // turn on searchBuilder
         searchBuilder: {
           depthLimit: 2
         },
-
-        // Set column reordering
-        colReorder: false,
 
         // Set language strings
         language: {
@@ -71,11 +61,17 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           }
         },
+        
+        // We are not currently using the pager, but when we do these settings will be relevant
         lengthMenu: [
           [10, 100, 1000],
           ['10', '100', '1,000']
         ],
-        deferRender: true,
+        pagingType: 'full_numbers',
+        pageLength: table_rows_per_page,
+
+        // We may want to turn this on? https://datatables.net/reference/option/deferRender
+        deferRender: false,
 
         // turn on scroller
         paging: false,
@@ -83,18 +79,32 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         scrollY: "60vh",
         scrollCollapse: true,
 
+        search: {
+
+          "smart": true,
+          "regex": false,
+          "return": false
+
+        },
+
         columnDefs: [
+
+          // make sure id column on far left stays narrow
           {
             width: '20px',
             targets: 0
           },
+
+          // make sure all text is rendered as text in case tables have HTML in them
           {
             targets: '_all',
             render: DataTable.render.text()
           }
+
         ],
 
         buttons: [
+
           {
             extend: 'copy',
             text: '<i class="fa fa-copy" aria-hidden="true"></i> COPY SELECTED',
@@ -113,6 +123,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               ]
             }
           },
+
           {
             extend: 'print',
             text: '<i class="fa fa-print" aria-hidden="true"></i> PRINT SELECTED',
@@ -131,54 +142,64 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               ]
             }
           },
+
           {
             text: '<i class="fa fa-link" aria-hidden="true"></i> Share Search',
             title: "",
             className: 'btn-sharesearch',
             action: function ( e, dt, node, config ) {
-              /*
-              var state = datatable.stateRestore.state.add("Share Search " + Date.now() );
-              const url = new URL(window.location.href);
-              let dtprv_state = url.searchParams.get('dtprv_state');
-              $( '#dtprv_state' ).val( dtprv_state );
-              */
 
               var state = datatable.state();
 
               if( _inIframe() ) {
+
                 if( _sameOrigin() ) {
+
                   // In an iFrame on the same domain
                   // Post message to parent window to show ShareSearch modal
+                  // Parent window needs to be set up to catch this message and act accordingly.
+                  // Currently this is accomplished by adding code to the theme extension, but 
+                  // it would be better to move that code into this extension if we can figure 
+                  // out how to do that.
+
                   window.parent.postMessage({ shareSearch: state }, '*');
+
                 } else {
+
                   // In an iFrame not on the same domain
-                  // Do nothing, we don't want Share Search links on embedded tables
+                  // Do nothing, we don't want Share Search capability on embedded tables because 
+                  // thanks to CORS we can't do the required interwindow communication beteen the 
+                  // iframe and the parent
+
                 }
+
               } else {
+
                 // Not in an iFrame, aka in 'Fullscreen' mode
-                // Do nothing, we don't want Share Search links on fullscreen tables
+                // Do nothing, we don't want Share Search capability on fullscreen tables
+                // We could implement this - would need to set up the modal code to work in this case
+
               }
               
             }
           },
+
         ],
-        pagingType: 'full_numbers',
-        "pageLength": table_rows_per_page,
-        "initComplete": function (settings, json) {
+
+        initComplete: function (settings, json) {
 
           setup_select_buttons();
           setup_searchbuilder_buttons();
-          update_filenames();
           add_advanced_search_button();
 
-          if( initial_state.searchBuilder !== undefined && initial_state.searchBuilder.criteria !== undefined ) {
+          // if this is a shared search that is in 'advanced' mode, update the display
+          if( is_advancedsearch ) {
 
-            $('.dt-free-text-search').css('display', 'none');
-            $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'block');
-            $('.dt-buttons button.btn-sharesearch.btn-tertiary').css('display', 'inline-block');
-            $('.dt-buttons button.btn-sharesearch.btn-disabled').css('display', 'none');
+            toggle_search( 'advanced' );
   
           }
+
+          // Disable ShareSearch if we are in fullscreen mode or embedded on a third party site
           if( ! _inIframe() || ! _sameOrigin() ) {
 
             $('.dt-buttons button.btn-sharesearch.btn-tertiary').css('display', 'none');
@@ -186,13 +207,14 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
   
           }
 
+
+          console.log( 'initComplete' );
+
         },
-        search: {
-          "smart": true,
-          "regex": false,
-          "return": false
-        },
-        "drawCallback": function( settings ) {
+
+        drawCallback: function( settings ) {
+
+          console.log( 'drawCallback' );
 
           update_sharesearch();
 
@@ -203,8 +225,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
   
           }
   
-
         },
+
         infoCallback: function (settings, start, end, max, total, pre) {
 
           var rows_per_page = $('select[name="dtprv_length"]').val();
@@ -231,6 +253,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           }
           
         },
+
         headerCallback: function (thead, data, start, end, display) {
 
           $(thead).find('th').eq(0).html('');
@@ -306,57 +329,79 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             });
           }
         },
-        "rowCallback": function( row, data ) {
+
+        rowCallback: function( row, data ) {
 
           var count = 0;
           for (const d of data) {
             if( d == 'None' ){ $('td:eq('+count+')', row).html( '' ); }
             count++;
           }
+
         },
-        // DT stateSave provides Share Sarech functionality
-        stateSave: true,
+
         stateSaveCallback: function (settings, data) {
 
-          // encode current state to base64
-          var json = JSON.stringify(data)
-          const state = btoa(json);
-          $('#dtprv_state').val( state );
-      
-          /*
-          //get query part of the url
-          let searchParams = new URLSearchParams(window.location.search);
+            const state = btoa(JSON.stringify(data));
+            $('#dtprv_state').val( state );
 
-          //add encoded state into query part
-          searchParams.set($(this).attr('id') + '_state', state);
+            delete data.time;
+            const search = JSON.stringify(data)
+            // const search = btoa(json);
+            $('#dtprv_search_current').val( search );
 
-          //form url with new query parameter
-          const newRelativePathQuery = window.location.pathname + '?' + searchParams.toString() + window.location.hash;
 
-          //push new url into history object, this will change the current url without need of reload
-          history.pushState(null, '', newRelativePathQuery);
-          */
-          
         },
+
         stateLoadCallback: function (settings) {
 
-          console.log( 'state stateLoadCallback' );
+          console.log( 'stateLoadCallback' );
+
           let params = new URLSearchParams(document.location.search);
-          let uuid = params.get( 'ss' );
-          let json = _getShareSearchUUID( uuid );
-          if( json ) {
-            is_sharesearch = true;
-            json['time'] = Date.now();
-          }
+          let uuid = params.get( 'sharesearch' );
+          if( uuid != '' ) {
+
+            let json = _getShareSearchUUID( uuid );
+            if( json ) {
+              if( json.search.search != '' ) {
+
+                is_advancedsearch = false;
+
+              } else if( json.searchBuilder !== undefined && json.searchBuilder.criteria !== undefined ) {
+              
+                is_advancedsearch = true;
+
+              }
+
+              is_sharesearch = true;
+
+              if( ! is_stateloaded ) {
+
+                delete json.time;
+                console.log( json );
+                const search = JSON.stringify(json)
+                $('#dtprv_search_orig').val( search );
+
+              }
+              
+
+              json['time'] = Date.now();
+
+              is_stateloaded = true;
+
+
+            } else {
+
+              is_failedsharesearch = true;    
+
+            }
           
-          return json;
+            return json;
+          }
 
         },
-        stateLoaded: function(settings, data) {
 
-          console.log( 'state loaded' );
-          console.log( data );
-          // initial_state = data;
+        stateLoaded: function(settings, data) {
 
         }
 
@@ -397,19 +442,16 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         /* Add click callback to handle when the clear all button is clicked in Search Builder */
         onElementInserted('.dtsb-searchBuilder', '.dtsb-clearAll', function (element) {
           $(element).click(function () {
-            $('.dt-free-text-search').css('display', 'block');
-            $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'none');
+            toggle_search( 'simple' );
           });
           $( element ).addClass( 'btn btn-secondary' );
         });
 
         /* Add click callback to handle when the Search Builder is activated */
         onElementInserted('.dtsb-searchBuilder', '.dtsb-add', function (element) {
-          
+
           $(element).click(function () {
-            $('.dt-free-text-search').css('display', 'none');
-            $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'block');
-            cancel_simple_search();
+            toggle_search( 'advanced' );
           });
 
           // Set class to style SB buttons
@@ -421,10 +463,12 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         });
 
         /* Add input callback to monitor criteria settings and add/remove warning class for empty criteria */
+        /*
         onElementInserted('.dtsb-searchBuilder', '.dtsb-value', function (element) {
           $(element).on('input', function () {
           });
         });
+        */
 
         /* Add click callback to display free text search input when 
           Search Builder is deactivated by removing the last filter 
@@ -434,8 +478,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           $(element).click(function () {
             var conditions = $('.dtsb-searchBuilder').find('.dtsb-delete');
             if (conditions.length == 0) {
-              $('.dt-free-text-search').css('display', 'block');
-              $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'none');
+              toggle_search( 'simple' );
             }
           });
         });
@@ -447,8 +490,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           $(element).click(function () {
             var conditions = $('.dtsb-searchBuilder').find('.dtsb-clearGroup');
             if (conditions.length == 0) {
-              $('.dt-free-text-search').css('display', 'block');
-              $('#dtprv_wrapper .dtsb-searchBuilder').css('display', 'none');
+              toggle_search( 'simple' );
             }
           });
         });
@@ -516,9 +558,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       var selectTimeout;
 
-      function update_filenames() {
-      }
-
       function setup_searchbuilder_buttons() {
       }
 
@@ -537,29 +576,60 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       }
 
-      function update_sharesearch_state() {
+      function update_sharesearch_status() {
 
-        var params = _getUrlVars()
+        console.log( 'update_sharesearch_status' );
 
-        if( show_sharesearch_banner && is_sharesearch ) {
+        if( is_failedsharesearch ) {
 
-          // Show sharesearch banner
-          $( '#dtprv_wrapper' ).prepend( '<div id="sharesearch_status">This search was loaded from a Share Search link.</div>' );
-          // only show once upon arrival
-          show_sharesearch_banner = false;
+          console.log( 'is_failedsharesearch' );
 
-        } else {
+          $( '#sharesearch_status' ).html('<div class="warning">Unable to find requested Share Search</div>');
 
-          $( '#sharesearch_status' ).remove();
+      
+        } else if( is_sharesearch ) {
+
+          console.log( 'is_sharesearch' );
+
+          if( has_sharesearch_changed() ) {
+
+
+            console.log( 'sharesearch has changed' );
+
+            $( '#sharesearch_status .warning' ).html("This search was loaded from a Share Search link, but has been modified.");
+
+            $( '#sharesearch_status .sharesearch-reload' ).html('<button class="btn btn-secondary"  onclick="parent.location.reload();">Reload original Share Search</button>');
+
+          } else {
+
+            console.log( 'sharesearch has not changed' );
+
+            $( '#sharesearch_status' ).html( 
+              '<div class="warning">This search was loaded from a Share Search link.</div>' 
+              + '<div class="sharesearch-reload"></div>'
+            );
+
+          }
 
         }
+
+      }
+
+      function has_sharesearch_changed() {
+
+        console.log( 'has_sharesearch_changed' );
+
+        console.log( $( '#dtprv_search_orig' ).val() );
+        console.log( $( '#dtprv_search_current' ).val() );
+
+        return $( '#dtprv_search_orig' ).val() != $( '#dtprv_search_current' ).val()
 
       }
 
       /* Show/Hide Share Search button */
       function update_sharesearch() {
 
-        update_sharesearch_state();
+        update_sharesearch_status();
 
         var activate = false;
         var state = datatable.state();
@@ -642,8 +712,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         var button = $('#dtprv_wrapper .advanced-search').find('button');
         $(button).click(function () {
 
-          $('.dt-free-text-search').css('display', 'none');
-          $('.dtsb-searchBuilder').css('display', 'block');
+          toggle_search( 'advanced' );
         
           if( $('#dtprv_wrapper .dtsb-searchBuilder').find('.dtsb-criteria').length == 0 ) {
 
@@ -654,6 +723,66 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         });
 
       }
+
+      function toggle_search( type ) {
+
+        console.log( 'Setting search to ' + type );
+
+        if( type == 'simple' ) {
+
+          if( $('.dt-free-text-search').css('display') != 'block' ) {
+
+            // Cancel the current simple search so that it doesn't conflict with advanced search
+            cancel_search( 'advanced' );
+          
+            $('.dt-free-text-search').css('display', 'block');
+            $('.dtsb-searchBuilder').css('display', 'none');
+
+          }
+
+        }
+
+        if( type == 'advanced' ) {
+
+          if( $('.dt-free-text-search').css('display') != 'none' ) {
+
+            // Cancel the current simple search so that it doesn't conflict with advanced search
+            cancel_search( 'simple');
+
+            $('.dt-free-text-search').css('display', 'none');
+            $('.dtsb-searchBuilder').css('display', 'block');
+
+          }
+
+        }
+
+      }
+
+      function cancel_search( type ) {
+
+        // console.log( 'Cancel ' + type + ' search' );
+
+        if( type == 'simple' ) {
+
+          datatable.search('').draw();
+          $('#dtprv_filter .dt-search-cancel').css('display', 'none');
+  
+        } else if( type == 'advanced' ) {
+        
+        } else {
+
+          // console.log( 'I don\'t know how to cancel a ' + type + ' search' );
+
+        }
+
+      }
+
+      datatable.on( 'stateSaveParams.dt', function (e, settings, data) {
+        
+        update_sharesearch_status();
+
+      });
+
 
       datatable.on('select', function (e, dt, type, indexes) {
 
@@ -695,17 +824,9 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       /* React to click of search clear button */
       $('#dtprv_filter .dt-search-cancel').click(function () {
 
-          cancel_simple_search();
+          cancel_search( 'simple' );
 
       });
-
-      function cancel_simple_search() {
-
-        datatable.search('').draw();
-        $('#dtprv_filter .dt-search-cancel').css('display', 'none');
-
-
-      }
 
       /* Get column header with 'true' label for export files */
       function get_export_header(i) {
@@ -741,46 +862,61 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       }
 
+      function _getShareSearchUUID( uuid ) {
+
+        var query = 'uuid=' + uuid;
+
+        var response = $.ajax({
+
+          type:'POST',
+          url: '/datatables/sharesearch/get/',
+          data: query,
+          cache: false,
+          async: false,
+
+          success: function(response, status, xhr) {
+
+          },
+
+          error: function (xhr, ajaxOptions, thrownError) {
+
+            console.log( 'AJAX sharesearch retrieval error' );
+            console.log( thrownError );
+
+          },
+
+        });
+
+        if( response.responseJSON != undefined ) {
+
+          return JSON.parse( response.responseJSON );
+
+        } else {
+
+          return false;
+
+        }
+  
+      }
+
+      var entityMap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+        '/': '&#x2F;',
+        '`': '&#x60;',
+        '=': '&#x3D;'
+      };
+      
+      function escapeHtml (string) {
+        return String(string).replace(/[&<>"'`=\/]/g, function fromEntityMap (s) {
+          return entityMap[s];
+        });
+      }
     }
 
   }
-
-  function _getShareSearchUUID( uuid ) {
-
-    var query = 'uuid=' + uuid;
-
-    var response = $.ajax({
-
-      type:'POST',
-      url: '/datatables/sharesearch/get/',
-      data: query,
-      cache: false,
-      async: false,
-
-      success: function(response, status, xhr) {
-
-      },
-
-      error: function (xhr, ajaxOptions, thrownError) {
-
-        console.log( 'AJAX sharesearch retrieval error' );
-        console.log( thrownError );
-
-      },
-
-    });
-
-    if( response.responseJSON != undefined ) {
-
-      return JSON.parse( response.responseJSON );
-
-    } else {
-
-      return false;
-
-    }
-    
-
-  }
-
+  
 });

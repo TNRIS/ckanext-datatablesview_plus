@@ -906,8 +906,13 @@ div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria input.dtsb-input
 #sharesearch_status {
 
   margin-top: 1rem;
-  color: #E23014;
   font-weight: bold;
+
+}
+
+#sharesearch_status .warning {
+
+  color: #E23014;
 
 }
 

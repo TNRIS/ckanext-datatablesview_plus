@@ -6,7 +6,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
   // 'Share Search' status variables
   var is_sharesearch = false;
   var is_failedsharesearch = false;
-  var is_changedsharesearch = false;
   var is_advancedsearch = false;
   var is_stateloaded = false;
 
@@ -208,13 +207,13 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           }
 
 
-          console.log( 'initComplete' );
+          // console.log( 'initComplete' );
 
         },
 
         drawCallback: function( settings ) {
 
-          console.log( 'drawCallback' );
+          // console.log( 'drawCallback' );
 
           update_sharesearch();
 
@@ -355,13 +354,18 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         stateLoadCallback: function (settings) {
 
-          console.log( 'stateLoadCallback' );
+          // console.log( 'stateLoadCallback' );
 
           let params = new URLSearchParams(document.location.search);
           let uuid = params.get( 'sharesearch' );
-          if( uuid != '' ) {
+          let json = {};
+          
+          // console.log( uuid );
 
-            let json = _getShareSearchUUID( uuid );
+          if( uuid != null ) {
+
+            json = _getShareSearchUUID( uuid );
+            // console.log( json );
             if( json ) {
               if( json.search.search != '' ) {
 
@@ -378,7 +382,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               if( ! is_stateloaded ) {
 
                 delete json.time;
-                console.log( json );
+                // console.log( json );
                 const search = JSON.stringify(json)
                 $('#dtprv_search_orig').val( search );
 
@@ -396,8 +400,10 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
             }
           
-            return json;
+            
           }
+
+          return json;
 
         },
 
@@ -525,20 +531,6 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       }
     
-      // Read a page's GET URL variables and return them as an associative array WITHOUT any url decoding.
-      function _getUrlVars()
-      {
-          var vars = [], hash;
-          var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-          for(var i = 0; i < hashes.length; i++)
-          {
-              hash = hashes[i].split('=');
-              vars.push(hash[0]);
-              vars[hash[0]] = hash[1];
-          }
-          return vars;
-      }
-
       /* Replace built in rotating ellipsis animation with TWDH preferred FontAwesome circle-o-notch animation */
       $('div.dataTables_processing').html('<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>');
 
@@ -578,35 +570,35 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       function update_sharesearch_status() {
 
-        console.log( 'update_sharesearch_status' );
+        // console.log( 'update_sharesearch_status' );
 
         if( is_failedsharesearch ) {
 
-          console.log( 'is_failedsharesearch' );
+          // console.log( 'is_failedsharesearch' );
 
-          $( '#sharesearch_status' ).html('<div class="warning">Unable to find requested Share Search</div>');
+          $( '#sharesearch_status' ).html('<div class="warning"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Unable to find requested Share Search</div>');
 
       
         } else if( is_sharesearch ) {
 
-          console.log( 'is_sharesearch' );
+          // console.log( 'is_sharesearch' );
 
           if( has_sharesearch_changed() ) {
 
 
-            console.log( 'sharesearch has changed' );
+            // console.log( 'sharesearch has changed' );
 
-            $( '#sharesearch_status .warning' ).html("This search was loaded from a Share Search link, but has been modified.");
-
-            $( '#sharesearch_status .sharesearch-reload' ).html('<button class="btn btn-secondary"  onclick="parent.location.reload();">Reload original Share Search</button>');
+            $( '#sharesearch_status' ).html(
+              '<div class="warning"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This search was loaded from a Share Search link, but has been modified.' +
+              '<div class="reload"><button class="btn btn-secondary"  onclick="parent.location.reload();">Reload original Share Search</button></div>'
+            );
 
           } else {
 
-            console.log( 'sharesearch has not changed' );
+            // console.log( 'sharesearch has not changed' );
 
             $( '#sharesearch_status' ).html( 
-              '<div class="warning">This search was loaded from a Share Search link.</div>' 
-              + '<div class="sharesearch-reload"></div>'
+              '<div class="notice"><i class="fa fa-info-circle" aria-hidden="true"></i> This search was loaded from a Share Search link.</div>'
             );
 
           }
@@ -617,10 +609,10 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       function has_sharesearch_changed() {
 
-        console.log( 'has_sharesearch_changed' );
+        // console.log( 'has_sharesearch_changed' );
 
-        console.log( $( '#dtprv_search_orig' ).val() );
-        console.log( $( '#dtprv_search_current' ).val() );
+        // console.log( $( '#dtprv_search_orig' ).val() );
+        // console.log( $( '#dtprv_search_current' ).val() );
 
         return $( '#dtprv_search_orig' ).val() != $( '#dtprv_search_current' ).val()
 
@@ -726,7 +718,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       function toggle_search( type ) {
 
-        console.log( 'Setting search to ' + type );
+        // console.log( 'Setting search to ' + type );
 
         if( type == 'simple' ) {
 

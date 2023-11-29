@@ -84,20 +84,19 @@ class DTSharedSearch(DomainObject):
         return shared_search
 
     @classmethod
-    def update_shared_search(cls, uuid, json_blob):
+    def update_shared_search(cls, uuid, json_blob=None):
         """
         finds a DTSharedSearch object by uuid
         :raises ValueError if the uuid is not provided
         """
         if uuid is None:
             raise ValueError("uuid parameter must be supplied")
-        if json_blob is None:
-            raise ValueError("json_blob parameter must be supplied")
 
         shared_search = cls.get_shared_search(uuid)
         shared_search.access_count += 1    
         shared_search.last_access = datetime.datetime.utcnow()
-        shared_search.json = json_blob
+        if json_blob is not None:
+            shared_search.json = json_blob
         shared_search.commit()
         return shared_search
 

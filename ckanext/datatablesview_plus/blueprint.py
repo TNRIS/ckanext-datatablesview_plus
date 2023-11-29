@@ -4,12 +4,14 @@ from six.moves.urllib.parse import urlencode
 
 from flask import Blueprint, jsonify
 from six import text_type
+from typing import Any, Optional
 
 import ckan.model as model
 from ckan.common import json
 from ckan.plugins.toolkit import get_action, request, h
 from ckan.plugins import toolkit as tk
-\
+from ckan.lib.helpers import Page
+
 from ckanext.datatablesview_plus.search_builder import parse
 
 from ckanext.datatablesview_plus.model import DTSharedSearch
@@ -331,12 +333,55 @@ def get_sharesearch():
 
     uuid = request.form.get( 'uuid', '' )
 
-    sharesearch = DTSharedSearch.get_shared_search( uuid )
+    sharesearch = DTSharedSearch.update_shared_search( uuid )
 
     if sharesearch is not None:
         return jsonify(sharesearch.json)
     else:
         return ''
+
+
+CONFIG_BASE_TEMPLATE = "ckanext.sharesearch.report.base_template"
+CONFIG_REPORT_URL = "ckanext.sharesearch.report.url"
+
+
+DEFAULT_BASE_TEMPLATE = "datatables/sharesearch/base_admin.html"
+DEFAULT_REPORT_URL = "/sharesearch/report/global"
+
+def get_sharesearch_report():
+    '''
+    get sharesearch report and return HTML view
+    :return: rendered HTML template
+    '''
+
+    reports = { 'results': 'Hello, world!', 'count': 10 }
+
+    try:
+        page = max(1, tk.asint(tk.request.args.get("page", 1)))
+    except ValueError:
+        page = 1
+
+    per_page = 200
+
+    def pager_url(*args: Any, **kwargs: Any):
+        return tk.url_for("sharesearch.report", **kwargs)
+
+    base_template = tk.config.get(CONFIG_BASE_TEMPLATE, DEFAULT_BASE_TEMPLATE)
+    return tk.render(
+        "datatables/sharesearch/report.html",
+        {
+            "base_template": base_template,
+            "page": Page(
+                reports["results"],
+                url=pager_url,
+                page=page,
+                item_count=reports["count"],
+                items_per_page=per_page,
+                presliced_list=True,
+            ),
+        },
+    )
+
 
 
 datatablesview_plus.add_url_rule(
@@ -349,9 +394,13 @@ datatablesview_plus.add_url_rule(
 )
 
 datatablesview_plus.add_url_rule(
-    u'/datatables/sharesearch/', view_func=sharesearch, methods=[u'GET',u'POST']
+    u'/datatables/sharesearch/', view_func=sharesearch, methods=[u'POST']
 )
 
 datatablesview_plus.add_url_rule(
-    u'/datatables/sharesearch/get/', view_func=get_sharesearch, methods=[u'GET',u'POST']
+    u'/datatables/sharesearch/get/', view_func=get_sharesearch, methods=[u'POST']
+)
+
+datatablesview_plus.add_url_rule(
+    u'/ckan-admin/sharesearch/', view_func=get_sharesearch_report, methods=[u'GET',u'POST']
 )

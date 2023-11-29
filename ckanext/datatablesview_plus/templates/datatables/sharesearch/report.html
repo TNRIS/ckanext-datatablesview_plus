@@ -1,0 +1,25 @@
+{% extends base_template %}
+
+
+{% block sharesearch_breadcrumb %}
+    {{ super() }}
+    <li class="active">
+        {{ _("Global") }}
+    </li>
+{% endblock %}
+
+
+{% block sharesearch_content %}
+
+    <div class="sharesearch-reports">
+        <em>ShareSearch reports will live here one day.</em>
+    </div>
+{% endblock sharesearch_content %}
+
+
+
+{% block sharesearch_help_text %}
+
+{% snippet 'datatables/sharesearch/snippets/report_overview.html' %}
+
+{% endblock sharesearch_help_text %}

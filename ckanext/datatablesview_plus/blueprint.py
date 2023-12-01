@@ -263,6 +263,9 @@ def ajax(resource_view_id):
                     for row in response[u'records']],
     })
 
+def ajax_admin(report_id):
+
+    return {}
 
 def filtered_download(resource_view_id):
     params = json.loads(request.form[u'params'])
@@ -387,6 +390,10 @@ def get_sharesearch_report():
 
 datatablesview_plus.add_url_rule(
     u'/datatables/ajax/<resource_view_id>', view_func=ajax, methods=[u'POST']
+)
+
+datatablesview_plus.add_url_rule(
+    u'/datatables/ajax-admin/<report_id>', view_func=ajax_admin, methods=[u'POST']
 )
 
 datatablesview_plus.add_url_rule(

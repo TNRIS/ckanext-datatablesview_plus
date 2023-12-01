@@ -266,9 +266,13 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           // replace column header labels with those from the data dictionary if available
           var datadict = JSON.parse($('#dtprv_wrapper table').attr('data-datadictionary'));
 
+          var label = '';
+          var column = '';
+          var unit = '';
+
           $(datadict).each(function (i) {
 
-            var label = escapeHtml( datadict[i].id );
+            label = escapeHtml( datadict[i].id );
 
             if (
               'info' in datadict[i] && 
@@ -361,7 +365,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         stateLoadCallback: function (settings) {
 
           let params = new URLSearchParams(document.location.search);
-          let uuid = params.get( 'sharesearch' );
+          let uuid = params.get( 'search' );
           let json = {};
           
           if( uuid != null ) {

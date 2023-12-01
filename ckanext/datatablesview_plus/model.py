@@ -32,8 +32,6 @@ if the database does not exist yet")
         shared_search.create()
         print("Created datatablesview_plus Shared Search table")
     else:
-        shared_search.drop()
-        shared_search.create()
         print("datatablesview_plus Shared Search table already exists -- skipping")
 
 

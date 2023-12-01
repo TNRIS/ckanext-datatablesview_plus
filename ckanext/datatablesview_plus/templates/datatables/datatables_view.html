@@ -4,7 +4,7 @@
 
   <div id="dtplus_dtprv_wrapper">
     <div id="sharesearch_status"></div>
-    {% set ss = request.args.get('sharesearch', '') %}
+    {% set ss = request.args.get('search', '') %}
     {% set dtprv_state = h.get_sharesearch_state( ss, true ) %}
 
     <div id="dt-state-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="Copy State"></div>

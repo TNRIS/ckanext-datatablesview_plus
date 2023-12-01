@@ -32,6 +32,8 @@ if the database does not exist yet")
         shared_search.create()
         print("Created datatablesview_plus Shared Search table")
     else:
+        shared_search.drop()
+        shared_search.create()
         print("datatablesview_plus Shared Search table already exists -- skipping")
 
 
@@ -42,6 +44,7 @@ def define_shared_search_tables():
     shared_search = Table(
         'shared_search', metadata,
         Column('uuid', types.UnicodeText, primary_key=True, default=make_uuid),
+        Column('dataset_id', types.UnicodeText, default=u''),
         Column('json', types.UnicodeText, default=u''),
         Column('access_count', types.Integer, default=0),
         Column('last_access', types.DateTime, default=datetime.datetime.utcnow)
@@ -55,7 +58,7 @@ def define_shared_search_tables():
 class DTSharedSearch(DomainObject):
 
     @classmethod
-    def create_shared_search(cls, json_blob):
+    def create_shared_search(cls, json_blob, dataset_id):
         """
         Create a shared_search record for a json_blob
         :param json_blob:
@@ -65,7 +68,7 @@ class DTSharedSearch(DomainObject):
             raise ValueError("json_blob parameter must be supplied")    
     
         # Leave our uuid so that make_uuid will autocreate it
-        new_shared_search = DTSharedSearch(json=json_blob)
+        new_shared_search = DTSharedSearch(json=json_blob, dataset_id=dataset_id)
         new_shared_search.save()
         return new_shared_search.uuid
 

@@ -223,7 +223,13 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             $('.dt-buttons button.btn-sharesearch.btn-disabled').css('display', 'none');
   
           }
-  
+
+          if( $('#dtprv_filter input[type=search]').val() != '' ) {
+
+            $('#dtprv_filter .dt-search-cancel').css('display', 'block');
+
+          }
+          
         },
 
         infoCallback: function (settings, start, end, max, total, pre) {
@@ -354,18 +360,13 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         stateLoadCallback: function (settings) {
 
-          // console.log( 'stateLoadCallback' );
-
           let params = new URLSearchParams(document.location.search);
           let uuid = params.get( 'sharesearch' );
           let json = {};
           
-          // console.log( uuid );
-
           if( uuid != null ) {
 
             json = _getShareSearchUUID( uuid );
-            // console.log( json );
             if( json ) {
               if( json.search.search != '' ) {
 
@@ -382,25 +383,21 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               if( ! is_stateloaded ) {
 
                 delete json.time;
-                // console.log( json );
                 const search = JSON.stringify(json)
                 $('#dtprv_search_orig').val( search );
 
               }
               
-
               json['time'] = Date.now();
-
+              
               is_stateloaded = true;
-
 
             } else {
 
               is_failedsharesearch = true;    
 
             }
-          
-            
+                      
           }
 
           return json;

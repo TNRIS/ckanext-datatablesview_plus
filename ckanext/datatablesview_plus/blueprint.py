@@ -317,10 +317,11 @@ def sharesearch():
     '''
 
     searchstate = request.form.get( 'searchstate', '' )
-    
     searchstate = base64.b64decode(searchstate).decode('ascii')
 
-    uuid = DTSharedSearch.create_shared_search( searchstate )
+    dataset_id = request.form.get( 'dataset_id', '' )
+
+    uuid = DTSharedSearch.create_shared_search( searchstate, dataset_id )
 
     return jsonify({ 'uuid': uuid })
 

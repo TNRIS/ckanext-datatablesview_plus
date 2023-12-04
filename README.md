@@ -41,10 +41,17 @@ To install ckanext-datatablesview_plus:
    config file (by default the config file is located at
    `/etc/ckan/default/ckan.ini`).
 
+
 5. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu:
-     ```
-     sudo service apache2 reload
-     ```
+    ```
+    sudo service apache2 reload
+    ```
+
+6. Create the DB table used to store 'Share Search' data.
+
+    ```
+    ckan -c ckan.ini datatablesview-plus migrate
+    ```
 
 ## Developer installation
 

@@ -33,7 +33,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         // turn on searchBuilder
         searchBuilder: {
-          depthLimit: 2
+          depthLimit: 2,
+          liveSearch: true
         },
 
         // Set language strings

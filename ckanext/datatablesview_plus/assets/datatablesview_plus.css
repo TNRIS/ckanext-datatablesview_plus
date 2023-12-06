@@ -705,6 +705,20 @@ div.dataTables_wrapper .dataTables_processing.panel
 
 }
 
+/* 
+Surely SearchBuilder will fix this upstream at 
+some point, but for now with the liveSearch 
+setting turned on, the new search button feature 
+should be hidden. Instead it's element styled as 
+inline-block so we get to override it with !important
+*/
+.dtsb-search.dtsb-button
+{
+
+  display: none !important;
+
+}
+
 
 /* Override criteria border coloring in search builder */
 div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria select.dtsb-data,

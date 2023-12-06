@@ -3,6 +3,10 @@
 import ckan.plugins as p
 import ckan.plugins.toolkit as toolkit
 from ckanext.datatablesview_plus import blueprint
+import ckanext.datatablesview_plus.cli as cli
+
+from ckanext.datatablesview_plus.model import define_shared_search_tables, db_setup, DTSharedSearch
+import base64
 
 default = toolkit.get_validator(u'default')
 boolean_validator = toolkit.get_validator(u'boolean_validator')
@@ -27,6 +31,26 @@ def dtprv_date(iso_date_string):
     format='%b %d, %Y'
     return native.strftime(format) 
 
+def get_sharesearch_state(uuid, encoded=False):
+    """
+    Retrieve sharesearch record
+
+    Args: sharesearch record uuid
+        
+    Returns:
+        sharesearch record
+
+    """
+
+    sharesearch = DTSharedSearch.get_shared_search(uuid)
+
+    if sharesearch:
+        if encoded:
+            b64 =  base64.b64encode(sharesearch.json.encode('UTF-8'))
+            return b64.decode('UTF-8')
+        else:
+            return sharesearch.json
+    return None
 
 class DatatablesviewPlusPlugin(p.SingletonPlugin):
     u'''
@@ -35,6 +59,7 @@ class DatatablesviewPlusPlugin(p.SingletonPlugin):
     p.implements(p.IConfigurer, inherit=True)
     p.implements(p.IResourceView, inherit=True)
     p.implements(p.IBlueprint)
+    p.implements(p.IClick)
     p.implements(p.ITemplateHelpers)
 
 
@@ -43,9 +68,17 @@ class DatatablesviewPlusPlugin(p.SingletonPlugin):
     def get_blueprint(self):
         return blueprint.datatablesview_plus
 
+    # IClick
+    def get_commands(self):
+        return cli.get_commands()
+
     # IConfigurer
 
     def update_config(self, config):
+
+        # map shared search model to db schema
+        define_shared_search_tables()
+
         u'''
         Set up the resource library, public directory and
         template directory for the view
@@ -61,6 +94,8 @@ class DatatablesviewPlusPlugin(p.SingletonPlugin):
 
             return {
                 'dtprv_date': dtprv_date,
+                'get_sharesearch_state': get_sharesearch_state,
+
             }
     
 
@@ -81,6 +116,7 @@ class DatatablesviewPlusPlugin(p.SingletonPlugin):
             u'name': u'datatablesview_plus',
             u'title': u'Table',
             u'filterable': True,
+            u'iframed': True,
             u'icon': u'table',
             u'requires_datastore': True,
             u'default_title': p.toolkit._(u'Table'),

@@ -3,10 +3,18 @@
 {% block page %}
 
   <div id="dtplus_dtprv_wrapper">
-  <input type="hidden" id="dtprv_is_preview" value="{% if resource.get( 'preview' ) == True %}True{% else %}False{%endif%}"/>
-  <input type="hidden" id="dtprv_preview_rows" value="{{ resource.get( 'preview_rows' ) }}"/>
-  <input type="hidden" id="dtprv_total_record_count" value="{{ resource.get( 'total_record_count' ) }}"/>
-  <input type="hidden" id="dtprv_metadata_modified" value="{{ h.dtprv_date(resource.get( 'metadata_modified' ) ) }}"/>  
+    <div id="sharesearch_status"></div>
+    {% set ss = request.args.get('search', '') %}
+    {% set dtprv_state = h.get_sharesearch_state( ss, true ) %}
+
+    <div id="dt-state-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="Copy State"></div>
+    <input type="hidden" id="dtprv_state" value="{{ dtprv_state }}"/>
+    <input type="hidden" id="dtprv_search_orig" value=""/>
+    <input type="hidden" id="dtprv_search_current" value=""/>
+    <input type="hidden" id="dtprv_is_preview" value="{% if resource.get( 'preview' ) == True %}True{% else %}False{%endif%}"/>
+    <input type="hidden" id="dtprv_preview_rows" value="{{ resource.get( 'preview_rows' ) }}"/>
+    <input type="hidden" id="dtprv_total_record_count" value="{{ resource.get( 'total_record_count' ) }}"/>
+    <input type="hidden" id="dtprv_metadata_modified" value="{{ h.dtprv_date(resource.get( 'metadata_modified' ) ) }}"/>  
     <table id="dtprv"
       class="table table-bordered"
       data-module="datatablesview_plus"
@@ -30,21 +38,6 @@
         data-responsive="false"
         data-scroll-x="true"
       {% endif %}
-
-      {#
-
-        DT data-dom reference:
-        f = free text search
-        Q = SearchBuilder
-        i = info summary
-        B = select buttons
-        r = processing indicator
-        p = pagination controls
-        l = length control
-        S = status 
-        t = table
-
-      #}
 
       {# only turn on row-selection if it is a full dataset #}
       {% if resource.get( 'preview' ) == True %}

@@ -250,19 +250,6 @@ button:focus-visible,
 
 }
 
-
-
-
-
-
-
-{
-
-  margin-right: 0.1rem;
-
-}
-
-
 #dtprv_status
 {
 
@@ -278,26 +265,37 @@ button:focus-visible,
 
 }
 
-#dtprv_status .warning
+#sharesearch_status
 {
 
   font-size: 1.4rem;
   line-height: 1.8rem;
   margin: 0;
   padding: 1rem 0;
-  color: #E23014;
 
 
 }
 
-#dtprv_status .warning .error-icon 
+#sharesearch_status .notice
 {
 
-  display: inline-block;
-  margin: 0.5rem 1rem 1rem;
+  color: #009E89;
+  
+}
+
+#sharesearch_status .warning
+{
+
+  color: #E23014;
 
 }
 
+#sharesearch_status .reload
+{
+
+  margin-top: 1rem;
+
+}
 
 
 /* OVERRIDES for table layout */
@@ -528,6 +526,13 @@ div.dtfh-floatingparent tr th
 
 }
 
+#dtprv_wrapper table tr td.dataTables_empty
+{
+
+  text-align: left;
+
+}
+
 #dtprv_wrapper table tr th:last-child
 {
 
@@ -697,6 +702,20 @@ div.dataTables_wrapper .dataTables_processing.panel
   clear: both;
   margin: 0 0 1em 0;
   display: none;
+
+}
+
+/* 
+Surely SearchBuilder will fix this upstream at 
+some point, but for now with the liveSearch 
+setting turned on, the new search button feature 
+should be hidden. Instead it's element styled as 
+inline-block so we get to override it with !important
+*/
+.dtsb-search.dtsb-button
+{
+
+  display: none !important;
 
 }
 
@@ -874,7 +893,7 @@ table.dataTable thead > tr > td:first-child.sorting_desc_disabled:after
 div.dtfc-right-top-blocker, div.dtfc-left-top-blocker
 {
 
-  background: #e0e0e0 !important;
+  background: transparent !important;
   border-top: 1px solid #000;
   border-bottom: 3px solid #000 !important;
   margin-top: 0;
@@ -906,6 +925,19 @@ div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria input.dtsb-input
 .dtsb-criteria.warning{
 
   background: #FFC107;
+
+}
+
+#sharesearch_status {
+
+  margin-top: 1rem;
+  font-weight: bold;
+
+}
+
+#sharesearch_status .warning {
+
+  color: #E23014;
 
 }
 

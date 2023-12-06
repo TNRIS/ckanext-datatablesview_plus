@@ -2,15 +2,20 @@
 
 from six.moves.urllib.parse import urlencode
 
-from flask import Blueprint
+from flask import Blueprint, jsonify
 from six import text_type
+from typing import Any, Optional
 
 import ckan.model as model
 from ckan.common import json
 from ckan.plugins.toolkit import get_action, request, h
 from ckan.plugins import toolkit as tk
-\
+from ckan.lib.helpers import Page
+
 from ckanext.datatablesview_plus.search_builder import parse
+
+from ckanext.datatablesview_plus.model import DTSharedSearch
+import base64
 
 import logging
 log = logging.getLogger(__name__)
@@ -119,8 +124,99 @@ def ajax(resource_view_id):
         )
         # Need to be fixed to get the total number of records
         response['total'] = len(response.get('records'))
-    else:
 
+    elif search_text != '':
+        # perform SQL search using exact search string, i.e. no tokenizing
+
+        # remove leading and trailing spaces and sql-escape single quotes as two single quotes
+        search_text = search_text.strip().replace("'", "''")
+
+        sql = 'SELECT * FROM "{table_name}" WHERE '.format(table_name=str(resource_view[u'resource_id']))
+
+        context = {
+            "model": model,
+            "user": tk.g.user,
+            "session": model.Session,
+            "ignore_auth": True
+        }
+
+        where = '1=1'
+
+        datastore_search = get_action(u'datastore_search_sql')
+        unfiltered_response = datastore_search(
+            None, {
+                u"sql": sql + where,
+                u"limit": 0,
+                u"filters": view_filters,
+            }
+        )
+
+        cols = [f[u'id'] for f in unfiltered_response[u'fields']]
+        if u'show_fields' in resource_view:
+            cols = [c for c in cols if c in resource_view[u'show_fields']]
+
+        sort_list = []
+        i = 0
+        while True:
+            if u'order[%d][column]' % i not in request.form:
+                break
+            sort_by_num = int(request.form[u'order[%d][column]' % i])
+            sort_order = (
+                u'desc' if request.form[u'order[%d][dir]' %
+                                        i] == u'desc' else u'asc'
+            )
+            sort_list.append(cols[sort_by_num] + u' ' + sort_order)
+            i += 1
+
+        if '_full_text' in cols:    
+           cols.remove( '_full_text' )
+
+        sql = 'SELECT "{cols}" FROM "{table_name}" WHERE '.format(cols='","'.join(cols),table_name=str(resource_view[u'resource_id']))
+
+        where = ''
+
+        need_or = False
+
+        for field in unfiltered_response['fields']:
+
+            if need_or:
+                where += 'OR '
+
+            if field['type'] == 'text':
+                where += '"{col}" ilike \'%{term}%\' '.format(col=field['id'], term=search_text)
+                need_or = True
+            elif field['type'] == 'numeric':
+                # cast column using ::TEXT so that we can do an 'ilike' search
+                # this way substring matches work on numeric types
+                # For instance, string 0.01 will match on 0.01 and 0.011
+                # If we used numeric comarison this wouldn't work
+                where += '"{col}"::TEXT ilike \'%{term}%\' '.format(col=field['id'], term=search_text)
+                need_or = True
+            elif field['type'] == 'timestamp':
+                # cast column using ::TEXT for similar reasons as above
+                where += '"{col}"::TEXT ilike \'%{term}%\' '.format(col=field['id'], term=search_text)
+                need_or = True
+
+        sql += where
+
+        response = datastore_search(
+           context, {
+                u"sql": sql,
+                u"limit": 0,
+                u"offset": offset,
+                u"limit": limit,
+                #u"sort": u', '.join(sort_list),
+                u"filters": filters,
+            }
+        )
+
+        response['total'] = len(response.get('records'))
+
+    else:
+        # This currently should never run but 
+        # I've left it here in case we ever want to revert to 
+        # Postgres 'Free Text Search' style search using the 
+        # 'datastore_seach' endpoint
 
         datastore_search = get_action(u'datastore_search')
         unfiltered_response = datastore_search(
@@ -167,6 +263,9 @@ def ajax(resource_view_id):
                     for row in response[u'records']],
     })
 
+def ajax_admin(report_id):
+
+    return {}
 
 def filtered_download(resource_view_id):
     params = json.loads(request.form[u'params'])
@@ -213,12 +312,103 @@ def filtered_download(resource_view_id):
         })
     )
 
+def sharesearch():
+    '''
+    create a sharesearch record and return it's uuid
+
+    :return: uuid
+    '''
+
+    searchstate = request.form.get( 'searchstate', '' )
+    searchstate = base64.b64decode(searchstate).decode('ascii')
+
+    dataset_id = request.form.get( 'dataset_id', '' )
+
+    uuid = DTSharedSearch.create_shared_search( searchstate, dataset_id )
+
+    return jsonify({ 'uuid': uuid })
+
+def get_sharesearch():
+    '''
+    retrieve json describine a sharesearch
+
+    :return: sharesarech record json
+    '''
+
+    uuid = request.form.get( 'uuid', '' )
+
+    sharesearch = DTSharedSearch.update_shared_search( uuid )
+
+    if sharesearch is not None:
+        return jsonify(sharesearch.json)
+    else:
+        return ''
+
+
+CONFIG_BASE_TEMPLATE = "ckanext.sharesearch.report.base_template"
+CONFIG_REPORT_URL = "ckanext.sharesearch.report.url"
+
+
+DEFAULT_BASE_TEMPLATE = "datatables/sharesearch/base_admin.html"
+DEFAULT_REPORT_URL = "/sharesearch/report/global"
+
+def get_sharesearch_report():
+    '''
+    get sharesearch report and return HTML view
+    :return: rendered HTML template
+    '''
+
+    reports = { 'results': 'Hello, world!', 'count': 10 }
+
+    try:
+        page = max(1, tk.asint(tk.request.args.get("page", 1)))
+    except ValueError:
+        page = 1
+
+    per_page = 200
+
+    def pager_url(*args: Any, **kwargs: Any):
+        return tk.url_for("sharesearch.report", **kwargs)
+
+    base_template = tk.config.get(CONFIG_BASE_TEMPLATE, DEFAULT_BASE_TEMPLATE)
+    return tk.render(
+        "datatables/sharesearch/report.html",
+        {
+            "base_template": base_template,
+            "page": Page(
+                reports["results"],
+                url=pager_url,
+                page=page,
+                item_count=reports["count"],
+                items_per_page=per_page,
+                presliced_list=True,
+            ),
+        },
+    )
+
+
 
 datatablesview_plus.add_url_rule(
     u'/datatables/ajax/<resource_view_id>', view_func=ajax, methods=[u'POST']
 )
 
 datatablesview_plus.add_url_rule(
+    u'/datatables/ajax-admin/<report_id>', view_func=ajax_admin, methods=[u'POST']
+)
+
+datatablesview_plus.add_url_rule(
     u'/datatables/filtered-download/<resource_view_id>',
     view_func=filtered_download, methods=[u'POST']
+)
+
+datatablesview_plus.add_url_rule(
+    u'/datatables/sharesearch/', view_func=sharesearch, methods=[u'POST']
+)
+
+datatablesview_plus.add_url_rule(
+    u'/datatables/sharesearch/get/', view_func=get_sharesearch, methods=[u'POST']
+)
+
+datatablesview_plus.add_url_rule(
+    u'/ckan-admin/sharesearch/', view_func=get_sharesearch_report, methods=[u'GET',u'POST']
 )

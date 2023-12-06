@@ -1,0 +1,35 @@
+{% extends "page.html" %}
+
+{% block subtitle %}{{ _('Share Search') }}{% endblock %}
+
+
+{% block breadcrumb_content %}
+    <li>
+        {{ _("Share Search") }}
+    </li>
+    {% block sharesearch_breadcrumb %}
+    {% endblock sharesearch_breadcrumb %}
+{% endblock %}
+
+
+
+{% block secondary_content %}
+    <div class="module module-narrow module-shallow">
+        <h2 class="module-heading">
+            <i class="fa fa-info-circle"></i>
+            {{ _('Share Search') }}
+        </h2>
+        <div class="module-content">
+            {% block admin_form_help %}
+                {% block sharesearch_help_text %}
+                {% endblock sharesearch_help_text %}
+            {% endblock %}
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block primary_content_inner %}
+    {% block sharesearch_content %}
+    {% endblock sharesearch_content %}
+{% endblock primary_content_inner %}

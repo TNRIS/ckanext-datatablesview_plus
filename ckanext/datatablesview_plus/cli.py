@@ -23,15 +23,18 @@ def migrate():
     print("Finished tables setup for ckanext-datatablesplus_view")
 
 @datatablesview_plus.command()
+@click.argument("dataset_id")
 @click.argument("json_blob")
 def test_insert(
+    dataset_id: str,
     json_blob: str
 ):
     """
     Test insert
     """
     print("Test insert")
-    DTSharedSearch.create_shared_search( json_blob )
+    uuid = DTSharedSearch.create_shared_search( json_blob, dataset_id )
+    print( uuid )
     print("Finished test insert")
 
 @datatablesview_plus.command()
@@ -45,6 +48,7 @@ def test_get(
     print("Test get")
     shared_search = DTSharedSearch.get_shared_search(uuid)
     print('  UUID: ', shared_search.uuid)
+    print('  Dataset: ', shared_search.dataset_id)
     print('  Access Count: ', shared_search.access_count)
     print('  Last Access: ', shared_search.last_access)
     print('  JSON: ', shared_search.json)

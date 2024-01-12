@@ -6,7 +6,11 @@ log = logging.getLogger(__name__)
 def convert_type(type, value):
     #Convert according the type
     if type == 'num':
-        return value
+        #return value
+        # Sometimes SearchBuilder guesses that a text column is a num and when it does it causes an SQL error unless we quote the value
+        # This does not appear to negatively affect the case when the value really is a num, but it would be nice to fix this upstream
+        # Or else maybe we should check the value and quote it if it isn't a num
+        return f"'{value}'"
     elif type in ['string', 'date']:
         return f"'{value}'"
 

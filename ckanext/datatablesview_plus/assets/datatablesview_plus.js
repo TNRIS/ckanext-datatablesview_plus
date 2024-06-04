@@ -98,7 +98,19 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           // make sure all text is rendered as text in case tables have HTML in them
           {
             targets: '_all',
-            render: DataTable.render.text()
+            //  render: DataTable.render.text();
+            render: function(data, type, row){
+              const regex1 = /T00:00:00$/;
+              const regex2 = /^1899-12-31T/;
+
+              if( data.match(regex1) ||  data.match(regex2) ) {
+                return data.replace( 'T00:00:00', '' ).replace( '1899-12-31T', '' );
+              } else {
+                return escapeHtml( data );
+              }
+              
+            }
+
           }
 
         ],

@@ -101,10 +101,12 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             //  render: DataTable.render.text();
             render: function(data, type, row){
               const regex1 = /T00:00:00$/;
-              const regex2 = /^1899-12-31T/;
+              const regex2 = / 00:00:00$/;
+              const regex3 = /^1899-12-31T/;
+              const regex4 = /^1899-12-31 /;
 
-              if( data.match(regex1) ||  data.match(regex2) ) {
-                return data.replace( 'T00:00:00', '' ).replace( '1899-12-31T', '' );
+              if( data.match(regex1) ||  data.match(regex2) ||  data.match(regex3) ||  data.match(regex4) ) {
+                return data.replace( regex1, '' ).replace( regex2, '' ).replace( regex3, '' ).replace( regex4, '' );
               } else {
                 return escapeHtml( data );
               }

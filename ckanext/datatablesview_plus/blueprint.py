@@ -213,19 +213,25 @@ def ajax(resource_view_id):
         response['total'] = len(response.get('records'))
 
     else:
-        # This currently should never run but 
-        # I've left it here in case we ever want to revert to 
-        # Postgres 'Free Text Search' style search using the 
-        # 'datastore_seach' endpoint
+        # No search, just return the resource
 
         datastore_search = get_action(u'datastore_search')
-        unfiltered_response = datastore_search(
-            None, {
-                u"resource_id": resource_view[u'resource_id'],
-                u"limit": 0,
-                u"filters": view_filters,
-            }
-        )
+        try: 
+            unfiltered_response = datastore_search(
+                None, {
+                    u"resource_id": resource_view[u'resource_id'],
+                    u"limit": 0,
+                    u"filters": view_filters,
+                }
+            )
+        except:
+            # Handle case where resource for some reason isn't in the Datastore
+            return json.dumps({
+                u'draw': draw,
+                u'iTotalRecords': 0,
+                u'iTotalDisplayRecords': 0,
+                u'aaData': [],
+            })
 
         cols = [f[u'id'] for f in unfiltered_response[u'fields']]
         if u'show_fields' in resource_view:

@@ -19,7 +19,7 @@
       class="table table-bordered"
       data-module="datatablesview_plus"
       data-datadictionary='{{ h.datastore_dictionary(resource.id)|tojson }}'
-      data-summary-statistics='{{ h.get_dataset_summary_statistics( resource.name )|tojson }}'
+      data-summary-statistics='{{ h.get_resource_summary_statistics( resource.name )|tojson }}'
       data-paging="true"
       data-server-side="true"
       data-processing="true"

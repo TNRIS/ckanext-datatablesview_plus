@@ -510,6 +510,13 @@ div.dtfh-floatingparent table.table-bordered tr th
   
 }
 
+table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td
+{
+
+  border-bottom-width: .1rem;
+  
+}
+
 #dtprv_wrapper table tr th,
 div.dtfh-floatingparent tr th
 {

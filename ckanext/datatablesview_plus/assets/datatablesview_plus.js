@@ -317,6 +317,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           });
 
           // set column widths based on information in summary statistics
+          /* This is breaking the way columns render, turning off until we can figure out the problem
           var data_summary_json = $('#dtprv_wrapper table').attr('data-summary-statistics');
           if (typeof data_summary_json !== 'undefined' && data_summary_json !== false && data_summary_json !== '' ) {
             var data_summary = JSON.parse(data_summary_json);
@@ -338,6 +339,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               }
             });
           }
+          */
         },
 
         rowCallback: function( row, data ) {

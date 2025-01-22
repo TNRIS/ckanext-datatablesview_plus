@@ -271,7 +271,6 @@ button:focus-visible,
   font-size: 1.4rem;
   line-height: 1.8rem;
   margin: 0;
-  padding: 1rem 0;
 
 
 }
@@ -280,6 +279,7 @@ button:focus-visible,
 {
 
   color: #009E89;
+  padding: 1rem 0;
   
 }
 
@@ -507,6 +507,13 @@ div.dtfh-floatingparent table.table-bordered tr th
 {
 
   border-bottom-width: .3rem;
+  
+}
+
+table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td
+{
+
+  border-bottom-width: .1rem;
   
 }
 

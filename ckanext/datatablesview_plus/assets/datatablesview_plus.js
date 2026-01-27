@@ -49,7 +49,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             last: '<i class="fa fa-angle-double-right" aria-hidden="true"></i>'
           },
           search: '',
-          searchPlaceholder: 'Search...',
+          searchPlaceholder: 'Search',
           searchBuilder: {
             title: '',
             add: '<i class="fa fa-plus" aria-hidden="true"></i> Add Filter',
@@ -268,7 +268,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           } else {
 
-            return "Showing " + start.toLocaleString("en-US") + "-" + end.toLocaleString("en-US") + " of " + total.toLocaleString("en-US") + "  row" + (total != 1 ? 's' : '');
+            return "Previewing " + start.toLocaleString("en-US") + "-" + end.toLocaleString("en-US") + " of " + total.toLocaleString("en-US") + "  row" + (total != 1 ? 's' : '');
 
           }
           
@@ -716,7 +716,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         // Add button
         var container = $('#dtprv_wrapper').find('.advanced-search');
-        container.append( '<button class="btn btn-default btn-secondary"><i class="fa fa-filter" aria-hidden="true"></i> Advanced Filters</button>' );
+        container.append( '<button class="btn btn-default btn-secondary" title="Filter table by query"><i class="fa fa-filter" aria-hidden="true" ></i> Advanced Filters</button>' );
 
         // Set click event on button
         var button = $('#dtprv_wrapper .advanced-search').find('button');

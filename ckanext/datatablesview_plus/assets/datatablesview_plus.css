@@ -948,6 +948,10 @@ div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria input.dtsb-input
 
 }
 
+div.dt-button-info > div {
+  padding: 1em 2em 1em 2em;
+}
+
 @media (min-width: 0) 
 {
 

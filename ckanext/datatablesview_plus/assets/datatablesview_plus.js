@@ -57,9 +57,57 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             delete: '<i class="fa fa-times" aria-hidden="true"></i>',
             right: '<i class="fa fa-chevron-right" aria-hidden="true"></i>',
             left: '<i class="fa fa-chevron-left" aria-hidden="true"></i>',
-            data: 'Field'
-
-          }
+            data: 'Field',
+            conditions: {
+              array: {
+                  contains: 'contains',
+                  empty: 'empty',
+                  equals: 'equals',
+                  not: 'not',
+                  notEmpty: 'not empty',
+                  without: 'without'
+              },
+              date: {
+                  after: 'after',
+                  before: 'before',
+                  between: 'between',
+                  empty: 'empty',
+                  equals: 'equals',
+                  not: 'not',
+                  notBetween: 'not between',
+                  notEmpty: 'not empty'
+              },
+              // eslint-disable-next-line id-blacklist
+              number: {
+                  between: 'between',
+                  empty: 'empty',
+                  equals: 'equals',
+                  gt: 'greater than',
+                  gte: 'greater than equal to',
+                  lt: 'less than',
+                  lte: 'less than equal to',
+                  not: 'not',
+                  notBetween: 'not between',
+                  notEmpty: 'not empty'
+              },
+              // eslint-disable-next-line id-blacklist
+              string: {
+                  contains: 'contains',
+                  empty: 'empty',
+                  endsWith: 'ends with',
+                  equals: 'equals',
+                  not: 'not',
+                  notContains: 'does not contain',
+                  notEmpty: 'not empty',
+                  notEndsWith: 'does not end with',
+                  notStartsWith: 'does not start with',
+                  startsWith: 'starts with'
+              }
+            },
+          },
+          buttons: {
+            copyTitle: ''
+          },
         },
         
         // We are not currently using the pager, but when we do these settings will be relevant

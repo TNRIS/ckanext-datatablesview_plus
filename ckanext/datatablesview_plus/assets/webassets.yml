@@ -1,10 +1,12 @@
 main-css:
+  filters: cssmin
   output: datapreview/%(version)s_main.css
   contents:
     - vendor/datatables.css
     - vendor/datatables.mark.css
     - datatablesview_plus.css
 main-js:
+  filters: rjsmin
   output: datapreview/%(version)s_main.js
   extra:
     preload:

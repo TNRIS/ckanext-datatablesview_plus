@@ -683,13 +683,6 @@ box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.1);
 
 }
 
-.advanced-search button.btn-secondary:hover
-{
-
-  line-height: 1.8rem;
-
-}
-
 /* Remove border and shadow from processing panel */
 div.dataTables_wrapper .dataTables_processing.panel
 {
@@ -949,7 +942,21 @@ div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria input.dtsb-input
 }
 
 div.dt-button-info > div {
+
+  top: 30%;
+
+}
+
+div.dt-button-info > div {
   padding: 1em 2em 1em 2em;
+}
+
+#datatables_buttons_info
+{
+
+  font-weight: bold;
+  border: 3px solid #0B7D8E;
+
 }
 
 @media (min-width: 0) 

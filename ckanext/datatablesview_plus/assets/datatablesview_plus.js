@@ -316,7 +316,13 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           } else {
 
-            return "Previewing " + start.toLocaleString("en-US") + "-" + end.toLocaleString("en-US") + " of " + total.toLocaleString("en-US") + "  row" + (total != 1 ? 's' : '');
+            if( dtprv_total_record_count ) {
+              return "Previewing " + start.toLocaleString("en-US") + "-" + end.toLocaleString("en-US") + " of " + dtprv_total_record_count.toLocaleString("en-US") + "  row" + (dtprv_total_record_count != 1 ? 's' : '');
+            } else {
+
+              return start.toLocaleString("en-US") + "-" + end.toLocaleString("en-US") + " of " + total.toLocaleString("en-US") + "  row" + (total != 1 ? 's' : '');
+
+            }
 
           }
           

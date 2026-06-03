@@ -500,8 +500,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         dtprv_status = $(
           '<div id="dtprv_status">' +
-          '<p class="warning"><span title="" class="error-icon"></span> ' +
-          'Only the first ' + dtprv_preview_rows.toLocaleString("en-US") + ' rows of this dataset are shown in the data viewer due to storage restrictions. ' +
+          '<p class="warning">' +
+          'Only the first ' + dtprv_preview_rows.toLocaleString("en-US") + ' rows of this dataset are shown in the data viewer due to storage restrictions.<br/>' +
           'Download the full dataset to access all ' + dtprv_total_record_count.toLocaleString("en-US") + ' rows.' +
           '</p>' +
           '</div>'

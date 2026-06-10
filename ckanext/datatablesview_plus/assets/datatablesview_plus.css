@@ -74,11 +74,6 @@ table.dataTable
 }
 
 
-#dtprv_wrapper .dataTables_info
-{
-
-}
-
 #dtprv_wrapper  div.dataTables_paginate {
 
   float: right;

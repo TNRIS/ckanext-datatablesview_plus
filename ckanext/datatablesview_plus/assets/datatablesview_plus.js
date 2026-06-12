@@ -269,6 +269,9 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
   
           }
 
+          const tableHeight = $("#dtplus_dtprv_wrapper").height();
+          // Post message with height to clean up after a messy load - sometimes the resizeObserver events don't register correctly on initial load
+          setTimeout(() => { window.parent.postMessage({ frameHeight: tableHeight }, '*'); }, 1000);
 
           // console.log( 'initComplete' );
 

@@ -5,38 +5,43 @@ import ckan.plugins.toolkit as toolkit
 from ckanext.datatablesview_plus import blueprint
 import ckanext.datatablesview_plus.cli as cli
 
-from ckanext.datatablesview_plus.model import define_shared_search_tables, db_setup, DTSharedSearch
+from ckanext.datatablesview_plus.model import (
+    define_shared_search_tables,
+    db_setup,
+    DTSharedSearch,
+)
 import base64
 
-default = toolkit.get_validator(u'default')
-boolean_validator = toolkit.get_validator(u'boolean_validator')
-ignore_missing = toolkit.get_validator(u'ignore_missing')
+default = toolkit.get_validator("default")
+boolean_validator = toolkit.get_validator("boolean_validator")
+ignore_missing = toolkit.get_validator("ignore_missing")
 
 
 def dtprv_date(iso_date_string):
     """
-    Return a MM/DD/YYYY formatted text date string 
+    Return a MM/DD/YYYY formatted text date string
 
     Args: iso date string
-        
+
     Returns:
         string: MM/DD/YYYY formatted text date string
 
     """
 
-    import dateutil 
-    
+    import dateutil
+
     date = dateutil.parser.parse(iso_date_string)
     native = date.replace(tzinfo=None)
-    format='%b %d, %Y'
-    return native.strftime(format) 
+    format = "%b %d, %Y"
+    return native.strftime(format)
+
 
 def get_sharesearch_state(uuid, encoded=False):
     """
     Retrieve sharesearch record
 
     Args: sharesearch record uuid
-        
+
     Returns:
         sharesearch record
 
@@ -46,11 +51,12 @@ def get_sharesearch_state(uuid, encoded=False):
 
     if sharesearch:
         if encoded:
-            b64 =  base64.b64encode(sharesearch.json.encode('UTF-8'))
-            return b64.decode('UTF-8')
+            b64 = base64.b64encode(sharesearch.json.encode("UTF-8"))
+            return b64.decode("UTF-8")
         else:
             return sharesearch.json
     return None
+
 
 def get_datapusher_status(rid):
     """
@@ -68,19 +74,19 @@ def get_datapusher_status(rid):
     except Exception:
         dpp_status = {}
 
-
     return dpp_status
 
+
 class DatatablesviewPlusPlugin(p.SingletonPlugin):
-    u'''
+    """
     DataTables table view plugin using v1.13.1 of DataTables
-    '''
+    """
+
     p.implements(p.IConfigurer, inherit=True)
     p.implements(p.IResourceView, inherit=True)
     p.implements(p.IBlueprint)
     p.implements(p.IClick)
     p.implements(p.ITemplateHelpers)
-
 
     # IBlueprint
 
@@ -98,51 +104,49 @@ class DatatablesviewPlusPlugin(p.SingletonPlugin):
         # map shared search model to db schema
         define_shared_search_tables()
 
-        u'''
+        """
         Set up the resource library, public directory and
         template directory for the view
-        '''
-        toolkit.add_template_directory(config, u'templates')
-        toolkit.add_public_directory(config, 'public')
-        toolkit.add_resource(u'assets', u'ckanext-datatablesview_plus')
+        """
+        toolkit.add_template_directory(config, "templates")
+        toolkit.add_public_directory(config, "public")
+        toolkit.add_resource("assets", "ckanext-datatablesview_plus")
 
-   # ITemplateHelpers
+    # ITemplateHelpers
 
     def get_helpers(self):
-            """Register helper functions"""
+        """Register helper functions"""
 
-            return {
-                'dtprv_date': dtprv_date,
-                'get_sharesearch_state': get_sharesearch_state,
-                'get_datapusher_status': get_datapusher_status,
-            }
-    
+        return {
+            "dtprv_date": dtprv_date,
+            "get_sharesearch_state": get_sharesearch_state,
+            "get_datapusher_status": get_datapusher_status,
+        }
 
     # IResourceView
 
     def can_view(self, data_dict):
-        resource = data_dict['resource']
-        return resource.get(u'datastore_active')
+        resource = data_dict["resource"]
+        return resource.get("datastore_active")
 
     def view_template(self, context, data_dict):
-        return u'datatables/datatables_view.html'
+        return "datatables/datatables_view.html"
 
     def form_template(self, context, data_dict):
-        return u'datatables/datatables_form.html'
+        return "datatables/datatables_form.html"
 
     def info(self):
         return {
-            u'name': u'datatablesview_plus',
-            u'title': u'Table',
-            u'filterable': True,
-            u'iframed': True,
-            u'icon': u'table',
-            u'requires_datastore': True,
-            u'default_title': p.toolkit._(u'Table'),
-            u'schema': {
-                u'responsive': [default(False), boolean_validator],
-                u'show_fields': [ignore_missing],
-                u'filterable': [default(True), boolean_validator],
-            }
+            "name": "datatablesview_plus",
+            "title": "Table",
+            "filterable": True,
+            "iframed": True,
+            "icon": "table",
+            "requires_datastore": True,
+            "default_title": p.toolkit._("Table"),
+            "schema": {
+                "responsive": [default(False), boolean_validator],
+                "show_fields": [ignore_missing],
+                "filterable": [default(True), boolean_validator],
+            },
         }
-

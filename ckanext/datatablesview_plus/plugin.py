@@ -52,6 +52,25 @@ def get_sharesearch_state(uuid, encoded=False):
             return sharesearch.json
     return None
 
+def get_datapusher_status(rid):
+    """
+    Retrieve datapusher_status for a resource
+
+    Args: rid: resource id
+
+    Returns:
+        datapusher_status endpoint results
+
+    """
+
+    try:
+        dpp_status = toolkit.get_action("datapusher_status")({}, {"id": rid})
+    except Exception:
+        dpp_status = {}
+
+
+    return dpp_status
+
 class DatatablesviewPlusPlugin(p.SingletonPlugin):
     u'''
     DataTables table view plugin using v1.13.1 of DataTables
@@ -95,7 +114,7 @@ class DatatablesviewPlusPlugin(p.SingletonPlugin):
             return {
                 'dtprv_date': dtprv_date,
                 'get_sharesearch_state': get_sharesearch_state,
-
+                'get_datapusher_status': get_datapusher_status,
             }
     
 

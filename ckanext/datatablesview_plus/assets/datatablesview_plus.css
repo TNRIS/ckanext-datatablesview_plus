@@ -74,11 +74,6 @@ table.dataTable
 }
 
 
-#dtprv_wrapper .dataTables_info
-{
-
-}
-
 #dtprv_wrapper  div.dataTables_paginate {
 
   float: right;
@@ -402,7 +397,7 @@ div.dtfh-floatingparent table.table-bordered thead > tr > th.sorting_desc_disabl
   content: "▼";
 }
 
-/* When a solumn is the sort column, show the dark version of the appropriate arrow */
+/* When a column is the sort column, show the dark version of the appropriate arrow */
 #dtprv_wrapper table.dataTable thead > tr > th.sorting_asc:before, 
 #dtprv_wrapper table.dataTable thead > tr > th.sorting_desc:after,
 #dtprv_wrapper table.dataTable thead > tr > td.sorting_asc:before,
@@ -414,6 +409,18 @@ div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_desc:after
 {
   opacity: 0.6;
 }
+
+/* WIP Need to set asc/desc sort indicators to show up correctly when tabbed onto */
+/*
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_desc:focus-visible:after, 
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_asc:focus-visible:before {
+
+  opacity: 1;
+  outline: 2px solid var( twdh-secondary );
+
+}
+*/
+
 
 /* When hovering over a th with no sort set, show up arrow as dark and down arrow as light */
 #dtprv_wrapper table.dataTable thead > tr > th:hover:before, 

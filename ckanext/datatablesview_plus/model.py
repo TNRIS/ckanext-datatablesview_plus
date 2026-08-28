@@ -39,18 +39,17 @@ def define_shared_search_tables():
     if shared_search is not None:
         return
     shared_search = Table(
-        'shared_search', metadata,
-        Column('uuid', types.UnicodeText, primary_key=True, default=make_uuid),
-        Column('dataset_id', types.UnicodeText, default=u''),
-        Column('json', types.UnicodeText, default=u''),
-        Column('access_count', types.Integer, default=0),
-        Column('last_access', types.DateTime, default=datetime.datetime.utcnow)
+        "shared_search",
+        metadata,
+        Column("uuid", types.UnicodeText, primary_key=True, default=make_uuid),
+        Column("dataset_id", types.UnicodeText, default=""),
+        Column("json", types.UnicodeText, default=""),
+        Column("access_count", types.Integer, default=0),
+        Column("last_access", types.DateTime, default=datetime.datetime.utcnow),
     )
-    
-    mapper(
-        DTSharedSearch,
-        shared_search
-    )
+
+    mapper(DTSharedSearch, shared_search)
+
 
 class DTSharedSearch(DomainObject):
 
@@ -62,8 +61,8 @@ class DTSharedSearch(DomainObject):
         :return:  DTSharedSearch model -- saved
         """
         if json_blob is None:
-            raise ValueError("json_blob parameter must be supplied")    
-    
+            raise ValueError("json_blob parameter must be supplied")
+
         # Leave our uuid so that make_uuid will autocreate it
         new_shared_search = DTSharedSearch(json=json_blob, dataset_id=dataset_id)
         new_shared_search.save()
@@ -78,8 +77,11 @@ class DTSharedSearch(DomainObject):
         if uuid is None:
             raise ValueError("uuid parameter must be supplied")
 
-        shared_search = DTSharedSearch.Session.query(DTSharedSearch)\
-            .filter(DTSharedSearch.uuid == uuid).first()
+        shared_search = (
+            DTSharedSearch.Session.query(DTSharedSearch)
+            .filter(DTSharedSearch.uuid == uuid)
+            .first()
+        )
 
         return shared_search
 
@@ -93,13 +95,12 @@ class DTSharedSearch(DomainObject):
             raise ValueError("uuid parameter must be supplied")
 
         shared_search = cls.get_shared_search(uuid)
-        shared_search.access_count += 1    
+        shared_search.access_count += 1
         shared_search.last_access = datetime.datetime.utcnow()
         if json_blob is not None:
             shared_search.json = json_blob
         shared_search.commit()
         return shared_search
-
 
     @classmethod
     def delete_shared_search(cls, uuids):
@@ -111,18 +112,17 @@ class DTSharedSearch(DomainObject):
             raise ValueError("uuids parameter must be supplied")
 
         # Delete the UUIDs
-        DTSharedSearch.Session.query(DTSharedSearch)\
-            .filter(DTSharedSearch.uuid.in_(uuids))\
-            .delete(synchronize_session=False)
-        
+        DTSharedSearch.Session.query(DTSharedSearch).filter(
+            DTSharedSearch.uuid.in_(uuids)
+        ).delete(synchronize_session=False)
+
         # Commit the deletion
         DTSharedSearch.Session.commit()
 
         return True
 
     def __repr__(self):
-        return '<DTSharedSearch uuid={}>'\
-            .format(self.uuid)
+        return "<DTSharedSearch uuid={}>".format(self.uuid)
 
     def __str__(self):
-        return self.__repr__().encode('ascii', 'ignore')
+        return self.__repr__().encode("ascii", "ignore")

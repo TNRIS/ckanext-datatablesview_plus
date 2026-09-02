@@ -304,6 +304,7 @@ button:focus-visible,
 }
 */
 
+/*
 .dataTables_scroll
 {
 
@@ -311,6 +312,7 @@ button:focus-visible,
   
 
 }
+*/
 
 /* Don't show sort arrows unless the column is the current sort column or the th is in a hver state */
 #dtprv_wrapper table.dataTable thead > tr > th.sorting:before, 
@@ -458,8 +460,10 @@ div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_desc:hover:befor
 div.dataTables_scrollBody
 {
 
-  border-left: 1px solid #0D2856 !important;
+  border-left: 0px solid #0D2856 !important;
+  /*
   border-bottom: 1px solid #0D2856 !important;
+  */
 
 }
 
@@ -902,7 +906,7 @@ div.dtfc-right-top-blocker, div.dtfc-left-top-blocker
 
   background: transparent !important;
   border-top: 1px solid #000;
-  border-bottom: 3px solid #000 !important;
+  border-bottom: 0 solid #000 !important;
   margin-top: 0;
 
 }
@@ -965,6 +969,52 @@ div.dt-button-info > div {
   border: 3px solid #0B7D8E;
 
 }
+
+
+.dataTables_scrollHead tr th:first-child {
+
+  /*
+  border-radius: 0.8rem 0 0 0;
+  */
+}
+
+table.dataTable thead tr > .dtfc-fixed-left,
+table.dataTable thead tr > .dtfc-fixed-right,
+table.dataTable tfoot tr > .dtfc-fixed-left,
+table.dataTable tfoot tr > .dtfc-fixed-right {
+  background-color: var(--twdh-primary);
+}
+
+div.dtfc-right-top-blocker, div.dtfc-left-top-blocker {
+
+  border: 0;
+
+}
+
+.dataTables_scrollHead table.dataTable.table-twdh {
+  border: 0;
+  border-radius: 1rem 1rem 0 0;
+}
+
+#dtprv {
+
+  border-radius: 0;
+  border-left: 1px solid var(--twdh-primary);
+
+}
+
+.dataTables_scroll {
+  scrollbar-color: var(--twdh-primary) transparent;
+  overflow: hidden;
+}
+
+.dataTables_scroll:hover {
+  /* Show scrollbar on hover */
+  overflow: auto; 
+
+}
+
+
 
 @media (min-width: 0) 
 {

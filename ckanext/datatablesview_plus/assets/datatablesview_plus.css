@@ -993,7 +993,7 @@ div.dtfc-right-top-blocker, div.dtfc-left-top-blocker {
 
 .dataTables_scrollHead table.dataTable.table-twdh {
   border: 0;
-  border-radius: 1rem 1rem 0 0;
+  /* border-radius: 1rem 1rem 0 0; */
 }
 
 #dtprv {
@@ -1004,14 +1004,13 @@ div.dtfc-right-top-blocker, div.dtfc-left-top-blocker {
 }
 
 .dataTables_scroll {
-  scrollbar-color: var(--twdh-primary) transparent;
+  scrollbar-color: var(--twdh-primary) var(--twdh-light);
   overflow: hidden;
 }
 
 .dataTables_scroll:hover {
   /* Show scrollbar on hover */
   overflow: auto; 
-
 }
 
 

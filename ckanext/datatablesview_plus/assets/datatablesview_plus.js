@@ -333,7 +333,10 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         headerCallback: function (thead, data, start, end, display) {
 
-          $(thead).find('th').eq(0).html('');
+          // Set up first column that contains sort order ids
+          $(thead).find('th').eq(0).html('#');
+          $(thead).find('th').eq(0).attr('data-term','Default Order' );
+          $(thead).find('th').eq(0).addClass('dt-asc' );
 
           // replace column header labels with those from the data dictionary if available
           var datadict = JSON.parse($('#dtprv_wrapper table').attr('data-datadictionary'));
@@ -377,15 +380,28 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             }
 
             if( label != '' ) {
-
               $(thead).find('th').eq(i + 1).html(label);
-
             }
+
 
             // Stash the original term as an attribute so that we can use it when exporting data
             $(thead).find('th').eq(i + 1).attr('data-term', datadict[i].id);
 
           });
+
+          datatable.columns().header().each(function (headerElement, index) {
+
+
+            $(headerElement).attr('title','Sort Ascending by ' + $(headerElement).attr('data-term'));
+            $(headerElement).attr('aria-sort','none');
+            $(headerElement).attr('data-bs-toggle','tooltip');
+            $(headerElement).attr('data-bs-placement','right');
+            $(headerElement).attr('data-bs-custom-class','twdh-tooltip');
+            $(headerElement).addClass( 'twdh-tooltip-span' );
+
+
+          });
+
 
           // set column widths based on information in summary statistics
           /* This is breaking the way columns render, turning off until we can figure out the problem
@@ -844,6 +860,50 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       }
 
+      datatable.on( 'order', function() {
+
+        var order = datatable.order(); 
+        // console.log( order[0][1] );
+
+        var th = datatable.column(order[0][0]).header(); 
+        // console.log( th );
+
+        if( order[0][1] == 'asc' ) {
+          var new_title = 'Sort Descending by ' + $(th).attr('data-term');
+          $(th).removeClass('dt-asc');
+          $(th).addClass('dt-desc');
+        } else {
+          var new_title = 'Sort Ascending by ' + $(th).attr('data-term');
+          $(th).removeClass('dt-desc');
+          $(th).addClass('dt-asc');
+        }
+        $(th).attr('title',new_title);
+        $(th).attr('data-bs-original-title',new_title);
+        // $(thead).find('th').eq(i + 1)
+
+        // alert( th.id );
+        const element = document.getElementById(th.id);
+        // console.log( element );
+        const tooltip = bootstrap.Tooltip.getInstance(element);
+        // console.log( tooltip );
+        if( tooltip ) {
+          tooltip._config.title = new_title;
+
+          if (tooltip.tip) {
+            const inner = tooltip.tip.querySelector('.tooltip-inner');
+            if (inner) {
+              inner.textContent = new_title;
+            }
+          }
+
+
+          tooltip.update();
+          // tooltip.setContent({ '.tooltip-inner': 'Sort Descending' });
+          console.log( tooltip );
+        }
+
+      });
+
       datatable.on( 'stateSaveParams.dt', function (e, settings, data) {
         
         update_sharesearch_status();
@@ -982,6 +1042,17 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           return entityMap[s];
         });
       }
+
+      /*
+      function twdhColSort(event){
+        if( event.data.sort !== undefined ) {
+          console.log('no aria-sort');
+        } else {
+          console.log(event.data.sort);
+        }
+
+      }
+      */
     }
 
   }

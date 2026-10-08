@@ -124,7 +124,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         // turn on scroller
         paging: false,
         scrollX: true,
-        scrollY: "60vh",
+        scrollY: "",
         scrollCollapse: true,
 
         search: {
@@ -269,9 +269,9 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
   
           }
 
-          const tableHeight = $("#dtplus_dtprv_wrapper").height();
+          // const tableHeight = $("#dtplus_dtprv_wrapper").height();
           // Post message with height to clean up after a messy load - sometimes the resizeObserver events don't register correctly on initial load
-          setTimeout(() => { window.parent.postMessage({ frameHeight: tableHeight }, '*'); }, 1000);
+          // setTimeout(() => { window.parent.postMessage({ frameHeight: tableHeight }, '*'); }, 1000);
 
           // console.log( 'initComplete' );
 
@@ -632,12 +632,25 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       const resizeObserver = new ResizeObserver((entries) => {
         for (const entry of entries) {
           if (entry.contentBoxSize) {
+            console.log( 'hello' );
             const contentBoxSize = entry.contentBoxSize[0];
-            window.parent.postMessage({ frameHeight: contentBoxSize.blockSize }, '*');
+            console.log( entry.contentBoxSize[0] );
+//            window.parent.postMessage({ frameHeight: contentBoxSize.blockSize }, '*');
+
+              console.log( $("html").height() );
+              console.log( $(".dataTables_scrollHead").height() );
+              console.log( $("html").height() - $(".dataTables_scrollHead").height() );
+
+              $(".dataTables_scrollBody").height(
+                $("html").height() - $(".dataTables_scrollHead").height()
+              );
+              
           }
         }
       });
-      resizeObserver.observe(document.querySelector("#dtplus_dtprv_wrapper"));
+      // resizeObserver.observe(document.querySelector("#dtplus_dtprv_wrapper"));
+      resizeObserver.observe(document.querySelector("html"));
+  
 
       var selectTimeout;
 
@@ -899,7 +912,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           tooltip.update();
           // tooltip.setContent({ '.tooltip-inner': 'Sort Descending' });
-          console.log( tooltip );
+          // console.log( tooltip );
         }
 
       });

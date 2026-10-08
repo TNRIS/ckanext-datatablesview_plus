@@ -457,16 +457,11 @@ div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_desc:hover:befor
   opacity: 0.126;
 }
 
-
 div.dataTables_scrollBody
 {
-
-  border-left: 0px solid #0D2856 !important;
+  border-left: 1px solid #0D2856 !important;
   border-right: 1px solid #0D2856 !important;
-  border-bottom: 1px solid #0D2856 !important;
-
 }
-
 
 #dtprv_wrapper .table-bordered, 
 div.dtfh-floatingparent  .table-bordered
@@ -941,7 +936,6 @@ div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria input.dtsb-input
 
 #sharesearch_status {
 
-  margin-top: 1rem;
   font-weight: bold;
 
 }
@@ -999,7 +993,7 @@ div.dtfc-right-top-blocker, div.dtfc-left-top-blocker {
 #dtprv {
 
   border-radius: 0;
-  border-left: 1px solid var(--twdh-primary);
+  /* border-left: 1px solid var(--twdh-primary); */
 
 }
 

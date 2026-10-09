@@ -638,11 +638,13 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 //            window.parent.postMessage({ frameHeight: contentBoxSize.blockSize }, '*');
 
               console.log( $("html").height() );
+              console.log( $(".dt-header-wrapper").height() );
               console.log( $(".dataTables_scrollHead").height() );
-              console.log( $("html").height() - $(".dataTables_scrollHead").height() );
+              console.log( $("html").height() - $(".dataTables_scrollHead").height() - $(".dt-header-wrapper").height());
 
               $(".dataTables_scrollBody").height(
-                $("html").height() - $(".dataTables_scrollHead").height()
+                $("html").height() - $(".dataTables_scrollHead").height() - $(".dt-header-wrapper").height()
+                // $("body").height()
               );
               
           }

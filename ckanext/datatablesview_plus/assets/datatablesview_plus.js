@@ -124,7 +124,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         // turn on scroller
         paging: false,
         scrollX: true,
-        scrollY: "60vh",
+        scrollY: "",
         scrollCollapse: true,
 
         search: {
@@ -269,6 +269,9 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
   
           }
 
+          // const tableHeight = $("#dtplus_dtprv_wrapper").height();
+          // Post message with height to clean up after a messy load - sometimes the resizeObserver events don't register correctly on initial load
+          // setTimeout(() => { window.parent.postMessage({ frameHeight: tableHeight }, '*'); }, 1000);
 
           // console.log( 'initComplete' );
 
@@ -330,7 +333,10 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         headerCallback: function (thead, data, start, end, display) {
 
-          $(thead).find('th').eq(0).html('');
+          // Set up first column that contains sort order ids
+          $(thead).find('th').eq(0).html('#');
+          $(thead).find('th').eq(0).attr('data-term','Default Order' );
+          $(thead).find('th').eq(0).addClass('dt-asc' );
 
           // replace column header labels with those from the data dictionary if available
           var datadict = JSON.parse($('#dtprv_wrapper table').attr('data-datadictionary'));
@@ -374,15 +380,28 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             }
 
             if( label != '' ) {
-
               $(thead).find('th').eq(i + 1).html(label);
-
             }
+
 
             // Stash the original term as an attribute so that we can use it when exporting data
             $(thead).find('th').eq(i + 1).attr('data-term', datadict[i].id);
 
           });
+
+          datatable.columns().header().each(function (headerElement, index) {
+
+
+            $(headerElement).attr('title','Sort Ascending by ' + $(headerElement).attr('data-term'));
+            $(headerElement).attr('aria-sort','none');
+            $(headerElement).attr('data-bs-toggle','tooltip');
+            $(headerElement).attr('data-bs-placement','right');
+            $(headerElement).attr('data-bs-custom-class','twdh-tooltip');
+            $(headerElement).addClass( 'twdh-tooltip-span' );
+
+
+          });
+
 
           // set column widths based on information in summary statistics
           /* This is breaking the way columns render, turning off until we can figure out the problem
@@ -500,8 +519,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         dtprv_status = $(
           '<div id="dtprv_status">' +
-          '<p class="warning"><span title="" class="error-icon"></span> ' +
-          'Only the first ' + dtprv_preview_rows.toLocaleString("en-US") + ' rows of this dataset are shown in the data viewer due to storage restrictions. ' +
+          '<p class="warning">' +
+          'Only the first ' + dtprv_preview_rows.toLocaleString("en-US") + ' rows of this dataset are shown in the data viewer due to storage restrictions.<br/>' +
           'Download the full dataset to access all ' + dtprv_total_record_count.toLocaleString("en-US") + ' rows.' +
           '</p>' +
           '</div>'
@@ -613,12 +632,27 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       const resizeObserver = new ResizeObserver((entries) => {
         for (const entry of entries) {
           if (entry.contentBoxSize) {
+            console.log( 'hello' );
             const contentBoxSize = entry.contentBoxSize[0];
-            window.parent.postMessage({ frameHeight: contentBoxSize.blockSize }, '*');
+            console.log( entry.contentBoxSize[0] );
+//            window.parent.postMessage({ frameHeight: contentBoxSize.blockSize }, '*');
+
+              console.log( $("html").height() );
+              console.log( $(".dt-header-wrapper").height() );
+              console.log( $(".dataTables_scrollHead").height() );
+              console.log( $("html").height() - $(".dataTables_scrollHead").height() - $(".dt-header-wrapper").height());
+
+              $(".dataTables_scrollBody").height(
+                $("html").height() - $(".dataTables_scrollHead").height() - $(".dt-header-wrapper").height()
+                // $("body").height()
+              );
+              
           }
         }
       });
-      resizeObserver.observe(document.querySelector("#dtplus_dtprv_wrapper"));
+      // resizeObserver.observe(document.querySelector("#dtplus_dtprv_wrapper"));
+      resizeObserver.observe(document.querySelector("html"));
+  
 
       var selectTimeout;
 
@@ -841,6 +875,50 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       }
 
+      datatable.on( 'order', function() {
+
+        var order = datatable.order(); 
+        // console.log( order[0][1] );
+
+        var th = datatable.column(order[0][0]).header(); 
+        // console.log( th );
+
+        if( order[0][1] == 'asc' ) {
+          var new_title = 'Sort Descending by ' + $(th).attr('data-term');
+          $(th).removeClass('dt-asc');
+          $(th).addClass('dt-desc');
+        } else {
+          var new_title = 'Sort Ascending by ' + $(th).attr('data-term');
+          $(th).removeClass('dt-desc');
+          $(th).addClass('dt-asc');
+        }
+        $(th).attr('title',new_title);
+        $(th).attr('data-bs-original-title',new_title);
+        // $(thead).find('th').eq(i + 1)
+
+        // alert( th.id );
+        const element = document.getElementById(th.id);
+        // console.log( element );
+        const tooltip = bootstrap.Tooltip.getInstance(element);
+        // console.log( tooltip );
+        if( tooltip ) {
+          tooltip._config.title = new_title;
+
+          if (tooltip.tip) {
+            const inner = tooltip.tip.querySelector('.tooltip-inner');
+            if (inner) {
+              inner.textContent = new_title;
+            }
+          }
+
+
+          tooltip.update();
+          // tooltip.setContent({ '.tooltip-inner': 'Sort Descending' });
+          // console.log( tooltip );
+        }
+
+      });
+
       datatable.on( 'stateSaveParams.dt', function (e, settings, data) {
         
         update_sharesearch_status();
@@ -979,6 +1057,17 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           return entityMap[s];
         });
       }
+
+      /*
+      function twdhColSort(event){
+        if( event.data.sort !== undefined ) {
+          console.log('no aria-sort');
+        } else {
+          console.log(event.data.sort);
+        }
+
+      }
+      */
     }
 
   }

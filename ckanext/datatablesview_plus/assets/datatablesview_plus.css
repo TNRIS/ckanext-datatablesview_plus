@@ -74,11 +74,6 @@ table.dataTable
 }
 
 
-#dtprv_wrapper .dataTables_info
-{
-
-}
-
 #dtprv_wrapper  div.dataTables_paginate {
 
   float: right;
@@ -309,6 +304,7 @@ button:focus-visible,
 }
 */
 
+/*
 .dataTables_scroll
 {
 
@@ -316,6 +312,7 @@ button:focus-visible,
   
 
 }
+*/
 
 /* Don't show sort arrows unless the column is the current sort column or the th is in a hver state */
 #dtprv_wrapper table.dataTable thead > tr > th.sorting:before, 
@@ -355,6 +352,7 @@ div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_desc_disabled:af
   opacity: 0;
   line-height: 1rem;
   font-size: .9em;
+  right: 10px;
 }
 
 /* The default unicode arrows don't match in height so we are using these instead */
@@ -402,7 +400,7 @@ div.dtfh-floatingparent table.table-bordered thead > tr > th.sorting_desc_disabl
   content: "▼";
 }
 
-/* When a solumn is the sort column, show the dark version of the appropriate arrow */
+/* When a column is the sort column, show the dark version of the appropriate arrow */
 #dtprv_wrapper table.dataTable thead > tr > th.sorting_asc:before, 
 #dtprv_wrapper table.dataTable thead > tr > th.sorting_desc:after,
 #dtprv_wrapper table.dataTable thead > tr > td.sorting_asc:before,
@@ -414,6 +412,18 @@ div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_desc:after
 {
   opacity: 0.6;
 }
+
+/* WIP Need to set asc/desc sort indicators to show up correctly when tabbed onto */
+/*
+#dtprv_wrapper table.dataTable thead > tr > th.sorting_desc:focus-visible:after, 
+#dtprv_wrapper table.dataTable thead > tr > td.sorting_asc:focus-visible:before {
+
+  opacity: 1;
+  outline: 2px solid var( twdh-secondary );
+
+}
+*/
+
 
 /* When hovering over a th with no sort set, show up arrow as dark and down arrow as light */
 #dtprv_wrapper table.dataTable thead > tr > th:hover:before, 
@@ -447,15 +457,11 @@ div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_desc:hover:befor
   opacity: 0.126;
 }
 
-
 div.dataTables_scrollBody
 {
-
   border-left: 1px solid #0D2856 !important;
-  border-bottom: 1px solid #0D2856 !important;
-
+  border-right: 1px solid #0D2856 !important;
 }
-
 
 #dtprv_wrapper .table-bordered, 
 div.dtfh-floatingparent  .table-bordered
@@ -895,7 +901,7 @@ div.dtfc-right-top-blocker, div.dtfc-left-top-blocker
 
   background: transparent !important;
   border-top: 1px solid #000;
-  border-bottom: 3px solid #000 !important;
+  border-bottom: 0 solid #000 !important;
   margin-top: 0;
 
 }
@@ -930,7 +936,6 @@ div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria input.dtsb-input
 
 #sharesearch_status {
 
-  margin-top: 1rem;
   font-weight: bold;
 
 }
@@ -957,6 +962,49 @@ div.dt-button-info > div {
   font-weight: bold;
   border: 3px solid #0B7D8E;
 
+}
+
+
+.dataTables_scrollHead tr th:first-child {
+
+  /*
+  border-radius: 0.8rem 0 0 0;
+  */
+}
+
+table.dataTable thead tr > .dtfc-fixed-left,
+table.dataTable thead tr > .dtfc-fixed-right,
+table.dataTable tfoot tr > .dtfc-fixed-left,
+table.dataTable tfoot tr > .dtfc-fixed-right {
+  background-color: var(--twdh-primary);
+}
+
+div.dtfc-right-top-blocker, div.dtfc-left-top-blocker {
+
+  border: 0;
+
+}
+
+.dataTables_scrollHead table.dataTable.table-twdh {
+  border: 0;
+  border-radius: 0;
+}
+
+#dtprv {
+
+  border-radius: 0;
+  /* border-left: 1px solid var(--twdh-primary); */
+
+}
+
+.dataTables_scroll {
+  scrollbar-color: var(--twdh-primary) var(--twdh-light);
+  overflow: hidden;
+}
+
+.dataTables_scroll:hover {
+  /* Show scrollbar on hover */
+  overflow: auto; 
 }
 
 @media (min-width: 0) 

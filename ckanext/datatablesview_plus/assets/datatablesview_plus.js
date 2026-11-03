@@ -1,3 +1,137 @@
+console.log( 'registering datatable modules');
+
+this.ckan.module('data-dictionary-bigtab', function (jQuery) {
+
+  return {
+    initialize: function () {
+      console.log('Data Dictionary BigTab DataTable Init');
+      var callerId = this.el.attr('id');
+      console.log( callerId );
+      var datatable = jQuery('#' + callerId + ' table').DataTable({ 
+        paging: false,
+        scrollX: true,
+        scrollY: "",
+        scrollCollapse: true,
+        searching: false,
+        info: false,
+        autoWidth: false,
+        columnDefs: [
+
+          // make sure id column on far left stays narrow
+          {
+            className: 'dt-desc',
+            targets: 0
+          },
+        ],
+
+        headerCallback: function (thead, data, start, end, display) {
+
+          var api = this.api();
+
+          api.columns().header().each(function (headerElement, index) {
+
+            if( $(headerElement).hasClass('dt-desc') ) {
+              $(headerElement).attr('title','Sort Descending by ' + $(headerElement).text());
+            } else {
+              $(headerElement).attr('title','Sort Ascending by ' + $(headerElement).text());
+            }
+
+            $(headerElement).attr('aria-sort','none');
+            $(headerElement).attr('data-bs-toggle','tooltip');
+            $(headerElement).attr('data-bs-placement','right');
+            $(headerElement).attr('data-bs-custom-class','twdh-tooltip');
+            $(headerElement).addClass( 'twdh-tooltip-span' );
+
+          });
+
+        }
+
+      });
+
+      jQuery('#' + callerId).addClass('js-initialized');
+
+      datatable.on( 'order', function() {
+
+        var order = datatable.order(); 
+        console.log( order[0][1] );
+
+        var th = datatable.column(order[0][0]).header(); 
+
+        if( order[0][1] == 'asc' ) {
+          var new_title = 'Sort Descending by ' + $(th).text();
+          $(th).removeClass('dt-asc');
+          $(th).addClass('dt-desc');
+        } else {
+          var new_title = 'Sort Ascending by ' + $(th).text();
+          $(th).removeClass('dt-desc');
+          $(th).addClass('dt-asc');
+        }
+        $(th).attr('title',new_title);
+        $(th).attr('data-bs-original-title',new_title);
+
+        // const element = document.getElementById(th.id);
+        const element = th;
+        console.log( element );
+        const tooltip = bootstrap.Tooltip.getInstance(element);
+        console.log( tooltip );
+        if( tooltip ) {
+          tooltip._config.title = new_title;
+
+          if (tooltip.tip) {
+            const inner = tooltip.tip.querySelector('.tooltip-inner');
+            if (inner) {
+              inner.textContent = new_title;
+            }
+          }
+          tooltip.update();
+        }
+
+      });
+
+    }
+
+  }
+
+});
+
+$('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+  console.log( 'Big Tab Switch' );
+
+  // Automatically find and adjust any DataTable inside the newly visible tab
+  $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+
+
+});
+
+this.ckan.module('data-dictionary-modal', function (jQuery) {
+
+  return {
+    initialize: function () {
+      console.log('Data Dictionary Modal DataTable Init');
+      var datadict = jQuery('#data-dictionary-modal').DataTable({ 
+        paging: false,
+        scrollX: true,
+        scrollY: "",
+        scrollCollapse: true,
+        searching: false,
+        info: false
+          
+      });
+
+    }
+
+  }
+
+});
+
+$('button[data-bs-toggle="modal"]').on('click', function (e) {
+  console.log( 'Modal Open' );
+    // Automatically find and adjust any DataTable inside the newly visible modal
+    $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+
+});
+
+
 this.ckan.module('datatablesview_plus', function (jQuery) {
 
   // pager variables
@@ -13,11 +147,14 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
   return {
     initialize: function () {
 
+      var callerId = this.el.attr('id'); 
+
+      console.log( callerId );
       $.fn.dataTable.ext.errMode = 'throw';
       
       // Initialize datatable. To set options on DataTable, use data-attribute 
       // tags in templates/datatables/datatables_view.html
-      var datatable = jQuery('#dtprv').DataTable({
+      var datatable = jQuery('#'+callerId).DataTable({
 
         // turn on search highlighting
         mark: true,
@@ -32,10 +169,12 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         colReorder: false,
 
         // turn on searchBuilder
+        /*
         searchBuilder: {
           depthLimit: 2,
           liveSearch: true
         },
+        */
 
         // Set language strings
         language: {
@@ -127,6 +266,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         scrollY: "",
         scrollCollapse: true,
 
+        /*
         search: {
 
           "smart": true,
@@ -134,6 +274,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           "return": false
 
         },
+        */
 
         columnDefs: [
 
@@ -167,6 +308,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         buttons: [
 
+          /*
           {
             extend: 'copy',
             text: '<i class="fa fa-copy" aria-hidden="true"></i> COPY SELECTED',
@@ -245,14 +387,15 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               
             }
           },
+          */
 
         ],
 
         initComplete: function (settings, json) {
 
-          setup_select_buttons();
-          setup_searchbuilder_buttons();
-          add_advanced_search_button();
+          // setup_select_buttons();
+          // setup_searchbuilder_buttons();
+          // add_advanced_search_button();
 
           // if this is a shared search that is in 'advanced' mode, update the display
           if( is_advancedsearch ) {
@@ -269,11 +412,11 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
   
           }
 
-          // const tableHeight = $("#dtplus_dtprv_wrapper").height();
-          // Post message with height to clean up after a messy load - sometimes the resizeObserver events don't register correctly on initial load
-          // setTimeout(() => { window.parent.postMessage({ frameHeight: tableHeight }, '*'); }, 1000);
-
-          // console.log( 'initComplete' );
+          // show table
+          let tableId = this.api().table().node().id;
+          jQuery('#dtprv_wrapper').show(); 
+          // adjust columns
+          $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
 
         },
 
@@ -334,12 +477,13 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         headerCallback: function (thead, data, start, end, display) {
 
           // Set up first column that contains sort order ids
-          $(thead).find('th').eq(0).html('#');
+          $(thead).find('th').eq(0).html('');
           $(thead).find('th').eq(0).attr('data-term','Default Order' );
           $(thead).find('th').eq(0).addClass('dt-asc' );
 
           // replace column header labels with those from the data dictionary if available
-          var datadict = JSON.parse($('#dtprv_wrapper table').attr('data-datadictionary'));
+          // console.log( $('#dtplus_dtprv_wrapper .dataTables_scrollHeadInner table').attr('data-datadictionary') );
+          var datadict = JSON.parse($('#dtplus_dtprv_wrapper .dataTables_scrollHeadInner table').attr('data-datadictionary'));
 
           var label = '';
           var column = '';
@@ -632,20 +776,32 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
       const resizeObserver = new ResizeObserver((entries) => {
         for (const entry of entries) {
           if (entry.contentBoxSize) {
-            console.log( 'hello' );
             const contentBoxSize = entry.contentBoxSize[0];
-            console.log( entry.contentBoxSize[0] );
+            // console.log( entry.contentBoxSize[0] );
 //            window.parent.postMessage({ frameHeight: contentBoxSize.blockSize }, '*');
 
-              console.log( $("html").height() );
-              console.log( $(".dt-header-wrapper").height() );
-              console.log( $(".dataTables_scrollHead").height() );
-              console.log( $("html").height() - $(".dataTables_scrollHead").height() - $(".dt-header-wrapper").height());
+              /*
+              console.log( 'html='+$("html").height() );
+              console.log( 'body='+$("body").height() );
+              console.log( 'document='+$(document).height() );
+              console.log( ".dt-header-wrapper="+$(".dt-header-wrapper").height() );
+              console.log( ".dataTables_scrollHead="+$(".dataTables_scrollHead").height() );
+              console.log( ".dataTables_scrollBody.height="+$(".dataTables_scrollBody").height() );
+              console.log( $(document).height() - $(".dataTables_scrollHead").height() - $(".dt-header-wrapper").height());
 
+
+              var hasHorizontalScrollbar = $('.dataTables_scrollBody').width() < $('#dtprv')[0].scrollWidth;
+              console.log($('.dataTables_scrollBody').width());
+              console.log($('.dataTables_scrollBody')[0].clientWidth);
+              console.log(hasHorizontalScrollbar);
+              */
+              /*
               $(".dataTables_scrollBody").height(
-                $("html").height() - $(".dataTables_scrollHead").height() - $(".dt-header-wrapper").height()
+                $(document).height() - $(".dataTables_scrollHead").height() - $(".dt-header-wrapper").height()
                 // $("body").height()
               );
+              */
+              $(".dt-wrapper .dataTables_scrollBody").height('60vh');
               
           }
         }
@@ -910,11 +1066,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               inner.textContent = new_title;
             }
           }
-
-
           tooltip.update();
-          // tooltip.setContent({ '.tooltip-inner': 'Sort Descending' });
-          // console.log( tooltip );
         }
 
       });
@@ -1068,8 +1220,22 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       }
       */
+
+
+   
     }
 
   }
   
+});
+
+$(document).on('click', 'a.resource-view-link', function (event) {
+
+  const targetPaneId = event.target.getAttribute('data-id');
+  console.log( targetPaneId );
+  $( '#view-' + targetPaneId + ' .dt-wrapper' ).show();
+
+  $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+
+
 });

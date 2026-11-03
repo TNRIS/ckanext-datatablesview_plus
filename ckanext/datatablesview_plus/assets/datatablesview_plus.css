@@ -457,11 +457,35 @@ div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_desc:hover:befor
   opacity: 0.126;
 }
 
-div.dataTables_scrollBody
-{
-  border-left: 1px solid #0D2856 !important;
-  border-right: 1px solid #0D2856 !important;
+.dataTables_scroll {
+
+  /* background: #0D2856; */
+  border: 1px solid #0D2856;
+  border-radius: 0.8rem;
+  overflow: clip;
+
 }
+
+
+#dtprv,
+#data-dictionary,
+.table-twdh.dataTable {
+
+  background: #fff;
+}
+
+#data-dictionary-bigtabs,
+#data-dictionary-modal,
+#data-dictionary-review {
+
+  width: 100% !important;
+
+}
+#data-dictionary_wrapper .dataTables_scrollBody {
+  min-height: 1vh;
+  max-height: 60vh;
+}
+
 
 #dtprv_wrapper .table-bordered, 
 div.dtfh-floatingparent  .table-bordered
@@ -477,6 +501,14 @@ div.dtfh-floatingparent  .table-bordered
   border-top-width: 1px !important;
   clear: both;
 
+}
+
+div.dataTables_scrollHeadInner {
+  border-bottom: 2px solid #0D2856;
+}
+
+div.dataTables_scrollHeadInner .table-twdh tr th {
+  border-bottom: 0;
 }
 
 
@@ -680,6 +712,12 @@ box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.1);
 
 }
 
+.advanced-search button.btn-secondary
+{
+
+  text-align: right;
+
+}
 
 /* custom height so that advanced search button matches free text saerch input */
 .advanced-search button.btn-secondary
@@ -964,7 +1002,6 @@ div.dt-button-info > div {
 
 }
 
-
 .dataTables_scrollHead tr th:first-child {
 
   /*
@@ -972,12 +1009,14 @@ div.dt-button-info > div {
   */
 }
 
+/*
 table.dataTable thead tr > .dtfc-fixed-left,
 table.dataTable thead tr > .dtfc-fixed-right,
 table.dataTable tfoot tr > .dtfc-fixed-left,
 table.dataTable tfoot tr > .dtfc-fixed-right {
   background-color: var(--twdh-primary);
 }
+*/
 
 div.dtfc-right-top-blocker, div.dtfc-left-top-blocker {
 
@@ -1000,6 +1039,9 @@ div.dtfc-right-top-blocker, div.dtfc-left-top-blocker {
 .dataTables_scroll {
   scrollbar-color: var(--twdh-primary) var(--twdh-light);
   overflow: hidden;
+  /*
+  height: 60vh;
+  */
 }
 
 .dataTables_scroll:hover {

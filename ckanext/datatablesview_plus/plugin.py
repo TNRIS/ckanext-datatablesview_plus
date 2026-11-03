@@ -140,7 +140,7 @@ class DatatablesviewPlusPlugin(p.SingletonPlugin):
             "name": "datatablesview_plus",
             "title": "Table",
             "filterable": True,
-            "iframed": True,
+            "iframed": False,
             "icon": "table",
             "requires_datastore": True,
             "default_title": p.toolkit._("Table"),

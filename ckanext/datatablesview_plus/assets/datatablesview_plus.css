@@ -481,7 +481,7 @@ div.dtfh-floatingparent table.dataTable thead > tr > th.sorting_desc:hover:befor
   width: 100% !important;
 
 }
-#data-dictionary_wrapper .dataTables_scrollBody {
+#data-dictionary-bigtab-wrapper .dataTables_scrollBody {
   min-height: 1vh;
   max-height: 60vh;
 }
@@ -1039,14 +1039,18 @@ div.dtfc-right-top-blocker, div.dtfc-left-top-blocker {
 .dataTables_scroll {
   scrollbar-color: var(--twdh-primary) var(--twdh-light);
   overflow: hidden;
-  /*
-  height: 60vh;
-  */
 }
 
 .dataTables_scroll:hover {
   /* Show scrollbar on hover */
   overflow: auto; 
+}
+
+.dt-spinner {
+
+  text-align: center;
+  margin: 2rem;
+  color:#0B7D8E;
 }
 
 @media (min-width: 0) 
@@ -1116,7 +1120,6 @@ div.dtfc-right-top-blocker, div.dtfc-left-top-blocker {
 
   }
 
-
 }
 
 @media (min-width: 768px) 
@@ -1133,7 +1136,3 @@ div.dtfc-right-top-blocker, div.dtfc-left-top-blocker {
 {
 
 }
-
-
-
-

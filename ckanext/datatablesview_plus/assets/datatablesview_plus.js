@@ -6,7 +6,6 @@ this.ckan.module('data-dictionary-bigtab', function (jQuery) {
     initialize: function () {
       console.log('Data Dictionary BigTab DataTable Init');
       var callerId = this.el.attr('id');
-      console.log( callerId );
       var datatable = jQuery('#' + callerId + ' table').DataTable({ 
         paging: false,
         scrollX: true,
@@ -16,8 +15,6 @@ this.ckan.module('data-dictionary-bigtab', function (jQuery) {
         info: false,
         autoWidth: false,
         columnDefs: [
-
-          // make sure id column on far left stays narrow
           {
             className: 'dt-desc',
             targets: 0
@@ -108,6 +105,7 @@ this.ckan.module('data-dictionary-modal', function (jQuery) {
   return {
     initialize: function () {
       console.log('Data Dictionary Modal DataTable Init');
+      /*
       var datadict = jQuery('#data-dictionary-modal').DataTable({ 
         paging: false,
         scrollX: true,
@@ -117,6 +115,7 @@ this.ckan.module('data-dictionary-modal', function (jQuery) {
         info: false
           
       });
+      */
 
     }
 
@@ -149,6 +148,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
       var callerId = this.el.attr('id'); 
 
+      console.log('Data Resource BigTab DataTable Init');
       console.log( callerId );
       $.fn.dataTable.ext.errMode = 'throw';
       
@@ -178,6 +178,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
         // Set language strings
         language: {
+
           emptyTable: 'No matching rows found',
           zeroRecords: 'No matching records found',
           lengthMenu: '_MENU_ rows per page',
@@ -280,6 +281,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           // make sure id column on far left stays narrow
           {
+            title: '#',
             width: '20px',
             targets: 0
           },
@@ -287,6 +289,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           // make sure all text is rendered as text in case tables have HTML in them
           {
             targets: '_all',
+
             //  render: DataTable.render.text();
             render: function(data, type, row){
               const regex1 = /T00:00:00$/;
@@ -413,7 +416,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           }
 
           // show table
-          let tableId = this.api().table().node().id;
+          // let tableId = this.api().table().node().id;
+          jQuery('#dtprv_wrapper').prev('.dt-spinner').hide(); 
           jQuery('#dtprv_wrapper').show(); 
           // adjust columns
           $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
@@ -462,11 +466,14 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 
           } else {
 
-            if( dtprv_total_record_count ) {
+
+            // if( dtprv_is_preview ) {
+            if (dtprv_is_preview == 'True') {
               return "Previewing " + start.toLocaleString("en-US") + "-" + end.toLocaleString("en-US") + " of " + dtprv_total_record_count.toLocaleString("en-US") + "  row" + (dtprv_total_record_count != 1 ? 's' : '');
             } else {
 
-              return start.toLocaleString("en-US") + "-" + end.toLocaleString("en-US") + " of " + total.toLocaleString("en-US") + "  row" + (total != 1 ? 's' : '');
+              // return start.toLocaleString("en-US") + "-" + end.toLocaleString("en-US") + " of " + total.toLocaleString("en-US") + "  row" + (total != 1 ? 's' : '');
+              return total.toLocaleString("en-US") + "  row" + (total != 1 ? 's' : '');
 
             }
 
@@ -477,7 +484,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         headerCallback: function (thead, data, start, end, display) {
 
           // Set up first column that contains sort order ids
-          $(thead).find('th').eq(0).html('');
+          $(thead).find('th').eq(0).html('#');
           $(thead).find('th').eq(0).attr('data-term','Default Order' );
           $(thead).find('th').eq(0).addClass('dt-asc' );
 
@@ -504,6 +511,10 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
               label = escapeHtml( datadict[i].info.label );
               column = escapeHtml( datadict[i].id );
 
+              // If column is unnamed and it has been given a label, use the label as the column
+              if( column == '' || column == 'twdh_' ) {
+                column = label;
+              }
               if (datadict[i].id != datadict[i].info.label) {
                 label = '<div class="dtlabel">' + column + '</div>' + 
                   '<div class="small dim">' + label + '</div>';
@@ -524,7 +535,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
             }
 
             if( label != '' ) {
-              $(thead).find('th').eq(i + 1).html(label);
+              // Remove twdh_ prefix that may be prepended by DP+ on 'unsafe' column headers
+              $(thead).find('th').eq(i + 1).html(label.replace("twdh_", ""));
             }
 
 
@@ -765,9 +777,9 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         }
 
       }
-    
+
       /* Replace built in rotating ellipsis animation with TWDH preferred FontAwesome circle-o-notch animation */
-      $('div.dataTables_processing').html('<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>');
+      $('div.dataTables_processing').html('<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>');
 
       /* 
         Observe iframe body height and post message to parent on resize
@@ -1137,6 +1149,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
           callback:         the function to call when elementSelector is found
         */
 
+        /*
         var onMutationsObserved = function (mutations) {
           mutations.forEach(function (mutation) {
             if (mutation.addedNodes.length) {
@@ -1153,7 +1166,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
         var MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
         var observer = new MutationObserver(onMutationsObserved);
         observer.observe(target, config);
-
+        */
       }
 
       function _getShareSearchUUID( uuid ) {
@@ -1232,10 +1245,8 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
 $(document).on('click', 'a.resource-view-link', function (event) {
 
   const targetPaneId = event.target.getAttribute('data-id');
-  console.log( targetPaneId );
+  // console.log( targetPaneId );
   $( '#view-' + targetPaneId + ' .dt-wrapper' ).show();
-
   $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
-
 
 });

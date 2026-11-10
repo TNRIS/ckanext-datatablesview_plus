@@ -813,7 +813,7 @@ this.ckan.module('datatablesview_plus', function (jQuery) {
                 // $("body").height()
               );
               */
-              $(".dt-wrapper .dataTables_scrollBody").height('60vh');
+              $(".dt-wrapper .dataTables_scrollBody").css('max-height', '60vh');
               
           }
         }
